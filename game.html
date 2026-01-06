@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Aero Dream OS - Ultimate</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #a4cbdc 0%, #d6e4ed 50%, #b8d1e0 100%);
+            font-family: 'Segoe UI', 'Tahoma', sans-serif;
+            user-select: none;
+            height: 100vh;
+            transition: background 0.5s ease;
+        }
+
+        /* Эффект вспышки при рекорде */
+        .flash { background: white !important; }
+
+        .aero-window {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            outline: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15), inset 0 0 15px rgba(255,255,255,0.5);
+            width: 380px;
+            pointer-events: auto;
+            animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        .title-bar {
+            padding: 8px 12px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 100%);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            font-size: 12px;
+            color: #1a4a7a;
+            display: flex;
+            justify-content: space-between;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .content { padding: 30px; text-align: center; }
+        
+        h1 { font-weight: 300; margin-top: 0; color: #003366; letter-spacing: 1px; }
+
+        select {
+            width: 100%;
+            padding: 8px;
+            margin: 15px 0;
+            border: 1px solid #adc5d4;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.85);
+            outline: none;
+        }
+
+        .btn-stack { display: flex; flex-direction: column; gap: 10px; }
+
+        .aero-btn {
+            background: linear-gradient(180deg, #fdfdfd 0%, #eeeeee 48%, #e0e0e0 50%, #dcdcdc 100%);
+            border: 1px solid #8e9cad;
+            padding: 8px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #1d344f;
+            box-shadow: inset 0 1px 0 white;
+        }
+        .aero-btn:hover { border-color: #3c7fb1; background: linear-gradient(180deg, #f5faff 0%, #e1f0ff 100%); }
+
+        #ui-layer {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100; pointer-events: none;
+        }
+
+        #hud {
+            position: absolute; top: 20px; left: 20px;
+            color: #1a4a7a; font-size: 18px; font-weight: bold;
+            z-index: 50; display: none;
+            background: rgba(255,255,255,0.4);
+            padding: 6px 20px;
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.5);
+            backdrop-filter: blur(8px);
+        }
+
+        canvas { position: absolute; top: 0; left: 0; }
+        #game-canvas { cursor: none; z-index: 10; }
+        #bg-canvas { z-index: 1; }
+    </style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <div class="aero-window" id="menu">
+        <div class="title-bar"><span>Aero Shell v1.0</span><span>✕</span></div>
+        <div class="content">
+            <h1>Aero Dream</h1>
+            <label style="font-size: 12px; color: #555;">Выберите звуковой фон:</label>
+            <select id="music-list"></select>
+            
+            <div class="btn-stack">
+                <button class="aero-btn" onclick="startGame()">Запустить сеанс</button>
+                <button class="aero-btn" onclick="location.reload()"><A HREF=ubble.html>Вернуться к истокам</button></A>
+            </div>
+        </div>
+    </div>
+
+    <div class="aero-window" id="game-over" style="display:none">
+        <div class="title-bar"><span>Системное прерывание</span><span>✕</span></div>
+        <div class="content">
+            <h2 style="color:#1a4a7a; font-weight: normal;">Сеанс завершен</h2>
+            <p>Итоговый результат: <span id="final-score" style="font-size: 20px; font-weight:bold">0</span></p>
+            <div class="btn-stack">
+                <button class="aero-btn" onclick="startGame()">Повторить</button>
+                <button class="aero-btn" onclick="backToMenu()">В меню</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="hud">Score: <span id="score-val">0</span></div>
+<canvas id="bg-canvas"></canvas>
+<canvas id="game-canvas"></canvas>
+<audio id="player-audio" loop></audio>
+
+<script>
+    const playlist = [
+        { name: "Без звука", src: "" },
+        { name: "chlopczy - all the bugs in my garden", src: "gamebg.mp3" },
+    ];
+
+    const musicList = document.getElementById('music-list');
+    playlist.forEach((t, i) => {
+        let opt = document.createElement('option');
+        opt.value = i; opt.innerText = t.name;
+        musicList.appendChild(opt);
+    });
+
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    const bgCanvas = document.getElementById('bg-canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    const audio = document.getElementById('player-audio');
+
+    let w, h, score = 0, active = false, difficulty = 1;
+    let orbs = [], bubbles = [];
+
+    function resize() {
+        w = window.innerWidth; h = window.innerHeight;
+        canvas.width = w; canvas.height = h;
+        bgCanvas.width = w; bgCanvas.height = h;
+    }
+    window.onresize = resize;
+    resize();
+
+    let mouse = { x: w/2, y: h/2 };
+    window.onmousemove = e => { mouse.x = e.clientX; mouse.y = e.clientY; };
+
+    function triggerFlash() {
+        document.body.classList.add('flash');
+        setTimeout(() => document.body.classList.remove('flash'), 150);
+    }
+
+    function startGame() {
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('game-over').style.display = 'none';
+        document.getElementById('hud').style.display = 'block';
+        
+        const track = playlist[musicList.value];
+        if(track.src) { audio.src = track.src; audio.play().catch(()=>{}); }
+
+        score = 0; difficulty = 1;
+        orbs = [];
+        document.getElementById('score-val').innerText = '0';
+        active = true;
+        loop();
+    }
+
+    function backToMenu() {
+        active = false;
+        audio.pause();
+        document.getElementById('game-over').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
+        document.getElementById('hud').style.display = 'none';
+    }
+
+    class Orb {
+        constructor(bad) {
+            this.bad = bad;
+            this.r = bad ? 16 : 12;
+            this.x = Math.random() * w;
+            this.y = Math.random() < 0.5 ? -30 : h + 30;
+            this.vx = (Math.random() - 0.5) * 1.8;
+            this.vy = (this.y < 0 ? 1 : -1) * (Math.random() * 1.5 + 1) * difficulty;
+        }
+        draw() {
+            ctx.beginPath();
+            let g = ctx.createRadialGradient(this.x-this.r/3, this.y-this.r/3, 2, this.x, this.y, this.r);
+            if(this.bad) {
+                g.addColorStop(0, '#ffaaaa'); g.addColorStop(1, '#cc0000');
+            } else {
+                g.addColorStop(0, '#e0f7ff'); g.addColorStop(0.4, '#3498db'); g.addColorStop(1, '#2980b9');
+            }
+            ctx.fillStyle = g;
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+            ctx.fill();
+            // Блик сверху (глянец)
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.beginPath(); ctx.ellipse(this.x-this.r/3, this.y-this.r/3, this.r/2.5, this.r/4, Math.PI/4, 0, Math.PI*2); ctx.fill();
+        }
+    }
+
+    function loop() {
+        if(!active) return;
+        requestAnimationFrame(loop);
+        ctx.clearRect(0,0,w,h);
+
+        if(Math.random() < 0.035) orbs.push(new Orb(false));
+        if(Math.random() < 0.007) orbs.push(new Orb(true));
+
+        for(let i=orbs.length-1; i>=0; i--) {
+            let o = orbs[i];
+            o.x += o.vx; o.y += o.vy;
+            o.draw();
+
+            let d = Math.hypot(mouse.x - o.x, mouse.y - o.y);
+            if(d < o.r + 14) {
+                if(o.bad) {
+                    active = false;
+                    document.getElementById('game-over').style.display = 'block';
+                    document.getElementById('final-score').innerText = score;
+                } else {
+                    score += 10;
+                    if(score % 100 === 0) triggerFlash(); // Эффект на каждые 100 очков
+                    difficulty += 0.006;
+                    document.getElementById('score-val').innerText = score;
+                    orbs.splice(i, 1);
+                }
+            }
+            if(o.y < -100 || o.y > h+100 || o.x < -100 || o.x > w+100) orbs.splice(i,1);
+        }
+
+        // Игрок (Стеклянный шар с ярким бликом)
+        ctx.beginPath();
+        ctx.shadowBlur = 25; ctx.shadowColor = 'rgba(255,255,255,0.8)';
+        let pG = ctx.createRadialGradient(mouse.x-4, mouse.y-4, 2, mouse.x, mouse.y, 14);
+        pG.addColorStop(0, '#fff'); pG.addColorStop(1, 'rgba(255,255,255,0.6)');
+        ctx.fillStyle = pG;
+        ctx.arc(mouse.x, mouse.y, 14, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+
+    // Фоновые пузыри
+    for(let i=0; i<18; i++) bubbles.push({x: Math.random()*w, y: Math.random()*h, r: Math.random()*50+20, s: Math.random()*0.3+0.1});
+    function drawBg() {
+        bgCtx.clearRect(0,0,w,h);
+        bubbles.forEach(b => {
+            b.y -= active ? b.s * 1.5 : b.s; // Ускорение при игре
+            if(b.y < -100) b.y = h+100;
+            bgCtx.beginPath();
+            bgCtx.fillStyle = "rgba(255,255,255,0.08)";
+            bgCtx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+            bgCtx.fill();
+            bgCtx.strokeStyle = "rgba(255,255,255,0.12)";
+            bgCtx.stroke();
+        });
+        requestAnimationFrame(drawBg);
+    }
+    drawBg();
+</script>
+</body>
+</html>
