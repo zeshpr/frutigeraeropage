@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Games Page</title>
+    <style>
+        /* ОСНОВНОЙ ФОН В СТИЛЕ VISTA/WIN7 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0072ff 0%, #00c6ff 50%, #78ffd6 100%);
+        }
+
+        /* КОНТЕЙНЕР ДЛЯ ПУЗЫРЬКОВ */
+        #bubble-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -150px;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.3);
+            animation: floatUp 12s infinite linear;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* ГЛАВНАЯ СТЕКЛЯННАЯ ПАНЕЛЬ */
+        .glass-panel {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 1000px;
+            margin: 5vh auto;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            padding: 40px;
+            height: 75vh;
+            color: white;
+            overflow-y: auto;
+        }
+
+        /* НАВИГАЦИЯ */
+        nav { display: flex; gap: 15px; margin-bottom: 30px; }
+        .nav-btn {
+            padding: 10px 25px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.1));
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.5); transform: translateY(-2px); }
+
+        /* СТРАНИЦЫ */
+        .page { display: none; animation: fadeIn 0.5s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ГАЛЕРЕЯ */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+	.gallery-grid1 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+	.gallery-grid2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .gallery-item {
+            position: relative;
+            height: 150px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid white;
+            transition: 0.4s;
+        }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-item:hover { transform: scale(1.05); }
+        .item-overlay {
+            position: absolute; bottom: 0; width: 100%;
+            background: rgba(255,255,255,0.3); backdrop-filter: blur(5px);
+            padding: 5px; text-align: center; font-size: 0.8rem;
+        }
+
+        /* ПЛЕЕР И ЧАСЫ */
+        .bottom-bar {
+            position: absolute; bottom: 20px; left: 40px; right: 40px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        input[type=range] { cursor: pointer; }
+    </style>
+
+<div id="bubble-container"></div>
+
+    <div class="glass-panel">
+        <nav>
+            <button class="nav-btn" onclick="showPage('AeroBubblePop')">Aero Bubble Pop Plus</button>
+            <button class="nav-btn" onclick="showPage('AeroShell')">Aero Shell</button>
+            <button class="nav-btn" onclick="showPage('AeroWasteland')">Aero Wasteland</button>
+            <button class="nav-btn" onclick="showPage('BackToMenu')"><A HREF=ubble.html>Назад</A></button>
+        </nav>
+	<!-- АЭРО БАБЛ ПОП ПЛЮС -->
+       <div id="AeroBubblePop" class="page active">
+    <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Aero Bubble Pop</h1>
+    <p style="font-size: 1.1rem; line-height: 1.4; opacity: 0.9;">
+        <strong>Aero Bubble Pop</strong> — Необходимо поймать всех разноцветных пузырей и остеригаться красных!
+    </p>
+    
+    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); margin-top: 20px;">
+        <h3 style="margin-top: 0;">Цвета пузырей</h3>
+        <ul style="line-height: 1.8;">
+            <li><strong>Прозрачный</strong> - обычный пузырь, даёт +1 балл, бывает разных диаметров, если пропустить, потеряешь сердце</li>
+            <li><strong>Красный</strong> - тот самый пузырь, которого необходимо бояться, отнимает жизнь, и лучше не нажимать на него</li>
+            <li><strong>Зелёный</strong> - ничем не отличается от прозрачного, просто другой цвет, даёт +1 балл, и пропускать его не надо</li>
+	    <li><strong>Жёлтый</strong> - как прозрачный, ноо, даёт +5 баллов, так что его пропустить будет не очень приятно</li>
+	    <li><strong>Чёрный</strong> - то же самое, как прозрычный, но звук кликания на него, как у красного</li>
+        </ul>
+    </div>
+    <h3><p><A HREF=ещёминиигра.html>Начать играть!</A></p>
+    <p style="margin-top: 20px; opacity: 0.8;"></h3>
+        Приятно провести время!
+    </p>
+</div>
+<!-- АЭРО БАБЛ ПОП ПЛЮС -->
+       <div id="AeroShell" class="page active">
+    <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Aero Shell</h1>
+    <p style="font-size: 1.1rem; line-height: 1.4; opacity: 0.9;">
+        <strong>Aero Shell</strong> — Двигай курсором и собирай пузыри!
+    </p>
+    
+    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); margin-top: 20px;">
+        <h3 style="margin-top: 0;">Правила</h3>
+        <ul style="line-height: 1.8;">
+            Просто двигай курсор и остеригайся красных пузырей, ведь как только до них дотронешься, то сразу придется начинать сначала!
+        </ul>
+    </div>
+    <h3><p><A HREF=game.html>Начать играть!</A></p>
+    <p style="margin-top: 20px; opacity: 0.8;"></h3>
+        Приятно провести время!
+    </p>
+</div>
+<!-- АЭРО БАБЛ ПОП ПЛЮС -->
+       <div id="AeroWasteland" class="page active">
+    <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Aero Wasterland</h1>
+    <p style="font-size: 1.1rem; line-height: 1.4; opacity: 0.9;">
+        <strong>Aero Wasteland</strong> — Улучшай город, с помощью кликов и улучшения!
+    </p>
+    
+    <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); margin-top: 20px;">
+        <h3 style="margin-top: 0;">Улучшения</h3>
+        <ul style="line-height: 1.8;">
+          <li><strong>Свежий ветер</strong> - даёт 0.5 очков</li>
+	  <li><strong>Водяной фильтр</strong> - даёт 3.0 очков</li>
+          <li><strong>Солнечный блик</strong> - даёт 15.0 очков</li>  
+          <li><strong>Стеклянный купол</strong> - даёт * очков (узнайте сами😁)</li>
+        </ul>
+    </div>
+    <h3><p><A HREF=game3.html>Начать играть!</A></p>
+    <p style="margin-top: 20px; opacity: 0.8;"></h3>
+        Приятно провести время!
+    </p>
+</div>
+<!-- НАЗАД -->
+       <div id="BackToMenu" class="page active">
+    <p style="font-size: 1.1rem; line-height: 1.4; opacity: 0.9;">
+            <div style="background: rgba(255,255,255,0.15); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.3); margin-top: 20px;">
+        <h3 style="margin-top: 0;">Цвета пузырей</h3>
+        <ul style="line-height: 1.8;">
+            <li><strong>Прозрачный</strong> - обычный пузырь, даёт +1 балл, бывает разных диаметров, если пропустить, потеряешь сердце</li>
+            <li><strong>Красный</strong> - тот самый пузырь, которого необходимо бояться, отнимает жизнь, и лучше не нажимать на него</li>
+            <li><strong>Зелёный</strong> - ничем не отличается от прозрачного, просто другой цвет, даёт +1 балл, и пропускать его не надо</li>
+	    <li><strong>Жёлтый</strong> - как прозрачный, ноо, даёт +5 баллов, так что его пропустить будет не очень приятно</li>
+	    <li><strong>Чёрный</strong> - то же самое, как прозрычный, но звук кликания на него, как у красного</li>
+        </ul>
+    </div>
+
+
+
+    <script>
+        // Переключение страниц
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // Пузырьки
+        function createBubbles() {
+            const container = document.getElementById('bubble-container');
+            for (let i = 0; i < 15; i++) {
+                const b = document.createElement('div');
+                b.className = 'bubble';
+                const size = Math.random() * 40 + 20 + 'px';
+                b.style.width = size; b.style.height = size;
+                b.style.left = Math.random() * 100 + 'vw';
+                b.style.animationDelay = Math.random() * 10 + 's';
+                container.appendChild(b);
+            }
+        }
+
+        // Музыка
+        const music = document.getElementById('bg-music');
+        function toggleMusic() {
+            if (music.paused) music.play(); else music.pause();
+        }
+        function changeVolume(v) { music.volume = v; }
+        
+        // Автостарт при клике
+        document.addEventListener('click', () => {
+            if (music.paused && music.currentTime === 0) music.play();
+        }, { once: true });
+
+        // Часы
+        setInterval(() => {
+            document.getElementById('time').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        window.onload = createBubbles;
+// Эффект пузырьков за мышкой
+document.addEventListener('mousemove', function(e) {
+    if (Math.random() > 0.8) { // Создаем пузырек не на каждом кадре, чтобы не тормозило
+        const tail = document.createElement('div');
+        tail.className = 'bubble'; // Используем уже готовый стиль пузырьков
+        
+        const size = Math.random() * 15 + 5 + 'px';
+        tail.style.width = size;
+        tail.style.height = size;
+        
+        // Позиция мыши
+        tail.style.left = e.pageX + 'px';
+        tail.style.top = e.pageY + 'px';
+        
+        // Перезаписываем анимацию для хвоста
+        tail.style.animation = 'fadeUp 1s forwards';
+        tail.style.bottom = 'auto'; 
+        tail.style.zIndex = '1000';
+        
+        document.body.appendChild(tail);
+        
+        // Удаляем через секунду
+        setTimeout(() => tail.remove(), 100);
+    }
+});
+
+// Добавим стиль для затухания хвоста (вставьте это в блок <style>)
+/*
+@keyframes fadeUp {
+    0% { transform: translateY(0) scale(1); opacity: 0.5; }
+    100% { transform: translateY(-50px) scale(1.5); opacity: 0; }
+}
+*/
+
+    </script>
+</body>
+</html>
