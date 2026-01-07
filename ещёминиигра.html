@@ -2,13 +2,15 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Aero Bubble Pop Plus</title>
     <style>
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; font-family: 'Segoe UI', sans-serif;
+            overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(180deg, #0051a8 0%, #29abe2 45%, #76d211 100%);
+            user-select: none;
+            touch-action: manipulation;
         }
 
         #game-container { position: relative; width: 100vw; height: 100vh; }
@@ -17,21 +19,22 @@
         .glass-panel {
             background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             color: white;
-            padding: 15px;
+            padding: 12px;
             position: absolute;
             z-index: 100;
         }
 
-        #ui-top { top: 20px; left: 20px; min-width: 150px; }
+        #ui-top { top: 15px; left: 15px; min-width: 120px; }
 
         .btn-back {
-            top: 20px; right: 20px; cursor: pointer;
+            top: 15px; right: 15px; cursor: pointer;
             text-decoration: none; display: flex; align-items: center;
-            transition: 0.3s; font-weight: bold;
+            transition: 0.3s; font-weight: bold; font-size: 14px;
         }
         .btn-back:hover { background: rgba(255, 255, 255, 0.4); transform: scale(1.05); }
 
@@ -42,27 +45,80 @@
             box-shadow: inset -2px -2px 10px rgba(0,0,0,0.1), 0 5px 15px rgba(255,255,255,0.3);
             border: 1px solid rgba(255,255,255,0.5);
             cursor: pointer;
+            touch-action: none; 
+            transition: transform 0.05s ease-out; /* Для эффекта "нажатия" */
         }
+        .bubble:active {
+            transform: scale(0.9);
+        }
+
+        /* Цветовые модификации пузырьков */
+        .bubble.gold {
+            background: radial-gradient(circle at 30% 30%, rgba(255,223,0,0.9), rgba(255,140,0,0.5) 70%);
+            border: 1px solid rgba(255,223,0,0.8);
+            box-shadow: inset -2px -2px 10px rgba(150,100,0,0.2), 0 5px 15px rgba(255,223,0,0.5);
+        }
+        .bubble.red {
+            background: radial-gradient(circle at 30% 30%, rgba(255,100,100,0.9), rgba(200,0,0,0.5) 70%);
+            border: 1px solid rgba(255,100,100,0.8);
+            box-shadow: inset -2px -2px 10px rgba(100,0,0,0.2), 0 5px 15px rgba(255,100,100,0.5);
+        }
+        .bubble.green {
+            background: radial-gradient(circle at 30% 30%, rgba(144,238,144,0.9), rgba(0,128,0,0.5) 70%);
+            border: 1px solid rgba(144,238,144,0.8);
+            box-shadow: inset -2px -2px 10px rgba(0,70,0,0.2), 0 5px 15px rgba(144,238,144,0.5);
+        }
+        .bubble.black {
+            background: radial-gradient(circle at 30% 30%, rgba(100,100,100,0.9), rgba(0,0,0,0.5) 70%);
+            border: 1px solid rgba(100,100,100,0.8);
+            box-shadow: inset -2px -2px 10px rgba(0,0,0,0.4), 0 5px 15px rgba(100,100,100,0.5);
+        }
+
+        /* Частицы при лопании */
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none; /* Чтобы не мешали взаимодействию */
+            opacity: 0;
+            transform: scale(0);
+            animation: explode 0.5s forwards ease-out;
+        }
+
+        @keyframes explode {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0) translate(var(--x), var(--y)); }
+        }
+
 
         /* Экран проигрыша */
         #game-over {
             display: none; position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%); text-align: center;
-            width: 300px;
+            width: 80%; max-width: 300px;
         }
 
         .btn-restart {
-            margin-top: 15px; padding: 10px 20px; border-radius: 20px;
+            margin-top: 15px; padding: 12px 25px; border-radius: 25px;
             border: none; background: #fff; color: #0051a8;
-            cursor: pointer; font-weight: bold; font-size: 16px;
+            cursor: pointer; font-weight: bold; font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        .heart { color: #ff4d4d; font-size: 20px; }
+        .heart { color: #ff4d4d; font-size: 20px; letter-spacing: 2px; }
+
+        /* Адаптация для маленьких экранов */
+        @media (max-width: 480px) {
+            #ui-top { padding: 8px; font-size: 14px; top: 10px; left: 10px; }
+            .btn-back { padding: 8px; top: 10px; right: 10px; font-size: 12px; }
+            h2 { font-size: 1.2rem; margin: 10px 0; }
+            .btn-restart { font-size: 16px; padding: 10px 20px; }
+        }
     </style>
 </head>
 <body>
 
-    <a href="bubble.html" class="glass-panel btn-back">← Назад</a>
+    <a href="ubble.html" class="glass-panel btn-back">← Назад</a>
 
     <div id="ui-top" class="glass-panel">
         <div>Счет: <span id="score">0</span></div>
@@ -78,12 +134,7 @@
     <div id="game-container"></div>
 
     <script>
-        // ==========================================
-        // НАСТРОЙКИ ЗВУКА
-        // Поменяйте название файла ниже на ваше:
         const gameOverSound = 'gameover.mp3'; 	
-        // ==========================================
-
         const container = document.getElementById('game-container');
         const scoreEl = document.getElementById('score');
         const livesEl = document.querySelector('.heart');
@@ -93,24 +144,31 @@
         let lives = 3;
         let gameActive = true;
         let audioCtx = null;
+        let bubbleSpawnRate = 1000; // Начальная скорость появления пузырьков
+        let spawnerIntervalId;
+        let gameSpeedMultiplier = 1; // Множитель скорости для эффектов
+        let currentEffectTimeout;
 
-        // Инициализация звука
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                playBackgroundMusic();
-            }
-        }
-
-        // Звук лопания (синтезированный)
-        function playPopSound() {
+        // Звуки (placeholder, можно заменить на отдельные mp3)
+        function playPopSound(type = 'default') {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
             gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+
+            if (type === 'gold') {
+                osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.1);
+            } else if (type === 'bad') { // Красный или черный
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.1);
+            } else {
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            }
+            
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -118,11 +176,17 @@
             osc.stop(audioCtx.currentTime + 0.1);
         }
 
-        // Фоновая музыка (процедурная)
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                playBackgroundMusic();
+            }
+        }
+
         function playBackgroundMusic() {
             const notes = [261.63, 329.63, 392.00, 523.25]; 
             setInterval(() => {
-                if (!gameActive) return; // Останавливаем фоновую, когда игра окончена
+                if (!gameActive || !audioCtx) return;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.frequency.value = notes[Math.floor(Math.random() * notes.length)];
@@ -136,41 +200,154 @@
             }, 3000);
         }
 
+        function createParticles(x, y, count = 5, color = 'white') {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.width = `${Math.random() * 5 + 3}px`;
+                particle.style.height = particle.style.width;
+                particle.style.backgroundColor = color;
+                
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 20 + 10;
+                const finalX = Math.cos(angle) * distance;
+                const finalY = Math.sin(angle) * distance;
+
+                particle.style.setProperty('--x', `${finalX}px`);
+                particle.style.setProperty('--y', `${finalY}px`);
+
+                container.appendChild(particle);
+
+                particle.addEventListener('animationend', () => {
+                    particle.remove();
+                });
+            }
+        }
+
+        function applyGameEffect(effectType, duration = 3000) {
+            clearTimeout(currentEffectTimeout); // Отменяем предыдущий эффект, если он был
+
+            if (effectType === 'slow') {
+                gameSpeedMultiplier = 0.5; // Замедляем пузырьки в 2 раза
+                console.log('Эффект: Замедление!');
+            } else if (effectType === 'fast') {
+                gameSpeedMultiplier = 1.8; // Ускоряем пузырьки почти в 2 раза
+                console.log('Эффект: Ускорение!');
+            } else {
+                gameSpeedMultiplier = 1; // Сброс
+            }
+
+            // Сброс эффекта через 'duration'
+            currentEffectTimeout = setTimeout(() => {
+                gameSpeedMultiplier = 1;
+                console.log('Эффект завершен.');
+            }, duration);
+        }
+
+
+        function popBubble(e, bubble) {
+            if (!gameActive) return;
+            e.preventDefault(); 
+            initAudio();
+
+            const bubbleType = bubble.dataset.type || 'default';
+            const rect = bubble.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            if (bubbleType === 'gold') {
+                score += 5;
+                playPopSound('gold');
+                createParticles(centerX, centerY, 8, 'gold');
+            } else if (bubbleType === 'red') {
+                lives--;
+                playPopSound('bad');
+                createParticles(centerX, centerY, 10, 'red');
+            } else if (bubbleType === 'green') {
+                score++;
+                applyGameEffect('slow', 5000); // Замедляем на 5 секунд
+                playPopSound('default');
+                createParticles(centerX, centerY, 6, 'lightgreen');
+            } else if (bubbleType === 'black') {
+                score++;
+                applyGameEffect('fast', 5000); // Ускоряем на 5 секунд
+                playPopSound('bad');
+                createParticles(centerX, centerY, 6, 'gray');
+            }
+             else {
+                score++;
+                playPopSound('default');
+                createParticles(centerX, centerY, 5, 'white');
+            }
+
+            scoreEl.innerText = score;
+            updateLives();
+            bubble.remove();
+
+            // Постепенное увеличение скорости спавна со временем
+            bubbleSpawnRate = Math.max(300, 1000 - (score * 10)); // Минимальный интервал 300мс
+            clearInterval(spawnerIntervalId);
+            spawnerIntervalId = setInterval(createBubble, bubbleSpawnRate);
+        }
+
         function createBubble() {
             if (!gameActive) return;
             
             const bubble = document.createElement('div');
-            const size = Math.random() * 50 + 40;
+            let size = Math.random() * 50 + 50; 
+            let bubbleType = 'default';
+            let typeRoll = Math.random();
+
+            if (typeRoll < 0.05) { // 5% шанс на золотой
+                bubbleType = 'gold';
+                size = Math.random() * 30 + 70; // Золотые чуть больше
+            } else if (typeRoll < 0.15) { // 10% шанс на красный (0.05-0.15)
+                bubbleType = 'red';
+                size = Math.random() * 40 + 60; // Красные тоже
+            } else if (typeRoll < 0.20) { // 5% шанс на зеленый (0.15-0.20)
+                bubbleType = 'green';
+            } else if (typeRoll < 0.25) { // 5% шанс на черный (0.20-0.25)
+                bubbleType = 'black';
+            } else if (typeRoll > 0.95) { // Очень большой пузырь
+                size = Math.random() * 100 + 100; // От 100 до 200px
+            } else if (typeRoll < 0.02) { // Очень маленький пузырь
+                 size = Math.random() * 20 + 20; // От 20 до 40px
+            }
+
+
             const posX = Math.random() * (window.innerWidth - size);
             
             bubble.className = 'bubble';
+            bubble.classList.add(bubbleType);
+            bubble.dataset.type = bubbleType; // Для идентификации типа при лопании
             bubble.style.width = size + 'px';
             bubble.style.height = size + 'px';
             bubble.style.left = posX + 'px';
             bubble.style.bottom = '-100px';
 
-            bubble.addEventListener('mousedown', () => {
-                if (!gameActive) return;
-                initAudio();
-                score++;
-                scoreEl.innerText = score;
-                playPopSound();
-                bubble.remove();
-            });
+            bubble.addEventListener('mousedown', (e) => popBubble(e, bubble));
+            bubble.addEventListener('touchstart', (e) => popBubble(e, bubble), {passive: false});
 
             container.appendChild(bubble);
+
+            const baseDuration = Math.max(1500, 7000 - (score * 50)); 
+            const finalDuration = baseDuration / gameSpeedMultiplier; // Применяем множитель скорости
 
             const animation = bubble.animate([
                 { bottom: '-100px' },
                 { bottom: window.innerHeight + 'px' }
             ], {
-                duration: Math.random() * 3000 + 4000,
+                duration: finalDuration,
                 easing: 'linear'
             });
 
             animation.onfinish = () => {
                 if (bubble.parentElement && gameActive) {
-                    lives--;
+                    if (bubbleType !== 'red') { // Пропуск красных пузырей тоже наказывается
+                        lives--;
+                    }
                     updateLives();
                     bubble.remove();
                 }
@@ -178,26 +355,28 @@
         }
 
         function updateLives() {
-            livesEl.innerText = '❤'.repeat(lives);
+            livesEl.innerText = '❤'.repeat(Math.max(0, lives));
             if (lives <= 0) {
                 gameActive = false;
                 document.getElementById('final-score').innerText = score;
                 gameOverScreen.style.display = 'block';
                 container.innerHTML = '';
+                clearInterval(spawnerIntervalId);
+                clearTimeout(currentEffectTimeout);
                 
-                // ПРОИГРЫВАНИЕ MP3 ПРИ СМЕРТИ
                 try {
                     const audio = new Audio(gameOverSound);
-                    audio.play().catch(e => console.log("Браузер заблокировал автоплей или файл не найден:", e));
-                } catch (e) {
-                    console.error("Ошибка аудио:", e);
-                }
+                    audio.play().catch(e => console.log("Audio play blocked"));
+                } catch (e) {}
             }
         }
 
-        setInterval(createBubble, 1000);
+        // Запуск
+        spawnerIntervalId = setInterval(createBubble, bubbleSpawnRate);
+        
+        // Инициализация звука при первом клике/тапе где угодно
+        window.addEventListener('touchstart', initAudio, { once: true });
         window.addEventListener('mousedown', initAudio, { once: true });
     </script>
 </body>
-
 </html>
