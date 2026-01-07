@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aero Flow: Music & Back</title>
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.25);
+            --border: rgba(255, 255, 255, 0.6);
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #005a9e, #74c7ef, #a7e08c);
+            background-attachment: fixed;
+            background-size: 400% 400%;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Кнопка Назад */
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            padding: 10px 20px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            z-index: 100;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.4); }
+
+        #game-interface {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 95%;
+            max-width: 900px;
+            padding: 20px;
+            z-index: 10;
+            box-sizing: border-box;
+        }
+
+        .panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            color: #fff;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            flex: 1;
+            text-align: center;
+        }
+
+        #eco-ball {
+            width: clamp(120px, 40vw, 180px);
+            height: clamp(120px, 40vw, 180px);
+            margin: 20px auto;
+            background: radial-gradient(circle at 35% 35%, white, #83d0f5, #0078d7);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2), inset -10px -10px 30px rgba(255,255,255,0.5);
+            border: 3px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: transform 0.1s;
+            touch-action: manipulation;
+        }
+        #eco-ball:active { transform: scale(0.92); }
+
+        .upgrade-card {
+            background: rgba(255, 255, 255, 0.35);
+            margin-bottom: 10px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+        }
+        .upgrade-card.disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
+
+        .badge { background: #fff; color: #0078d7; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        .v-obj { position: absolute; pointer-events: none; z-index: 1; font-size: 2rem; opacity: 0.7; }
+
+        @media (max-width: 768px) {
+            #game-interface { flex-direction: column; margin-top: 60px; }
+        }
+    </style>
+</head>
+<body>
+
+<a href="bubble.html" class="back-btn">← Назад</a>
+
+<audio id="bg-music" loop>
+    <source src="SABBATH.mp3" type="audio/mpeg">
+</audio>
+
+<div id="game-interface">
+    <div class="panel">
+        <h2 id="rank" style="font-weight: 300; margin: 0;">Загрузка...</h2>
+        <div style="font-size: 2.5rem; margin: 10px 0;">💧 <span id="score">0</span></div>
+        <div id="pps">Приток: 0/сек</div>
+        <div id="eco-ball">AERO</div>
+    </div>
+
+    <div class="panel">
+        <h3 style="margin: 0 0 15px 0;">Магазин</h3>
+        <div id="shop-list"></div>
+    </div>
+</div>
+
+<script>
+    let state = {
+        score: 0,
+        totalScore: 0,
+        upgrades: [
+            { id: 0, name: 'Свежий ветер', cost: 15, power: 0.5, count: 0, icon: '🍃' },
+            { id: 1, name: 'Водяной фильтр', cost: 100, power: 3, count: 0, icon: '🌊' },
+            { id: 2, name: 'Солнечный блик', cost: 600, power: 15, count: 0, icon: '✨' },
+            { id: 3, name: 'Стеклянный купол', cost: 3000, power: 80, count: 0, icon: '💎' }
+        ],
+        visuals: []
+    };
+
+    const music = document.getElementById('bg-music');
+    let musicStarted = false;
+
+    // Функция запуска музыки
+    function startMusic() {
+        if (!musicStarted) {
+            music.play().catch(e => console.log("Музыка ждет взаимодействия"));
+            musicStarted = true;
+        }
+    }
+
+    const saved = localStorage.getItem('aero_final_v1');
+    if (saved) state = JSON.parse(saved);
+
+    function initShop() {
+        const list = document.getElementById('shop-list');
+        list.innerHTML = '';
+        state.upgrades.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'upgrade-card';
+            card.id = `upg-${index}`;
+            card.onclick = () => { startMusic(); buyUpgrade(index); };
+            card.innerHTML = `
+                <div style="text-align: left;">
+                    <b>${item.icon} ${item.name}</b><br>
+                    <span>Цена: <span id="cost-${index}">${item.cost}</span></span>
+                </div>
+                <div class="badge" id="count-${index}">${item.count}</div>
+            `;
+            list.appendChild(card);
+        });
+    }
+
+    function buyUpgrade(index) {
+        const item = state.upgrades[index];
+        if (state.score >= item.cost) {
+            state.score -= item.cost;
+            item.count++;
+            item.cost = Math.ceil(item.cost * 1.3);
+            addVisual(item.icon);
+            save();
+            updateDisplay();
+        }
+    }
+
+    function updateDisplay() {
+        document.getElementById('score').innerText = Math.floor(state.score);
+        const pps = state.upgrades.reduce((sum, u) => sum + (u.count * u.power), 0);
+        document.getElementById('pps').innerText = `Приток: ${pps.toFixed(1)}/сек`;
+
+        state.upgrades.forEach((item, index) => {
+            const card = document.getElementById(`upg-${index}`);
+            document.getElementById(`cost-${index}`).innerText = item.cost;
+            document.getElementById(`count-${index}`).innerText = item.count;
+            if (state.score >= item.cost) card.classList.remove('disabled');
+            else card.classList.add('disabled');
+        });
+
+        let rName = "Пустошь";
+        if (state.totalScore > 100) rName = "Оазис";
+        document.getElementById('rank').innerText = rName;
+    }
+
+    function addVisual(emoji) {
+        const v = { emoji, x: Math.random() * 85, y: Math.random() * 85 };
+        state.visuals.push(v);
+        drawSingleVisual(v);
+    }
+
+    function drawSingleVisual(v) {
+        const el = document.createElement('div');
+        el.className = 'v-obj';
+        el.innerText = v.emoji;
+        el.style.left = v.x + 'vw';
+        el.style.top = v.y + 'vh';
+        document.body.appendChild(el);
+    }
+
+    document.getElementById('eco-ball').addEventListener('click', () => {
+        startMusic(); // Запуск музыки при первом клике
+        state.score += 1;
+        state.totalScore += 1;
+        updateDisplay();
+    });
+
+    function save() { localStorage.setItem('aero_final_v1', JSON.parse(JSON.stringify(state))); }
+
+    setInterval(() => {
+        const pps = state.upgrades.reduce((sum, u) => sum + (u.count * u.power), 0);
+        if (pps > 0) {
+            state.score += pps / 10;
+            state.totalScore += pps / 10;
+            updateDisplay();
+        }
+    }, 100);
+
+    initShop();
+    updateDisplay();
+    state.visuals.slice(-30).forEach(drawSingleVisual);
+</script>
+</body>
+</html>
