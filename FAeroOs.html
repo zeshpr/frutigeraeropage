@@ -5,6 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AeroOS Ultimate V2</title>
     <style>
+		/* 1. Исправляем общие настройки экрана */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
+
+/* 2. Настраиваем фон рабочего стола */
+#desktop {
+    width: 100vw;
+    height: calc(100vh - 40px); /* Вычитаем высоту панели задач */
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    /* Центрируем содержимое */
+    display: flex;
+    flex-direction: column;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* 3. Фиксируем панель задач в самом низу */
+#taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    z-index: 999999; /* Чтобы всегда была поверх окон */
+}
+
         /* =========================================
            GLOBAL & AERO AESTHETICS
            ========================================= */
@@ -177,18 +214,28 @@
             display: none;
         }
 /* Адаптация для мобильных устройств */
+/* Ищи это место в коде */
 @media (max-width: 600px) {
     .window { 
-        width: 95% !important; 
+        width: 96% !important; 
         height: 80% !important; 
-        left: 2.5% !important; 
+        left: 2% !important; 
         top: 10px !important; 
     }
+
+    /* ВОТ СЮДА ВСТАВЛЯЙ ЭТОТ КУСОК: */
+    .icon {
+        margin: 5px; /* Уменьшаем расстояние между иконками, чтобы не улетали */
+        width: 65px;
+    }
+    
+    .icon-img {
+        font-size: 30px; /* Делаем саму иконку чуть меньше для мобилки */
+    }
+    /* ----------------------------- */
+
     .task-btn { width: 40px; overflow: hidden; text-indent: -999px; position: relative; }
-    .task-btn::before { content: '🔲'; position: absolute; left: 12px; text-indent: 0; }
     #start-menu { width: 100%; height: 80vh; bottom: 40px; }
-    .icon { width: 70px; }
-    .icon-img { font-size: 30px; }
 }
 
     </style>
@@ -800,5 +847,6 @@ const appManager = {
 </body>
 </html>
 	
+
 
 
