@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Frutiger Aero — мини-игра</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0b2a3a; /* небо */
+      --panel:#09232b;
+      --accent:#f9bc3b; /* фруктовый акцент */
+      --text:#eaf6f8;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family: "Frutiger", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    body{background:linear-gradient(180deg,var(--bg),#08323d);color:var(--text);display:flex;align-items:center;justify-content:center;padding:20px}
+    .game {
+      width:480px; max-width:100%; height:720px; background:linear-gradient(180deg,#0e3b4b 0%, #07313b 60%); border-radius:12px; box-shadow:0 10px 30px rgba(2,10,14,.6); position:relative; overflow:hidden;
+      border:4px solid rgba(255,255,255,0.03);
+    }
+    /* HUD top */
+    .hud{position:absolute;left:0;right:0;top:8px;display:flex;justify-content:space-between;padding:8px 12px;pointer-events:none}
+    .panel{background:rgba(0,0,0,.25);padding:6px 10px;border-radius:8px;font-weight:700;letter-spacing:.6px}
+    /* runway */
+    .ground{position:absolute;left:0;right:0;bottom:0;height:110px;background:linear-gradient(180deg,#062227,#031a1f);display:flex;align-items:center;justify-content:center}
+    .runway{width:90%;height:14px;background:linear-gradient(90deg,#1b2b2f,#0d1b20);border-radius:8px;box-shadow:inset 0 2px 6px rgba(255,255,255,0.03)}
+    /* plane */
+    .plane{position:absolute;width:64px;height:48px;left:40%;bottom:160px;transform-origin:center;transition:transform .08s linear}
+    .plane svg{width:100%;height:100%}
+    /* fruits (collectibles) */
+    .fruit{position:absolute;width:42px;height:42px;pointer-events:none;transition:transform .12s linear}
+    /* simple cloud */
+    .cloud{position:absolute;width:160px;height:80px;opacity:.12;filter:blur(3px)}
+    /* message */
+    .msg{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#092b32,#0e3a44);padding:18px 22px;border-radius:12px;display:none}
+    .controls{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);display:flex;gap:10px}
+    .btn{background:var(--panel);border:1px solid rgba(255,255,255,0.03);color:var(--text);padding:8px 12px;border-radius:8px;cursor:pointer}
+    .small{font-size:13px;opacity:.9}
+    /* score pop */
+    .pop{position:absolute;left:12px;top:54px;background:linear-gradient(90deg,var(--accent),#ff7a5b);padding:6px 10px;border-radius:8px;color:#102326;font-weight:800}
+  </style>
+</head>
+<body>
+  <div class="game" id="game" tabindex="0">
+    <div class="hud">
+      <div class="panel small" id="score">Счёт: 0</div>
+      <div class="panel small" id="lives">Жизни: 3</div>
+    </div>
+
+    <div id="playfield" style="position:absolute;inset:48px 6px 130px 6px;overflow:hidden">
+      <!-- plane -->
+      <div class="plane" id="plane" aria-hidden="true">
+        <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="#eaf6f8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 34c10-4 34-4 44-4s10 6 0 8c-10 2-34 4-44 0z" opacity=".12" fill="#000"/>
+            <path d="M6 30c8-5 36-6 52-6" stroke="#bfeeea"/>
+            <path d="M18 10c6-2 24-2 36 0l6 10c-10 4-34 4-46 2z" fill="#0d737b" stroke="#eaf6f8"/>
+            <circle cx="14" cy="34" r="2" fill="#eaf6f8"/>
+          </g>
+        </svg>
+      </div>
+      <!-- dynamic items go here -->
+    </div>
+
+    <div class="ground">
+      <div class="runway"></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn" id="start">Старт</button>
+      <button class="btn" id="pause">Пауза</button>
+      <button class="btn" id="reset">Сброс</button>
+    </div>
+
+    <div class="msg" id="msg">
+      <div style="font-weight:900;font-size:18px;margin-bottom:6px">Frutiger Aero</div>
+      <div class="small" style="opacity:.9;margin-bottom:8px">Собирай фрукты, избегай облаков. Стрелки влево/вправо для управления.</div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn" id="msg-start">Играть</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Game variables
+    const game = document.getElementById('game');
+    const pf = document.getElementById('playfield');
+    const plane = document.getElementById('plane');
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const msg = document.getElementById('msg');
+    const startBtn = document.getElementById('start');
+    const pauseBtn = document.getElementById('pause');
+    const resetBtn = document.getElementById('reset');
+    const msgStart = document.getElementById('msg-start');
+
+    let score = 0, lives = 3;
+    let running = false, paused = false;
+    let planeX = 0.5; // 0..1 relative
+    let speed = 0.018; // movement per frame when key pressed
+    let keys = {left:false,right:false};
+    let spawnTimer = 0;
+    let items = [];
+    const maxItems = 8;
+    const pfRect = () => pf.getBoundingClientRect();
+
+    // show start message
+    msg.style.display = 'block';
+
+    function resetGame(){
+      score = 0; lives = 3; running = false; paused = false;
+      items.forEach(it=>it.el.remove());
+      items = [];
+      updateHUD();
+      planeX = 0.5; setPlanePos();
+      msg.style.display = 'block';
+    }
+
+    function updateHUD(){
+      scoreEl.textContent = 'Счёт: ' + score;
+      livesEl.textContent = 'Жизни: ' + lives;
+    }
+
+    function setPlanePos(){
+      const r = pfRect();
+      const px = Math.round(r.left + planeX * (r.width - plane.offsetWidth) - r.left);
+      plane.style.left = px + 'px';
+    }
+
+    function spawnItem(type){
+      if(items.length >= maxItems) return;
+      const el = document.createElement('div');
+      el.className = 'fruit';
+      const r = pfRect();
+      const x = Math.random() * (r.width - 60);
+      const y = r.height + 30;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      // visuals
+      if(type === 'fruit'){
+        el.innerHTML = `
+          <svg viewBox="0 0 64 64" width="100%" height="100%">
+            <circle cx="32" cy="34" r="16" fill="${Math.random()<0.5? '#ffbd3a':'#ff6b6b'}" />
+            <path d="M36 18c-4-6-10-6-12 0" stroke="#2b2b2b" stroke-width="1.6" fill="none"/>
+          </svg>`;
+      } else { // cloud hazard
+        el.innerHTML = `
+          <svg viewBox="0 0 64 64" width="100%" height="100%">
+            <g fill="#ffffff" opacity="0.9">
+              <ellipse cx="28" cy="32" rx="18" ry="12"/>
+              <ellipse cx="40" cy="28" rx="10" ry="8"/>
+            </g>
+          </svg>`;
+        el.style.opacity = 0.95;
+      }
+      pf.appendChild(el);
+      items.push({el,type,x,y,vy: (type==='fruit'? -1.2 : -1.6), collected:false});
+    }
+
+    function gameOver(){
+      running = false;
+      msg.querySelector('div').textContent = 'Игра окончена';
+      msg.style.display = 'block';
+    }
+
+    function tick(){
+      if(!running || paused) return;
+      // input movement
+      if(keys.left) planeX = Math.max(0, planeX - speed);
+      if(keys.right) planeX = Math.min(1, planeX + speed);
+      setPlanePos();
+      // spawn logic
+      spawnTimer += 1;
+      if(spawnTimer > 30){
+        spawnTimer = 0;
+        if(Math.random() < 0.6) spawnItem('fruit');
+        if(Math.random() < 0.25) spawnItem('cloud');
+      }
+      // move items
+      const r = pfRect();
+      for(let i=items.length-1;i>=0;i--){
+        const it = items[i];
+        it.y += it.vy * (1 + score*0.02);
+        it.el.style.top = Math.round(it.y) + 'px';
+        // check collision with plane
+        const planeRect = plane.getBoundingClientRect();
+        const itRect = it.el.getBoundingClientRect();
+        if(!it.collected && intersectRects(planeRect, itRect)){
+          it.collected = true;
+          if(it.type === 'fruit'){
+            score += 10;
+            // pop animation
+            it.el.style.transform = 'scale(1.4)';
+            it.el.style.opacity = '0';
+            setTimeout(()=>it.el.remove(),220);
+          } else {
+            lives -= 1;
+            it.el.style.transform = 'translateY(8px) scale(.9)';
+            it.el.style.opacity = '.6';
+            setTimeout(()=>it.el.remove(),300);
+            // small shake
+            plane.style.transform = 'translateY(-6px) rotate(-6deg)';
+            setTimeout(()=>plane.style.transform = '',160);
+          }
+          updateHUD();
+        }
+        // remove if off-screen
+        if(it.y < -80 || it.y > r.height + 140) {
+          it.el.remove(); items.splice(i,1);
+        }
+      }
+      if(lives <= 0) gameOver();
+    }
+
+    function intersectRects(a,b){
+      return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+    }
+
+    // main loop
+    let last = 0;
+    function loop(ts){
+      if(!last) last = ts;
+      const dt = ts - last;
+      if(dt > 16) tick();
+      last = ts;
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    // input handlers
+    window.addEventListener('keydown', e=>{
+      if(e.key === 'ArrowLeft') keys.left = true;
+      if(e.key === 'ArrowRight') keys.right = true;
+      if(e.key === ' '){ // space pause
+        paused = !paused;
+        pauseBtn.textContent = paused ? 'Возобновить' : 'Пауза';
+      }
+    });
+    window.addEventListener('keyup', e=>{
+      if(e.key === 'ArrowLeft') keys.left = false;
+      if(e.key === 'ArrowRight') keys.right = false;
+    });
+
+    // touch / buttons
+    game.addEventListener('pointerdown', e=>{
+      const r = game.getBoundingClientRect();
+      const cx = e.clientX - r.left;
+      if(cx < r.width/2) keys.left = true; else keys.right = true;
+    });
+    window.addEventListener('pointerup', ()=>{ keys.left = keys.right = false; });
+
+    // controls
+    startBtn.addEventListener('click', startPlay);
+    pauseBtn.addEventListener('click', ()=>{
+      paused = !paused;
+      pauseBtn.textContent = paused ? 'Возобновить' : 'Пауза';
+    });
+    resetBtn.addEventListener('click', resetGame);
+    msgStart.addEventListener('click', ()=>{
+      msg.style.display = 'none'; startPlay();
+    });
+
+    function startPlay(){
+      if(running) return;
+      running = true; paused = false;
+      msg.style.display = 'none';
+      spawnTimer = 0;
+      updateHUD();
+      // initial items
+      for(let i=0;i<3;i++) spawnItem('fruit');
+    }
+
+    // focus for keyboard
+    game.addEventListener('click', ()=>game.focus());
+
+    // small auto difficulty increase
+    setInterval(()=>{ if(running && !paused) speed = Math.min(0.036, speed + 0.0006); },3000);
+
+    // accessibility: resize handler to keep plane
+    window.addEventListener('resize', setPlanePos);
+    setPlanePos();
+
+  </script>
+</body>
+</html>
