@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroOS Ultimate V2</title>
+    <style>
+        /* =========================================
+           GLOBAL & AERO AESTHETICS
+           ========================================= */
+        :root {
+            --bg-default: url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070');
+            --glass-header: linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 45%, rgba(255,255,255,0.0) 50%, rgba(255,255,255,0.3) 100%);
+            --glass-border: 1px solid rgba(255,255,255,0.5);
+            --win-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            --font-ui: 'Segoe UI', Tahoma, sans-serif;
+            --taskbar-h: 40px;
+        }
+
+        body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; font-family: var(--font-ui); background: var(--bg-default) no-repeat center center fixed; background-size: cover; user-select: none; }
+        * { box-sizing: border-box; outline: none; }
+
+        /* =========================================
+           LOGIN SCREEN
+           ========================================= */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white;
+            transition: top 0.8s ease-in-out;
+        }
+        .user-avatar-lg { width: 120px; height: 120px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.3); background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Windows_logo_and_wordmark_-_2012_%28dark_blue%29.svg/1024px-Windows_logo_and_wordmark_-_2012_%28dark_blue%29.svg.png') center/cover; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,255,255,0.5); }
+        .login-input-group { display: flex; gap: 5px; }
+        .login-input { padding: 5px 10px; border-radius: 5px; border: none; font-size: 16px; }
+        .login-btn { background: #0078d7; border: none; border-radius: 5px; width: 30px; color: white; cursor: pointer; font-size: 18px; }
+        .login-btn:hover { background: #005a9e; }
+
+        /* =========================================
+           DESKTOP & WINDOWS
+           ========================================= */
+        #desktop { width: 100%; height: calc(100% - var(--taskbar-h)); padding: 10px; display: flex; flex-direction: column; flex-wrap: wrap; align-content: flex-start; gap: 10px; position: relative; }
+
+        .icon { width: 80px; text-align: center; color: white; text-shadow: 0 2px 4px black; cursor: pointer; padding: 5px; border: 1px solid transparent; border-radius: 4px; transition: 0.1s; }
+        .icon:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+        .icon-img { font-size: 36px; margin-bottom: 3px; filter: drop-shadow(0 4px 2px rgba(0,0,0,0.4)); }
+        .icon-text { font-size: 12px; line-height: 1.2; word-wrap: break-word; }
+
+        /* Window Structure */
+        .window {
+            position: absolute; 
+            background: rgba(240, 245, 255, 0.9);
+            border-radius: 8px; 
+            box-shadow: var(--win-shadow);
+            border: 1px solid rgba(255,255,255,0.6);
+            backdrop-filter: blur(8px);
+            display: flex; flex-direction: column;
+            min-width: 200px; min-height: 100px;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .title-bar {
+            height: 32px;
+            background: var(--glass-header);
+            background-color: rgba(62, 149, 209, 0.75);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 8px; cursor: default;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        .window.active .title-bar { background-color: rgba(30, 110, 190, 0.85); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+        .win-title { font-size: 12px; color: #111; font-weight: bold; text-shadow: 0 0 5px rgba(255,255,255,0.8); pointer-events: none; }
+        .win-controls { display: flex; gap: 4px; }
+        .win-btn { width: 22px; height: 18px; border: 1px solid rgba(0,0,0,0.3); border-radius: 3px; font-size: 10px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: white; box-shadow: inset 0 1px 2px rgba(255,255,255,0.8); }
+        .btn-min { background: radial-gradient(circle, #8bc6eb, #2d6b94); }
+        .btn-max { background: radial-gradient(circle, #eee, #aaa); color: black; }
+        .btn-close { background: radial-gradient(circle, #ffaaaa, #cc0000); font-weight: bold; }
+        .btn-close:hover { background: red; box-shadow: 0 0 8px red; }
+
+        .win-content { flex: 1; background: #fff; position: relative; overflow: auto; border-top: 1px solid #999; }
+        
+        /* =========================================
+           APPS CONTENT STYLES
+           ========================================= */
+        /* Explorer */
+        .explorer-bar { padding: 5px; background: #f0f4fa; border-bottom: 1px solid #ccc; display: flex; gap: 5px; font-size: 12px; }
+        .explorer-path { flex: 1; border: 1px solid #ccc; padding: 2px 5px; background: white; }
+        .file-grid { display: flex; flex-wrap: wrap; gap: 10px; padding: 10px; }
+        .file-item { width: 70px; text-align: center; cursor: pointer; padding: 5px; }
+        .file-item:hover { background: #e0f0ff; border: 1px solid #cceeff; border-radius: 3px; }
+        .file-icon { font-size: 32px; }
+        .file-name { font-size: 11px; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Paint */
+        .paint-toolbar { height: 35px; background: #eee; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding: 0 5px; gap: 10px; }
+        .color-picker { width: 20px; height: 20px; cursor: pointer; border: 1px solid #000; }
+        canvas { cursor: crosshair; display: block; }
+
+        /* Notepad */
+        textarea.notepad { width: 100%; height: 100%; border: none; resize: none; padding: 5px; font-family: monospace; }
+
+        /* CMD */
+        .cmd-bg { background: black; color: #0f0; padding: 5px; font-family: 'Consolas', monospace; min-height: 100%; font-size: 13px; }
+        .cmd-line { display: flex; }
+        .cmd-in { background: transparent; border: none; color: #0f0; flex: 1; outline: none; font-family: inherit; }
+
+        /* =========================================
+           TASKBAR & MENUS
+           ========================================= */
+        #taskbar {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: var(--taskbar-h);
+            background: linear-gradient(to bottom, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%);
+            display: flex; align-items: center; z-index: 9999; border-top: 1px solid rgba(255,255,255,0.4);
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.3); padding: 0 5px;
+        }
+        #start-orb { 
+            width: 36px; height: 36px; border-radius: 50%; 
+            background: radial-gradient(circle at 50% 30%, #4facfe 0%, #00f2fe 100%);
+            border: 2px solid rgba(255,255,255,0.7); box-shadow: 0 0 10px rgba(0,255,255,0.6);
+            display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; cursor: pointer; margin-right: 10px;
+        }
+        #start-orb:hover { filter: brightness(1.2); box-shadow: 0 0 15px white; }
+        
+        #task-list { flex: 1; display: flex; gap: 3px; }
+        .task-btn {
+            width: 150px; height: 30px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 3px; color: white; display: flex; align-items: center; padding: 0 5px; font-size: 11px; cursor: pointer;
+            transition: 0.2s;
+        }
+        .task-btn:hover { background: rgba(255,255,255,0.3); }
+        .task-btn.active { background: linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(255,255,255,0.1)); box-shadow: inset 0 0 5px white; }
+
+        #tray { width: 90px; height: 100%; background: rgba(0,0,0,0.2); display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; font-size: 11px; margin-left: auto; border-left: 1px solid rgba(255,255,255,0.3); border-radius: 5px; }
+
+        /* Start Menu */
+        #start-menu {
+            position: absolute; bottom: 45px; left: 0; width: 320px; height: 450px;
+            background: rgba(245, 250, 255, 0.96); border: 1px solid #777; border-radius: 5px 5px 0 0;
+            box-shadow: 5px 5px 20px rgba(0,0,0,0.5); display: none; z-index: 10000; flex-direction: row;
+        }
+        #start-menu.show { display: flex; animation: slideUp 0.15s ease-out; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .start-left { width: 65%; background: white; padding: 5px; display: flex; flex-direction: column; gap: 2px; }
+        .start-right { width: 35%; background: #dceef7; padding: 5px; border-left: 1px solid #b4c9db; display: flex; flex-direction: column; gap: 5px; }
+        
+        .start-item { padding: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: #333; border-radius: 3px; font-size: 12px; }
+        .start-item:hover { background: linear-gradient(#e6f4ff, #cce8ff); border: 1px solid #99ccff; }
+        
+        /* Context Menu */
+        #context-menu {
+            position: absolute; background: #fff; border: 1px solid #999; box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+            width: 150px; z-index: 20000; display: none; padding: 2px;
+        }
+        .ctx-item { padding: 5px 15px; font-size: 12px; cursor: pointer; color: #333; }
+        .ctx-item:hover { background: #3399ff; color: white; }
+        .ctx-hr { border-bottom: 1px solid #eee; margin: 2px 0; }
+
+        /* Notification */
+        #notification-area { position: absolute; bottom: 50px; right: 10px; z-index: 20000; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            width: 250px; background: rgba(30, 40, 50, 0.9); color: white; border-radius: 5px; padding: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.3);
+            animation: slideIn 0.3s ease-out; cursor: pointer;
+        }
+        .toast h4 { margin: 0 0 5px 0; font-size: 13px; color: #00d2ff; }
+        .toast p { margin: 0; font-size: 11px; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        /* BSOD */
+        #bsod {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #0000aa; color: white; z-index: 999999;
+            font-family: 'Consolas', monospace; padding: 50px; font-size: 18px;
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="bsod">
+        <p>A problem has been detected and AeroOS has been shut down to prevent damage to your computer.</p>
+        <p>CRITICAL_PROCESS_DIED</p>
+        <br>
+        <p>If this is the first time you've seen this stop error screen, restart your computer. If this screen appears again, follow these steps:</p>
+        <p>Check for viruses on your computer. Remove any newly installed hard drives or hard drive controllers.</p>
+        <br>
+        <p>Technical information:</p>
+        <p>*** STOP: 0x000000FE (0x00000008, 0x000000006, 0x00000009, 0x847075cc)</p>
+        <br>
+        <p>Click anywhere to force restart...</p>
+    </div>
+
+    <div id="login-screen">
+        <div class="user-avatar-lg"></div>
+        <h2 style="margin-top:0">Administrator</h2>
+        <div class="login-input-group">
+            <input type="password" class="login-input" placeholder="Password" id="login-pass">
+            <button class="login-btn" onclick="system.login()">➜</button>
+        </div>
+        <p style="opacity: 0.6; font-size: 12px; margin-top: 20px;">Hint: Just click the arrow</p>
+    </div>
+
+    <div id="desktop" oncontextmenu="ui.showContext(event)"></div>
+
+    <div id="context-menu">
+        <div class="ctx-item" onclick="system.refresh()">🔄 Refresh</div>
+        <div class="ctx-hr"></div>
+        <div class="ctx-item" onclick="appManager.open('notepad')">📄 New Text Doc</div>
+        <div class="ctx-item" onclick="appManager.open('paint')">🎨 Start Paint</div>
+        <div class="ctx-hr"></div>
+        <div class="ctx-item" onclick="appManager.open('settings')">⚙️ Personalize</div>
+    </div>
+
+    <div id="start-menu">
+        <div class="start-left">
+            <div class="start-item" onclick="appManager.open('browser')"><span>🌐</span> Internet Browser</div>
+            <div class="start-item" onclick="appManager.open('paint')"><span>🎨</span> Paint Studio</div>
+            <div class="start-item" onclick="appManager.open('notepad')"><span>📝</span> Notepad</div>
+            <div class="start-item" onclick="appManager.open('calculator')"><span>🧮</span> Calculator</div>
+            <div class="start-item" onclick="appManager.open('cmd')"><span>💻</span> Command Prompt</div>
+            <div class="start-item" onclick="appManager.open('explorer', 'C:/Games')"><span>🎮</span> Games</div>
+        </div>
+        <div class="start-right">
+            <div class="start-item" onclick="appManager.open('explorer')">📂 My Computer</div>
+            <div class="start-item" onclick="appManager.open('explorer', 'C:/Documents')">📄 Documents</div>
+            <div class="start-item" onclick="appManager.open('explorer', 'C:/Pictures')">🖼️ Pictures</div>
+            <div style="flex:1"></div>
+            <div class="start-item" onclick="appManager.open('settings')">⚙️ Control Panel</div>
+            <div class="start-item" onclick="location.reload()" style="background:#ffcccc">🛑 Shut Down</div>
+        </div>
+    </div>
+
+    <div id="notification-area"></div>
+
+    <div id="taskbar">
+        <div id="start-orb" onclick="ui.toggleStart()">❖</div>
+        <div id="task-list"></div>
+        <div id="tray">
+            <div id="clock">12:00</div>
+            <div id="date">01.01.2025</div>
+        </div>
+    </div>
+
+    <script>
+        /* =========================================
+           CORE SYSTEM (V2)
+           ========================================= */
+        
+        // --- FILE SYSTEM MOCK ---
+        const FILE_SYSTEM = {
+            'C:/': {
+                'Documents': { type: 'folder' },
+                'Pictures': { type: 'folder' },
+                'Downloads': { type: 'folder' },
+                'Windows': { type: 'folder' },
+                'Games': { type: 'folder' },
+                'readme.txt': { type: 'file', icon: '📄', content: 'Welcome to AeroOS V2!\nEnjoy the update.' }
+            },
+            'C:/Documents': {
+                'todo.txt': { type: 'file', icon: '📝', content: '1. Make cool OS\n2. Drink coffee' },
+                'passwords.txt': { type: 'file', icon: '📝', content: 'admin: 12345' }
+            },
+            'C:/Pictures': {
+                'wallpaper.jpg': { type: 'file', icon: '🖼️' },
+                'cat.png': { type: 'file', icon: '🖼️' }
+            },
+            'C:/Downloads': {
+                'installer.exe': { type: 'file', icon: '📦' },
+                'virus.exe': { type: 'file', icon: '💀', action: 'virus' }
+            },
+            'C:/Games': {
+                'Minecraft Classic': { type: 'file', icon: '🧱', action: 'game_mc' },
+                'Doom': { type: 'file', icon: '🔫', action: 'game_doom' }
+            }
+        };
+
+        const APPS = {
+            'explorer': {
+                title: 'File Explorer', icon: '📂', w: 600, h: 400,
+                init: (win, path) => explorer.render(win, path || 'C:/')
+            },
+            'notepad': {
+                title: 'Notepad', icon: '📝', w: 400, h: 300,
+                html: '<textarea class="notepad" placeholder="Type here..."></textarea>'
+            },
+            'paint': {
+                title: 'Paint Studio', icon: '🎨', w: 500, h: 400,
+                html: `
+                    <div class="paint-toolbar">
+                        Color: <input type="color" id="p-color" value="#000000">
+                        Size: <input type="range" id="p-size" min="1" max="20" value="3">
+                        <button onclick="paint.clear()">Clear</button>
+                    </div>
+                    <canvas id="paint-canvas"></canvas>
+                `,
+                init: (win) => paint.init(win)
+            },
+	    'mygame': {
+            	title: 'ClickerOs', 
+           	icon: '🎮', 
+           	w: 900, 
+            	h: 600,
+            	html: '<iframe src="AeroOsMobile.html" style="width:100%; height:100%; border:none;"></iframe>'
+            },
+            'cmd': {
+                title: 'Command Prompt', icon: '💻', w: 500, h: 300,
+                html: '<div class="cmd-bg" onclick="document.getElementById(\'cmd-in\').focus()"><div id="cmd-out">Microsoft Windows [Version 6.1.7601]<br>(c) 2009 Microsoft Corporation.<br><br></div><div class="cmd-line"><span>C:\\Users\\Admin&gt;</span><input id="cmd-in" class="cmd-in" autocomplete="off"></div></div>',
+                init: (win) => cmd.init()
+            },
+            'settings': {
+                title: 'Settings', icon: '⚙️', w: 400, h: 300,
+                html: `
+                    <div style="padding:15px">
+                        <h3>Personalization</h3>
+                        <p>Change Wallpaper:</p>
+                        <button onclick="ui.setBg('https://images.unsplash.com/photo-1477346611705-65d1883cee1e?q=80&w=2070')">Mountains</button>
+                        <button onclick="ui.setBg('https://images.unsplash.com/photo-1518655048521-f130df041f66?q=80&w=2070')">Industrial</button>
+                        <button onclick="ui.setBg('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070')">Default</button>
+                        <hr>
+                        <button onclick="system.bsod()" style="background:red; color:white">DO NOT PRESS</button>
+                    </div>
+                `
+            }
+        };
+
+        // --- MANAGERS ---
+
+        const system = {
+            login: () => {
+                document.getElementById('login-screen').style.top = '-100%';
+                setTimeout(() => ui.notify('Welcome', 'Logged in as Administrator'), 1000);
+            },
+            bsod: () => {
+                const b = document.getElementById('bsod');
+                b.style.display = 'block';
+                b.onclick = () => location.reload();
+            },
+            refresh: () => {
+                document.getElementById('desktop').innerHTML = '';
+                ui.renderDesktop();
+                document.getElementById('context-menu').style.display = 'none';
+            }
+        };
+
+        const ui = {
+            zIndex: 100,
+            
+            toggleStart: () => {
+                document.getElementById('start-menu').classList.toggle('show');
+            },
+
+            showContext: (e) => {
+                e.preventDefault();
+                const menu = document.getElementById('context-menu');
+                menu.style.display = 'block';
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = e.pageY + 'px';
+            },
+
+            notify: (title, msg) => {
+                const area = document.getElementById('notification-area');
+                const t = document.createElement('div');
+                t.className = 'toast';
+                t.innerHTML = `<h4>${title}</h4><p>${msg}</p>`;
+                t.onclick = () => t.remove();
+                area.appendChild(t);
+                setTimeout(() => t.remove(), 4000);
+            },
+
+            setBg: (url) => {
+                document.body.style.backgroundImage = `url('${url}')`;
+            },
+
+            renderDesktop: () => {
+                const d = document.getElementById('desktop');
+		const shortcuts = [
+                    { name: 'My Computer', icon: '💻', action: () => appManager.open('explorer') },
+                    { name: 'Recycle Bin', icon: '🗑️', action: () => ui.notify('System', 'Bin is empty') },
+                    { name: 'ClickerOs', icon: '🎮', action: () => appManager.open('mygame') }
+                ];
+                shortcuts.forEach(s => {
+                    const el = document.createElement('div');
+                    el.className = 'icon';
+                    el.innerHTML = `<div class="icon-img">${s.icon}</div><div class="icon-text">${s.name}</div>`;
+                    el.ondblclick = s.action;
+                    d.appendChild(el);
+                });
+            }
+        };
+
+        const appManager = {
+            windows: [],
+            
+            open: (appId, param) => {
+                const app = APPS[appId];
+                if(!app) return;
+                
+                ui.zIndex++;
+                const id = 'win_' + Date.now();
+                const win = document.createElement('div');
+                win.className = 'window active';
+                win.id = id;
+                win.style.zIndex = ui.zIndex;
+                win.style.width = app.w + 'px';
+                win.style.height = app.h + 'px';
+                win.style.left = (50 + (appManager.windows.length * 20)) + 'px';
+                win.style.top = (50 + (appManager.windows.length * 20)) + 'px';
+
+                win.innerHTML = `
+                    <div class="title-bar" onmousedown="appManager.drag(event, '${id}')">
+                        <div class="win-title">${app.icon} ${app.title}</div>
+                        <div class="win-controls">
+                            <div class="win-btn btn-min" onclick="appManager.min('${id}')">_</div>
+                            <div class="win-btn btn-max" onclick="appManager.max('${id}')">◻</div>
+                            <div class="win-btn btn-close" onclick="appManager.close('${id}')">X</div>
+                        </div>
+                    </div>
+                    <div class="win-content">${app.html || ''}</div>
+                `;
+                
+                win.onmousedown = () => appManager.focus(id);
+                document.body.appendChild(win);
+                appManager.windows.push(id);
+                appManager.addTaskbar(id, app.title, app.icon);
+
+                if(app.init) app.init(win.querySelector('.win-content'), param);
+                
+                document.getElementById('start-menu').classList.remove('show');
+            },
+
+            close: (id) => {
+                document.getElementById(id).remove();
+                document.querySelector(`[data-id="${id}"]`).remove();
+                appManager.windows = appManager.windows.filter(w => w !== id);
+            },
+
+            min: (id) => { document.getElementById(id).style.display = 'none'; document.querySelector(`[data-id="${id}"]`).classList.remove('active'); },
+            
+            max: (id) => {
+                const w = document.getElementById(id);
+                if(w.style.width === '100%') {
+                    w.style.width = APPS['explorer'].w + 'px'; // Reset logic simplified
+                    w.style.height = APPS['explorer'].h + 'px';
+                    w.style.top = '50px'; w.style.left = '50px';
+                } else {
+                    w.style.top = '0'; w.style.left = '0';
+                    w.style.width = '100%'; w.style.height = 'calc(100% - 40px)';
+                }
+            },
+
+            focus: (id) => {
+                ui.zIndex++;
+                const w = document.getElementById(id);
+                w.style.zIndex = ui.zIndex;
+                document.querySelectorAll('.window').forEach(x => x.classList.remove('active'));
+                w.classList.add('active');
+                document.querySelectorAll('.task-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`[data-id="${id}"]`).classList.add('active');
+            },
+
+            addTaskbar: (id, title, icon) => {
+                const btn = document.createElement('div');
+                btn.className = 'task-btn active';
+                btn.dataset.id = id;
+                btn.innerHTML = `${icon} ${title}`;
+                btn.onclick = () => {
+                    const w = document.getElementById(id);
+                    if(w.style.display === 'none') { w.style.display = 'flex'; appManager.focus(id); }
+                    else if(w.classList.contains('active')) appManager.min(id);
+                    else appManager.focus(id);
+                };
+                document.getElementById('task-list').appendChild(btn);
+            },
+
+            drag: (e, id) => {
+                if(e.target.closest('.win-controls')) return;
+                appManager.focus(id);
+                const win = document.getElementById(id);
+                const shiftX = e.clientX - win.getBoundingClientRect().left;
+                const shiftY = e.clientY - win.getBoundingClientRect().top;
+
+                const move = (ev) => {
+                    win.style.left = ev.pageX - shiftX + 'px';
+                    win.style.top = ev.pageY - shiftY + 'px';
+                };
+                
+                const stop = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', stop); };
+                document.addEventListener('mousemove', move);
+                document.addEventListener('mouseup', stop);
+            }
+        };
+
+        // --- APP LOGIC ---
+
+        const explorer = {
+            render: (container, path) => {
+                const folder = FILE_SYSTEM[path];
+                if(!folder) { container.innerHTML = 'Error: Path not found'; return; }
+                
+                let html = `
+                    <div class="explorer-bar">
+                        <button onclick="explorer.render(this.closest('.win-content'), 'C:/')">🏠</button>
+                        <div class="explorer-path">${path}</div>
+                    </div>
+                    <div class="file-grid">
+                `;
+
+                // Up folder logic
+                if(path !== 'C:/') {
+                     // Simple parent logic for demo
+                     const parent = 'C:/'; 
+                     html += `<div class="file-item" onclick="explorer.render(this.closest('.win-content'), '${parent}')">
+                        <div class="file-icon">📁</div><div class="file-name">..</div></div>`;
+                }
+
+                for(let name in folder) {
+                    if(name === 'type') continue;
+                    const item = folder[name];
+                    const clickAction = item.type === 'folder' 
+                        ? `explorer.render(this.closest('.win-content'), '${path === 'C:/' ? path + name : path + '/' + name}')`
+                        : `explorer.openFile('${path}', '${name}')`;
+                    
+                    html += `
+                        <div class="file-item" ondblclick="${clickAction}">
+                            <div class="file-icon">${item.type === 'folder' ? '📁' : item.icon}</div>
+                            <div class="file-name">${name}</div>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            },
+            openFile: (path, name) => {
+                const file = FILE_SYSTEM[path][name];
+                if(file.action === 'virus') {
+                    system.bsod();
+                } else if (file.action === 'game_mc') {
+                    appManager.open('browser'); // Placeholder for game
+                    ui.notify('Game', 'Starting Minecraft...');
+                } else if(file.content) {
+                    ui.notify('File System', `Opening ${name}...`);
+                    // Simple alert for file content for now, or open notepad
+                    appManager.open('notepad');
+                    // In a complex version, we would inject content into notepad
+                }
+            }
+        };
+
+        const paint = {
+            init: (container) => {
+                const cvs = container.querySelector('canvas');
+                const rect = container.getBoundingClientRect();
+                cvs.width = rect.width; cvs.height = rect.height - 40;
+                const ctx = cvs.getContext('2d');
+                let painting = false;
+
+                const start = (e) => { painting = true; draw(e); };
+                const end = () => { painting = false; ctx.beginPath(); };
+                const draw = (e) => {
+                    if(!painting) return;
+                    const b = cvs.getBoundingClientRect();
+                    ctx.lineWidth = container.querySelector('#p-size').value;
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = container.querySelector('#p-color').value;
+                    ctx.lineTo(e.clientX - b.left, e.clientY - b.top);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(e.clientX - b.left, e.clientY - b.top);
+                };
+
+                cvs.onmousedown = start;
+                cvs.onmouseup = end;
+                cvs.onmousemove = draw;
+                
+                paint.clear = () => ctx.clearRect(0,0,cvs.width, cvs.height);
+            }
+        };
+
+        const cmd = {
+            init: () => {
+                const inp = document.getElementById('cmd-in');
+                inp.addEventListener('keydown', (e) => {
+                    if(e.key === 'Enter') {
+                        const val = inp.value.trim().toLowerCase();
+                        const out = document.getElementById('cmd-out');
+                        out.innerHTML += `<div>C:\\Users\\Admin&gt;${inp.value}</div>`;
+                        
+                        if(val === 'help') out.innerHTML += '<div>Commands: ver, date, cls, echo, exit, color</div>';
+                        else if(val === 'ver') out.innerHTML += '<div>AeroOS V2.0.1 [Build 7601]</div>';
+                        else if(val === 'date') out.innerHTML += `<div>${new Date().toString()}</div>`;
+                        else if(val === 'cls') out.innerHTML = '';
+                        else if(val === 'color') document.querySelector('.cmd-bg').style.color = '#'+Math.floor(Math.random()*16777215).toString(16);
+                        else if(val === 'exit') document.querySelector('.window.active .btn-close').click();
+                        else out.innerHTML += `<div>'${val}' is not recognized.</div>`;
+                        
+                        inp.value = '';
+                        inp.scrollIntoView();
+                    }
+                });
+                inp.focus();
+            }
+        };
+
+        // --- INIT ---
+        window.onload = () => {
+            setInterval(() => {
+                const d = new Date();
+                document.getElementById('clock').innerText = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                document.getElementById('date').innerText = d.toLocaleDateString();
+            }, 1000);
+            
+            ui.renderDesktop();
+            
+            // Close menus on click outside
+            document.addEventListener('click', (e) => {
+                if(!e.target.closest('#context-menu')) document.getElementById('context-menu').style.display = 'none';
+                if(!e.target.closest('#start-menu') && !e.target.closest('#start-orb')) document.getElementById('start-menu').classList.remove('show');
+            });
+        };
+
+    </script>
+</body>
+</html>
