@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Frutiger Aero — Mobile</title>
+<style>
+  :root{
+    --bg:#072a33; --accent:#ffb84d; --danger:#ff6b6b; --ui:#0e3a44; --text:#eaf6f8;
+    --safe-area-top: env(safe-area-inset-top);
+    --safe-area-bottom: env(safe-area-inset-bottom);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family: "Frutiger", system-ui, -apple-system, "Segoe UI", Roboto, Arial;color:var(--text);-webkit-tap-highlight-color:transparent}
+  body{background:linear-gradient(180deg,var(--bg),#04323a);display:flex;align-items:center;justify-content:center;padding:12px}
+  .phone {
+    width:360px; height:720px; max-width:92vw; border-radius:28px; overflow:hidden; position:relative;
+    background:linear-gradient(180deg,#0a3a46,#053034); box-shadow:0 20px 40px rgba(2,10,14,.6); border:6px solid rgba(255,255,255,0.03);
+    padding-top:var(--safe-area-top);
+  }
+  /* top HUD */
+  .topbar{height:56px; display:flex;align-items:center;justify-content:space-between;padding:8px 12px}
+  .chip{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:12px;font-weight:700;font-size:14px}
+  /* play area */
+  .play{position:relative; height:520px; margin:0 12px 12px 12px; background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent); border-radius:14px; overflow:hidden}
+  .sky{position:absolute;inset:0}
+  .plane{position:absolute;left:50%;bottom:22%;width:72px;height:54px;transform:translateX(-50%);transition:transform .08s linear}
+  .plane svg{width:100%;height:100%}
+  .item{position:absolute;width:46px;height:46px;pointer-events:none;transition:transform .12s linear}
+  .banner{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:linear-gradient(180deg,#092b32,#0e3a44);padding:16px;border-radius:12px;text-align:center}
+  .banner h1{margin:0 0 6px 0;font-size:18px}
+  .controls{position:absolute;left:0;right:0;bottom:12px;display:flex;gap:10px;justify-content:center;padding-bottom:var(--safe-area-bottom)}
+  .touchbtn{flex:1;max-width:150px;background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));border-radius:12px;padding:14px;font-weight:800;font-size:18px;text-align:center;user-select:none}
+  .small{font-size:13px;opacity:.9}
+  .scoreBox{position:absolute;left:12px;top:68px;background:linear-gradient(90deg,var(--accent),#ff8a6b);padding:6px 10px;border-radius:10px;color:#052e2f;font-weight:800}
+  .lives{position:absolute;right:12px;top:68px;background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:10px;font-weight:700}
+</style>
+</head>
+<body>
+  <div class="phone" id="phone">
+    <div class="topbar">
+      <div class="chip">Frutiger Aero</div>
+      <div class="chip small" id="distance">Дистанция: 0 м</div>
+    </div>
+
+    <div class="play" id="play">
+      <div class="sky" id="sky"></div>
+
+      <div class="plane" id="plane" aria-hidden="true">
+        <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
+          <g fill="none" stroke="#eaf6f8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 32c12-6 40-6 52-4" stroke="#bfeeea"/>
+            <path d="M18 8c6-2 24-2 36 0l6 10c-10 4-34 4-46 2z" fill="#0d737b" stroke="#eaf6f8"/>
+            <circle cx="14" cy="34" r="2" fill="#eaf6f8"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="scoreBox" id="score">Счёт: 0</div>
+      <div class="lives" id="lives">❤❤❤</div>
+
+      <div class="banner" id="banner">
+        <h1>Frutiger Aero</h1>
+        <div class="small">Проводи пальцем влево/вправо, собирай фрукты — избегай бурь.</div>
+        <div style="margin-top:10px;display:flex;gap:8px;justify-content:center">
+          <div class="touchbtn" id="start">Играть</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="touchbtn" id="left">◀</div>
+      <div class="touchbtn" id="right">▶</div>
+    </div>
+  </div>
+
+<script>
+  // Mobile-first simple game
+  const play = document.getElementById('play');
+  const sky = document.getElementById('sky');
+  const plane = document.getElementById('plane');
+  const banner = document.getElementById('banner');
+  const scoreEl = document.getElementById('score');
+  const livesEl = document.getElementById('lives');
+  const distanceEl = document.getElementById('distance');
+
+  let running = false, score = 0, lives = 3, distance = 0;
+  let planeX = 0.5; // relative 0..1
+  const moveSpeed = 0.012;
+  let touchDir = 0; // -1 left, 1 right
+  let items = [];
+
+  function reset(){
+    running = false; score = 0; lives = 3; distance = 0;
+    items.forEach(i=>i.el.remove()); items = [];
+    updateHUD();
+    planeX = 0.5; setPlane();
+    banner.style.display = 'block';
+  }
+
+  function updateHUD(){
+    scoreEl.textContent = 'Счёт: ' + score;
+    livesEl.textContent = '❤'.repeat(Math.max(0,lives));
+    distanceEl.textContent = 'Дистанция: ' + Math.floor(distance) + ' м';
+  }
+
+  function setPlane(){
+    const r = play.getBoundingClientRect();
+    const px = Math.round((r.width - plane.offsetWidth) * planeX);
+    plane.style.left = px + 'px';
+  }
+
+  function spawn(kind){
+    const el = document.createElement('div');
+    el.className = 'item';
+    const r = play.getBoundingClientRect();
+    const x = Math.random() * (r.width - 60);
+    const y = r.height + 40;
+    el.style.left = x + 'px'; el.style.top = y + 'px';
+    if(kind === 'fruit'){
+      el.innerHTML = `<svg viewBox="0 0 64 64" width="100%" height="100%"><circle cx="32" cy="34" r="16" fill="${Math.random()<0.5? '#ffbd3a':'#ff6b6b'}"/><path d="M36 18c-4-6-10-6-12 0" stroke="#2b2b2b" stroke-width="1.6" fill="none"/></svg>`;
+    } else {
+      el.innerHTML = `<svg viewBox="0 0 64 64" width="100%" height="100%"><g fill="#ffffff" opacity="0.95"><ellipse cx="28" cy="32" rx="18" ry="12"/><ellipse cx="40" cy="28" rx="10" ry="8"/></g></svg>`;
+      el.style.filter = 'blur(0.4px)';
+    }
+    sky.appendChild(el);
+    items.push({el,kind,x,y,vy: (kind==='fruit'? -1.2 : -1.9), hit:false});
+  }
+
+  function rect(a){ return a.getBoundingClientRect(); }
+  function hit(a,b){ return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom); }
+
+  // main loop
+  let spawnCounter = 0;
+  function tick(){
+    if(!running) return;
+    // movement by touch dir
+    planeX = Math.max(0, Math.min(1, planeX + touchDir * moveSpeed));
+    setPlane();
+    // distance increases with score/time
+    distance += 0.3;
+    // spawn logic
+    spawnCounter++;
+    if(spawnCounter > 30){
+      spawnCounter = 0;
+      if(Math.random() < 0.7) spawn('fruit');
+      if(Math.random() < 0.25 + Math.min(0.25, score/200)) spawn('storm');
+    }
+    // move items upward (toward plane)
+    const pr = play.getBoundingClientRect();
+    for(let i=items.length-1;i>=0;i--){
+      const it = items[i];
+      it.y += it.vy * (1 + score*0.01);
+      it.el.style.top = Math.round(it.y) + 'px';
+      const pRect = rect(plane);
+      const itRect = rect(it.el);
+      if(!it.hit && hit(pRect,itRect)){
+        it.hit = true;
+        if(it.kind === 'fruit'){
+          score += 5;
+          it.el.style.transform = 'scale(1.4)'; it.el.style.opacity = '0';
+          setTimeout(()=>{ it.el.remove(); },220);
+        } else {
+          lives -= 1;
+          it.el.style.opacity = '0.6';
+          plane.style.transform = 'translateY(-6px) rotate(-5deg)';
+          setTimeout(()=>plane.style.transform = '',180);
+          setTimeout(()=>{ it.el.remove(); },240);
+        }
+        updateHUD();
+      }
+      if(it.y < -100) { it.el.remove(); items.splice(i,1); }
+    }
+    if(lives <= 0){ endGame(); return; }
+    updateHUD();
+    requestAnimationFrame(tick);
+  }
+
+  function endGame(){
+    running = false;
+    banner.style.display = 'block';
+    banner.innerHTML = `<h1>Игра окончена</h1><div class="small">Счёт: ${score} — Дистанция: ${Math.floor(distance)} м</div><div style="margin-top:10px;display:flex;gap:8px;justify-content:center"><div class="touchbtn" id="restart">Заново</div></div>`;
+    document.getElementById('restart').addEventListener('click', ()=>{
+      banner.innerHTML = `<h1>Frutiger Aero</h1><div class="small">Проводи пальцем влево/вправо, собирай фрукты — избегай бурь.</div><div style="margin-top:10px;display:flex;gap:8px;justify-content:center"><div class="touchbtn" id="start">Играть</div></div>`;
+      document.getElementById('start').addEventListener('click', startGame);
+      reset();
+    });
+  }
+
+  function startGame(){
+    banner.style.display = 'none';
+    running = true; score = 0; lives = 3; distance = 0;
+    items.forEach(i=>i.el.remove()); items = [];
+    updateHUD();
+    setPlane();
+    requestAnimationFrame(tick);
+  }
+
+  // simple continuous touch controls
+  let leftBtn = document.getElementById('left');
+  let rightBtn = document.getElementById('right');
+  leftBtn.addEventListener('touchstart', e=>{ e.preventDefault(); touchDir = -1; }, {passive:false});
+  leftBtn.addEventListener('touchend', e=>{ e.preventDefault(); if(touchDir===-1) touchDir=0; }, {passive:false});
+  rightBtn.addEventListener('touchstart', e=>{ e.preventDefault(); touchDir = 1; }, {passive:false});
+  rightBtn.addEventListener('touchend', e=>{ e.preventDefault(); if(touchDir===1) touchDir=0; }, {passive:false});
+
+  // allow swipe on play area for more natural control
+  let activeTouch = null;
+  play.addEventListener('touchstart', e=>{
+    const t = e.changedTouches[0];
+    activeTouch = {id:t.identifier, startX:t.clientX, lastX:t.clientX};
+  }, {passive:true});
+  play.addEventListener('touchmove', e=>{
+    if(!activeTouch) return;
+    for(const t of e.changedTouches) if(t.identifier===activeTouch.id){
+      const dx = t.clientX - activeTouch.lastX;
+      activeTouch.lastX = t.clientX;
+      const r = play.getBoundingClientRect();
+      planeX += dx / r.width;
+      planeX = Math.max(0, Math.min(1, planeX));
+      setPlane();
+      break;
+    }
+  }, {passive:true});
+  play.addEventListener('touchend', e=>{ activeTouch = null; }, {passive:true});
+
+  // start button handler
+  document.getElementById('start').addEventListener('click', startGame);
+
+  // initial setup
+  reset();
+  // keep plane correctly positioned on resize
+  window.addEventListener('resize', setPlane);
+  setPlane();
+</script>
+</body>
+</html>
