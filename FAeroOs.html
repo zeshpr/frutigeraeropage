@@ -533,7 +533,7 @@
             }
         };
 
-        const appManager = {
+const appManager = {
             windows: [],
             
             open: (appId, param) => {
@@ -546,13 +546,17 @@
                 win.className = 'window active';
                 win.id = id;
                 win.style.zIndex = ui.zIndex;
-                win.style.width = app.w + 'px';
-                win.style.height = app.h + 'px';
-                win.style.left = (10 + (appManager.windows.length * 20)) + 'px';
-                win.style.top = (50 + (appManager.windows.length * 20)) + 'px';
+                
+                // Адаптивный размер для мобилок
+                const isMobile = window.innerWidth < 600;
+                win.style.width = isMobile ? '95%' : app.w + 'px';
+                win.style.height = isMobile ? '80%' : app.h + 'px';
+                win.style.left = isMobile ? '2.5%' : (50 + (appManager.windows.length * 20)) + 'px';
+                win.style.top = isMobile ? '10px' : (50 + (appManager.windows.length * 20)) + 'px';
 
+                // ДОБАВЛЕНО: ontouchstart для мобильного перетаскивания
                 win.innerHTML = `
-			<div class="title-bar" onmousedown="appManager.drag(event, '${id}')" ontouchstart="appManager.drag(event, '${id}')">
+                    <div class="title-bar" onmousedown="appManager.drag(event, '${id}')" ontouchstart="appManager.drag(event, '${id}')">
                         <div class="win-title">${app.icon} ${app.title}</div>
                         <div class="win-controls">
                             <div class="win-btn btn-min" onclick="appManager.min('${id}')">_</div>
@@ -563,29 +567,33 @@
                     <div class="win-content">${app.html || ''}</div>
                 `;
                 
-                win.onmousedown = () => appManager.focus(id);
+                // Фокус по клику или тапу
+                win.onmousedown = win.ontouchstart = () => appManager.focus(id);
+                
                 document.body.appendChild(win);
                 appManager.windows.push(id);
                 appManager.addTaskbar(id, app.title, app.icon);
 
                 if(app.init) app.init(win.querySelector('.win-content'), param);
-                
                 document.getElementById('start-menu').classList.remove('show');
             },
 
             close: (id) => {
                 document.getElementById(id).remove();
-                document.querySelector(`[data-id="${id}"]`).remove();
+                const taskBtn = document.querySelector(`[data-id="${id}"]`);
+                if(taskBtn) taskBtn.remove();
                 appManager.windows = appManager.windows.filter(w => w !== id);
             },
 
-            min: (id) => { document.getElementById(id).style.display = 'none'; document.querySelector(`[data-id="${id}"]`).classList.remove('active'); },
+            min: (id) => { 
+                document.getElementById(id).style.display = 'none'; 
+                document.querySelector(`[data-id="${id}"]`).classList.remove('active'); 
+            },
             
             max: (id) => {
                 const w = document.getElementById(id);
                 if(w.style.width === '100%') {
-                    w.style.width = APPS['explorer'].w + 'px'; // Reset logic simplified
-                    w.style.height = APPS['explorer'].h + 'px';
+                    w.style.width = '400px'; w.style.height = '300px';
                     w.style.top = '50px'; w.style.left = '50px';
                 } else {
                     w.style.top = '0'; w.style.left = '0';
@@ -596,11 +604,13 @@
             focus: (id) => {
                 ui.zIndex++;
                 const w = document.getElementById(id);
+                if(!w) return;
                 w.style.zIndex = ui.zIndex;
                 document.querySelectorAll('.window').forEach(x => x.classList.remove('active'));
                 w.classList.add('active');
                 document.querySelectorAll('.task-btn').forEach(b => b.classList.remove('active'));
-                document.querySelector(`[data-id="${id}"]`).classList.add('active');
+                const btn = document.querySelector(`[data-id="${id}"]`);
+                if(btn) btn.classList.add('active');
             },
 
             addTaskbar: (id, title, icon) => {
@@ -617,21 +627,21 @@
                 document.getElementById('task-list').appendChild(btn);
             },
 
-		drag: (e, id) => {
+            // УНИВЕРСАЛЬНЫЙ ДРАГ (МЫШЬ + ТАЧ)
+            drag: (e, id) => {
                 if(e.target.closest('.win-controls')) return;
                 appManager.focus(id);
                 const win = document.getElementById(id);
                 
-                // Определяем: это палец (touch) или мышь?
-                const event = e.type.includes('touch') ? e.touches[0] : e;
-                
-                const shiftX = event.clientX - win.getBoundingClientRect().left;
-                const shiftY = event.clientY - win.getBoundingClientRect().top;
+                // Берем координаты либо из мыши, либо из первого пальца
+                const touch = e.type.includes('touch') ? e.touches[0] : e;
+                const shiftX = touch.clientX - win.getBoundingClientRect().left;
+                const shiftY = touch.clientY - win.getBoundingClientRect().top;
 
                 const move = (ev) => {
-                    const moveEvent = ev.type.includes('touch') ? ev.touches[0] : ev;
-                    win.style.left = moveEvent.pageX - shiftX + 'px';
-                    win.style.top = moveEvent.pageY - shiftY + 'px';
+                    const mTouch = ev.type.includes('touch') ? ev.touches[0] : ev;
+                    win.style.left = mTouch.pageX - shiftX + 'px';
+                    win.style.top = mTouch.pageY - shiftY + 'px';
                 };
                 
                 const stop = () => { 
@@ -643,10 +653,10 @@
 
                 document.addEventListener('mousemove', move);
                 document.addEventListener('mouseup', stop);
-                // Для мобильных нужно добавить passive: false, чтобы окно не "дергалось" вместе со страницей
                 document.addEventListener('touchmove', move, {passive: false});
                 document.addEventListener('touchend', stop);
             }
+        };
 
         // --- APP LOGIC ---
 
@@ -779,3 +789,4 @@
     </script>
 </body>
 </html>
+
