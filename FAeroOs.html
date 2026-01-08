@@ -320,13 +320,7 @@
             	h: 600,
             	html: '<iframe src="AeroOsMobile.html" style="width:100%; height:100%; border:none;"></iframe>'
             },
-	    'telegram': {
-            title: 'telegram', 
-            icon: '✈️', // Твой самолетик
-            w: 900, 
-            h: 600,
-            html: '<iframe src="https://t.me/frutigeraerofunpage" style="width:100%; height:100%; border:none;"></iframe>'
-        },
+
 	    'page': {
             title: 'page', 
             icon: '📃', // Твой самолетик
@@ -536,10 +530,9 @@
                     { name: 'My Computer', icon: '💻', action: () => appManager.open('explorer') },
                     { name: 'My Game', icon: '🎮', action: () => appManager.open('mygame') },
                     { name: 'Music Player', icon: '📻', action: () => appManager.open('music') },
-                    // ВОТ ЭТА СТРОЧКА:
-		    { name: 'Telegram', icon: '✈️', action: () => window.open('https://t.me/frutigeraerofunpage', '_blank') }
 		    { name: 'Bubble Page', icon: '📃', action: () => window.open('https://zeshpr.github.io/frutigeraeropage/bubble.html', '_blank') }
                 ];
+
                 shortcuts.forEach(s => {
                     const el = document.createElement('div');
                     el.className = 'icon';
@@ -807,3 +800,4 @@ const appManager = {
 </body>
 </html>
 	
+
