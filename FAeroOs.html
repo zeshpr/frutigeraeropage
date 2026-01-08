@@ -320,6 +320,13 @@
             	h: 600,
             	html: '<iframe src="AeroOsMobile.html" style="width:100%; height:100%; border:none;"></iframe>'
             },
+			'telegram': {
+            	title: 'Telegram', 
+           	icon: 'telegram.png', 
+           	w: 900, 
+            	h: 600,
+            	html: '<iframe src="https://t.me/frutigeraerofunpage" style="width:100%; height:100%; border:none;"></iframe>'
+            },
 	    'music': {
             title: 'AeroMediaPlayer', 
             icon: '📻', 
@@ -520,7 +527,7 @@
                 const d = document.getElementById('desktop');
 	const shortcuts = [
                     { name: 'My Computer', icon: '💻', action: () => appManager.open('explorer') },
-                    { name: 'My Game', icon: '🎮', action: () => appManager.open('mygame') },
+                    { name: 'ClickerOs', icon: '🎮', action: () => appManager.open('mygame') },
                     { name: 'Music Player', icon: '📻', action: () => appManager.open('music') } // ДОБАВЛЕНО
                 ];
                 shortcuts.forEach(s => {
@@ -789,5 +796,6 @@ const appManager = {
     </script>
 </body>
 </html>
+
 
 
