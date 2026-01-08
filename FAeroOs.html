@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AeroOS Ultimate V2</title>
     <style>
         /* =========================================
@@ -176,6 +176,20 @@
             font-family: 'Consolas', monospace; padding: 50px; font-size: 18px;
             display: none;
         }
+/* Адаптация для мобильных устройств */
+@media (max-width: 600px) {
+    .window { 
+        width: 95% !important; 
+        height: 80% !important; 
+        left: 2.5% !important; 
+        top: 10px !important; 
+    }
+    .task-btn { width: 40px; overflow: hidden; text-indent: -999px; position: relative; }
+    .task-btn::before { content: '🔲'; position: absolute; left: 12px; text-indent: 0; }
+    #start-menu { width: 100%; height: 80vh; bottom: 40px; }
+    .icon { width: 70px; }
+    .icon-img { font-size: 30px; }
+}
 
     </style>
 </head>
@@ -334,11 +348,14 @@
                             📂 Открыть локальный MP3
                             <input type="file" id="file-input" accept="audio/*" style="display: none;">
                         </label>
+			<p>открывай лучше свои мп3 файлы, с этого плейлиста почемуто не работает, позже доработаю:)
+			прошу свои извинения
+			</p>
                     </div>
 
 	<div id="playlist" style="flex: 1; overflow-y: auto; background: white;">
-	    <div class="track-item" data-src="frutigeraeromix.mp3" style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px;">frutiger aero mix</div>
-	    <div class="track-item" data-src="SABBATH.mp3" style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px;">sabbath</div>
+	    <div class="track-item" data-src="sabbath.mp3" style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px;">sabbath</div>
+	    <div class="track-item" data-src="frutigeraeromix.mp3.mp3" style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px;">frutiger aero mix</div>
 	</div>
             `,
 	init: (win) => {
@@ -510,7 +527,7 @@
                     const el = document.createElement('div');
                     el.className = 'icon';
                     el.innerHTML = `<div class="icon-img">${s.icon}</div><div class="icon-text">${s.name}</div>`;
-                    el.ondblclick = s.action;
+		    el.onclick = s.action; // На телефоне лучше открывать в один клик
                     d.appendChild(el);
                 });
             }
@@ -531,11 +548,11 @@
                 win.style.zIndex = ui.zIndex;
                 win.style.width = app.w + 'px';
                 win.style.height = app.h + 'px';
-                win.style.left = (50 + (appManager.windows.length * 20)) + 'px';
+                win.style.left = (10 + (appManager.windows.length * 20)) + 'px';
                 win.style.top = (50 + (appManager.windows.length * 20)) + 'px';
 
                 win.innerHTML = `
-                    <div class="title-bar" onmousedown="appManager.drag(event, '${id}')">
+			<div class="title-bar" onmousedown="appManager.drag(event, '${id}')" ontouchstart="appManager.drag(event, '${id}')">
                         <div class="win-title">${app.icon} ${app.title}</div>
                         <div class="win-controls">
                             <div class="win-btn btn-min" onclick="appManager.min('${id}')">_</div>
@@ -600,23 +617,36 @@
                 document.getElementById('task-list').appendChild(btn);
             },
 
-            drag: (e, id) => {
+		drag: (e, id) => {
                 if(e.target.closest('.win-controls')) return;
                 appManager.focus(id);
                 const win = document.getElementById(id);
-                const shiftX = e.clientX - win.getBoundingClientRect().left;
-                const shiftY = e.clientY - win.getBoundingClientRect().top;
+                
+                // Определяем: это палец (touch) или мышь?
+                const event = e.type.includes('touch') ? e.touches[0] : e;
+                
+                const shiftX = event.clientX - win.getBoundingClientRect().left;
+                const shiftY = event.clientY - win.getBoundingClientRect().top;
 
                 const move = (ev) => {
-                    win.style.left = ev.pageX - shiftX + 'px';
-                    win.style.top = ev.pageY - shiftY + 'px';
+                    const moveEvent = ev.type.includes('touch') ? ev.touches[0] : ev;
+                    win.style.left = moveEvent.pageX - shiftX + 'px';
+                    win.style.top = moveEvent.pageY - shiftY + 'px';
                 };
                 
-                const stop = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', stop); };
+                const stop = () => { 
+                    document.removeEventListener('mousemove', move); 
+                    document.removeEventListener('mouseup', stop);
+                    document.removeEventListener('touchmove', move);
+                    document.removeEventListener('touchend', stop);
+                };
+
                 document.addEventListener('mousemove', move);
                 document.addEventListener('mouseup', stop);
+                // Для мобильных нужно добавить passive: false, чтобы окно не "дергалось" вместе со страницей
+                document.addEventListener('touchmove', move, {passive: false});
+                document.addEventListener('touchend', stop);
             }
-        };
 
         // --- APP LOGIC ---
 
@@ -749,6 +779,3 @@
     </script>
 </body>
 </html>
-
-
-
