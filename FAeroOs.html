@@ -306,6 +306,131 @@
             	h: 600,
             	html: '<iframe src="AeroOsMobile.html" style="width:100%; height:100%; border:none;"></iframe>'
             },
+	    'music': {
+            title: 'AeroMediaPlayer', 
+            icon: '📻', 
+            w: 450, 
+            h: 580,
+            html: `
+                <div class="player-container" style="background: #f0f0f0; height: 100%; display: flex; flex-direction: column; font-family: 'Segoe UI', sans-serif;">
+                    <canvas id="viz-canvas" style="width: 100%; height: 120px; background: #000; display: block;"></canvas>
+                    
+                    <div style="padding: 15px; background: linear-gradient(to bottom, #fff, #dceef7); border-bottom: 1px solid #999;">
+                        <div id="now-playing" style="font-weight: bold; margin-bottom: 8px; color: #004d7a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ожидание трека...</div>
+                        <input type="range" id="seek-slider" value="0" max="100" style="width: 100%; margin-bottom: 10px; cursor: pointer;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; gap: 8px;">
+                                <button id="play-btn" style="padding: 5px 15px; border-radius: 4px; border: 1px solid #777; background: linear-gradient(#eee, #ccc); cursor: pointer;">▶</button>
+                                <button id="pause-btn" style="padding: 5px 15px; border-radius: 4px; border: 1px solid #777; background: linear-gradient(#eee, #ccc); cursor: pointer;">⏸</button>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
+                                🔈 <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5" style="width: 70px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 10px; background: #e1e1e1; border-bottom: 1px solid #ccc;">
+                        <label style="display: block; background: #2989d8; color: white; text-align: center; padding: 5px; border-radius: 3px; cursor: pointer; font-size: 12px;">
+                            📂 Открыть локальный MP3
+                            <input type="file" id="file-input" accept="audio/*" style="display: none;">
+                        </label>
+			<p>открывай лучше свои мп3 файлы, с этого плейлиста почемуто не работает, позже доработаю:)
+			прошу свои извинения
+			</p>
+                    </div>
+
+	<div id="playlist" style="flex: 1; overflow-y: auto; background: white;">
+	    <div class="track-item" data-src="music.mp3" style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px;">music</div>
+	    <div class="track-item" data-src="music.mp3" style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 13px;">Моя песня 2</div>
+	</div>
+            `,
+	init: (win) => {
+                const audio = new Audio();
+                const canvas = win.querySelector('#viz-canvas');
+                const ctx = canvas.getContext('2d');
+                const playBtn = win.querySelector('#play-btn');
+                const pauseBtn = win.querySelector('#pause-btn');
+                const volSlider = win.querySelector('#volume-slider');
+                const seekSlider = win.querySelector('#seek-slider');
+                const fileInput = win.querySelector('#file-input');
+                const playlist = win.querySelector('#playlist');
+                const nowPlaying = win.querySelector('#now-playing');
+
+                let audioCtx, analyser, source, dataArray, bufferLength;
+                let initialized = false;
+
+                // Функция настройки звукового узла
+                function setupAudioNodes() {
+                    if (!audioCtx) {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        analyser = audioCtx.createAnalyser();
+                        source = audioCtx.createMediaElementSource(audio);
+                        source.connect(analyser);
+                        analyser.connect(audioCtx.destination);
+                        analyser.fftSize = 128;
+                        bufferLength = analyser.frequencyBinCount;
+                        dataArray = new Uint8Array(bufferLength);
+                        renderFrame();
+                    }
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                }
+
+                function renderFrame() {
+                    requestAnimationFrame(renderFrame);
+                    if (!analyser) return;
+                    analyser.getByteFrequencyData(dataArray);
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    const barWidth = (canvas.width / bufferLength) * 2;
+                    let x = 0;
+                    for (let i = 0; i < bufferLength; i++) {
+                        const barHeight = dataArray[i] * 0.4;
+                        ctx.fillStyle = `rgb(0, ${barHeight + 120}, 255)`;
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                        x += barWidth + 1;
+                    }
+                }
+
+                // КЛИК ПО ПЛЕЙЛИСТУ
+                playlist.onclick = (e) => {
+                    const item = e.target.closest('.track-item');
+                    if (item) {
+                        const trackPath = item.dataset.src;
+                        
+                        // Если файл локальный (не http), временно отключаем визуализатор, 
+                        // если он вызывает ошибку безопасности
+                        try {
+                            setupAudioNodes();
+                        } catch(e) {
+                            console.log("Visualizer blocked by browser security for local file");
+                        }
+
+                        audio.src = trackPath;
+                        nowPlaying.innerText = "🎵 " + item.innerText;
+                        audio.play().catch(err => {
+                            ui.notify("Info", "Нажмите PLAY для запуска");
+                        });
+                    }
+                };
+
+                // ВЫБОР ФАЙЛА ВРУЧНУЮ
+                fileInput.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        setupAudioNodes();
+                        audio.src = URL.createObjectURL(file);
+                        nowPlaying.innerText = "📁 " + file.name;
+                        audio.play();
+                    }
+                };
+
+                playBtn.onclick = () => { setupAudioNodes(); audio.play(); };
+                pauseBtn.onclick = () => audio.pause();
+                volSlider.oninput = (e) => audio.volume = e.target.value;
+                audio.ontimeupdate = () => { if (!isNaN(audio.duration)) seekSlider.value = (audio.currentTime / audio.duration) * 100; };
+                seekSlider.oninput = (e) => { if (!isNaN(audio.duration)) audio.currentTime = (e.target.value / 100) * audio.duration; };
+            }
+	},
             'cmd': {
                 title: 'Command Prompt', icon: '💻', w: 500, h: 300,
                 html: '<div class="cmd-bg" onclick="document.getElementById(\'cmd-in\').focus()"><div id="cmd-out">Microsoft Windows [Version 6.1.7601]<br>(c) 2009 Microsoft Corporation.<br><br></div><div class="cmd-line"><span>C:\\Users\\Admin&gt;</span><input id="cmd-in" class="cmd-in" autocomplete="off"></div></div>',
@@ -325,7 +450,9 @@
                     </div>
                 `
             }
-        };
+
+        }
+
 
         // --- MANAGERS ---
 
@@ -377,10 +504,10 @@
 
             renderDesktop: () => {
                 const d = document.getElementById('desktop');
-		const shortcuts = [
+	const shortcuts = [
                     { name: 'My Computer', icon: '💻', action: () => appManager.open('explorer') },
-                    { name: 'Recycle Bin', icon: '🗑️', action: () => ui.notify('System', 'Bin is empty') },
-                    { name: 'ClickerOs', icon: '🎮', action: () => appManager.open('mygame') }
+                    { name: 'My Game', icon: '🎮', action: () => appManager.open('mygame') },
+                    { name: 'Music Player', icon: '📻', action: () => appManager.open('music') } // ДОБАВЛЕНО
                 ];
                 shortcuts.forEach(s => {
                     const el = document.createElement('div');
