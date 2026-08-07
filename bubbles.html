@@ -1,0 +1,2665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUBBLES — your little place on the web</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --blue: #49bfe8;
+    --deep-blue: #178bc4;
+    --cyan: #9ff4ff;
+    --green: #77dca0;
+    --white: rgba(255,255,255,.78);
+    --glass: rgba(255,255,255,.48);
+    --border: rgba(255,255,255,.9);
+    --shadow: 0 12px 35px rgba(25,110,150,.22);
+    --text: #24546a;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Nunito", Arial, sans-serif;
+    color: var(--text);
+    background:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,.95) 0 3px, transparent 4px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,.8) 0 5px, transparent 6px),
+        linear-gradient(180deg,#71d9f4 0%,#b7f5fa 45%,#dfffd9 100%);
+    background-attachment: fixed;
+    overflow-x: hidden;
+}
+
+body::before {
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.35;
+    background:
+        radial-gradient(circle at 20% 80%, rgba(255,255,255,.7) 0 25px, transparent 26px),
+        radial-gradient(circle at 90% 15%, rgba(255,255,255,.65) 0 18px, transparent 19px),
+        radial-gradient(circle at 55% 45%, rgba(255,255,255,.4) 0 9px, transparent 10px);
+}
+
+a {
+    color:inherit;
+    text-decoration:none;
+}
+
+button,
+input,
+textarea,
+select {
+    font:inherit;
+}
+
+button {
+    cursor:pointer;
+}
+
+.hidden {
+    display:none !important;
+}
+
+/* BUBBLES */
+
+.bubble {
+    position:fixed;
+    bottom:-100px;
+    border-radius:50%;
+    pointer-events:none;
+    background:linear-gradient(
+        135deg,
+        rgba(255,255,255,.85),
+        rgba(255,255,255,.18)
+    );
+    border:1px solid rgba(255,255,255,.9);
+    box-shadow:
+        inset 5px 5px 12px rgba(255,255,255,.7),
+        0 4px 12px rgba(50,150,190,.1);
+    animation:floatBubble linear infinite;
+    z-index:0;
+}
+
+@keyframes floatBubble {
+    from {
+        transform:translateY(0) translateX(0);
+        opacity:0;
+    }
+    10% { opacity:.7; }
+    90% { opacity:.5; }
+    to {
+        transform:translateY(-120vh) translateX(50px);
+        opacity:0;
+    }
+}
+
+/* LOGIN */
+
+#authScreen {
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:25px;
+    position:relative;
+    z-index:5;
+}
+
+.auth-box {
+    width:min(470px,100%);
+    padding:34px;
+    border-radius:34px;
+    background:rgba(255,255,255,.64);
+    border:2px solid rgba(255,255,255,.9);
+    box-shadow:
+        inset 0 2px 0 white,
+        0 25px 60px rgba(20,110,150,.25);
+    backdrop-filter:blur(18px);
+}
+
+.logo {
+    text-align:center;
+    font-size:58px;
+    font-weight:800;
+    letter-spacing:-4px;
+    color:white;
+    text-shadow:
+        0 3px 0 #3aabd1,
+        0 7px 18px rgba(20,120,160,.35);
+    margin-bottom:2px;
+}
+
+.logo-sub {
+    text-align:center;
+    color:#28748f;
+    font-weight:700;
+    margin-bottom:28px;
+}
+
+.auth-tabs {
+    display:flex;
+    gap:8px;
+    padding:5px;
+    border-radius:18px;
+    background:rgba(255,255,255,.5);
+    margin-bottom:18px;
+}
+
+.auth-tabs button {
+    flex:1;
+    border:0;
+    padding:10px;
+    border-radius:13px;
+    background:transparent;
+    color:#28718b;
+    font-weight:800;
+}
+
+.auth-tabs button.active {
+    background:white;
+    box-shadow:0 3px 10px rgba(0,120,160,.13);
+}
+
+.field {
+    margin-bottom:13px;
+}
+
+.field label {
+    display:block;
+    font-size:13px;
+    font-weight:800;
+    margin:0 0 5px 5px;
+}
+
+.field input,
+.field textarea,
+.field select {
+    width:100%;
+    border:1px solid rgba(255,255,255,.95);
+    background:rgba(255,255,255,.72);
+    padding:12px 14px;
+    border-radius:15px;
+    outline:none;
+    color:var(--text);
+    box-shadow:inset 0 2px 5px rgba(50,120,150,.07);
+}
+
+.gender {
+    display:flex;
+    gap:10px;
+}
+
+.gender label {
+    flex:1;
+    margin:0;
+    cursor:pointer;
+}
+
+.gender input {
+    display:none;
+}
+
+.gender span {
+    display:block;
+    text-align:center;
+    padding:11px;
+    border-radius:15px;
+    background:rgba(255,255,255,.48);
+    border:1px solid transparent;
+}
+
+.gender input:checked + span {
+    background:white;
+    border-color:#56c4e3;
+    box-shadow:0 3px 10px rgba(0,130,170,.15);
+}
+
+.main-btn {
+    width:100%;
+    border:1px solid rgba(255,255,255,.9);
+    border-radius:17px;
+    padding:13px;
+    color:white;
+    font-weight:800;
+    background:linear-gradient(#72d9ef,#28a8d5);
+    box-shadow:
+        inset 0 2px 0 rgba(255,255,255,.7),
+        0 5px 12px rgba(20,130,170,.22);
+    transition:.2s;
+}
+
+.main-btn:hover {
+    transform:translateY(-2px);
+    filter:saturate(1.1);
+}
+
+.auth-note {
+    text-align:center;
+    font-size:12px;
+    margin-top:14px;
+    opacity:.7;
+}
+
+/* APP */
+
+#app {
+    position:relative;
+    z-index:2;
+    min-height:100vh;
+}
+
+.topbar {
+    position:sticky;
+    top:10px;
+    z-index:30;
+    width:min(1200px,calc(100% - 20px));
+    margin:10px auto;
+    min-height:68px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:9px 13px;
+    border-radius:25px;
+    background:rgba(255,255,255,.68);
+    border:1px solid white;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(18px);
+}
+
+.brand {
+    font-size:31px;
+    font-weight:900;
+    letter-spacing:-2px;
+    color:white;
+    text-shadow:0 2px 0 #48a8c8;
+    padding:0 12px;
+}
+
+.search {
+    flex:1;
+}
+
+.search input {
+    width:100%;
+    border:0;
+    outline:0;
+    border-radius:17px;
+    padding:12px 16px;
+    background:rgba(255,255,255,.62);
+    color:var(--text);
+}
+
+.top-actions {
+    display:flex;
+    gap:6px;
+}
+
+.icon-btn {
+    border:1px solid white;
+    background:rgba(255,255,255,.65);
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    font-size:18px;
+    transition:.2s;
+}
+
+.icon-btn:hover {
+    transform:translateY(-2px) rotate(-2deg);
+}
+
+.layout {
+    width:min(1200px,calc(100% - 20px));
+    margin:18px auto 50px;
+    display:grid;
+    grid-template-columns:220px minmax(0,1fr) 240px;
+    gap:16px;
+}
+
+.panel {
+    background:rgba(255,255,255,.58);
+    border:1px solid white;
+    border-radius:25px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(14px);
+    overflow:hidden;
+}
+
+.panel-inner {
+    padding:16px;
+}
+
+.panel-title {
+    font-size:14px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    color:#287b96;
+    margin-bottom:12px;
+}
+
+/* SIDEBAR */
+
+.avatar {
+    width:86px;
+    height:86px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:2px auto 10px;
+    background:
+        radial-gradient(circle at 30% 25%,white,transparent 24%),
+        linear-gradient(145deg,#8be9f8,#4eb7db);
+    border:4px solid white;
+    box-shadow:
+        0 6px 16px rgba(20,120,160,.22),
+        inset 0 0 15px rgba(255,255,255,.5);
+    font-size:37px;
+    overflow:hidden;
+}
+
+.avatar img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.user-name {
+    text-align:center;
+    font-size:18px;
+    font-weight:900;
+}
+
+.user-status {
+    text-align:center;
+    font-size:12px;
+    opacity:.7;
+    margin:2px 0 15px;
+}
+
+.nav {
+    display:grid;
+    gap:6px;
+}
+
+.nav button {
+    width:100%;
+    border:0;
+    text-align:left;
+    padding:11px 12px;
+    border-radius:14px;
+    background:transparent;
+    color:#2a6f86;
+    font-weight:800;
+}
+
+.nav button:hover,
+.nav button.active {
+    background:white;
+    box-shadow:0 4px 12px rgba(20,120,150,.1);
+}
+
+.nav-icon {
+    width:23px;
+    display:inline-block;
+}
+
+.mini-online {
+    margin-top:14px;
+    padding:11px;
+    border-radius:17px;
+    background:rgba(214,255,220,.58);
+    font-size:12px;
+}
+
+.dot {
+    display:inline-block;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#48c879;
+    box-shadow:0 0 6px #48c879;
+    margin-right:5px;
+}
+
+/* CONTENT */
+
+.view {
+    display:none;
+}
+
+.view.active {
+    display:block;
+}
+
+.hero {
+    min-height:210px;
+    padding:25px;
+    position:relative;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 78% 20%,rgba(255,255,255,.85) 0 30px,transparent 31px),
+        radial-gradient(circle at 85% 75%,rgba(255,255,255,.65) 0 45px,transparent 46px),
+        linear-gradient(135deg,#4bc7e9,#a2edf4 55%,#b6edb0);
+}
+
+.hero h1 {
+    margin:0;
+    font-size:32px;
+    color:white;
+    text-shadow:0 2px 0 rgba(40,130,160,.5);
+}
+
+.hero p {
+    max-width:500px;
+    font-weight:700;
+    color:#24728a;
+}
+
+.hero-bubbles {
+    position:absolute;
+    right:45px;
+    bottom:20px;
+    display:flex;
+    align-items:flex-end;
+    gap:7px;
+}
+
+.hero-bubbles span {
+    display:block;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(255,255,255,.16));
+    border:1px solid white;
+    box-shadow:inset 4px 4px 8px white;
+}
+
+.hero-bubbles span:nth-child(2) {
+    width:62px;
+    height:62px;
+}
+
+.hero-bubbles span:nth-child(3) {
+    width:22px;
+    height:22px;
+}
+
+.section {
+    margin-top:15px;
+}
+
+.section-head {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 17px 0;
+}
+
+.section-head h2 {
+    margin:0;
+    font-size:18px;
+}
+
+.section-body {
+    padding:15px;
+}
+
+/* EMPTY POST */
+
+.empty {
+    text-align:center;
+    padding:40px 20px;
+    border:2px dashed rgba(55,160,190,.25);
+    border-radius:20px;
+    background:rgba(255,255,255,.25);
+}
+
+.empty .empty-icon {
+    font-size:40px;
+    margin-bottom:5px;
+}
+
+.empty h3 {
+    margin:3px 0;
+}
+
+.empty p {
+    margin:5px auto 0;
+    font-size:13px;
+    opacity:.7;
+    max-width:400px;
+}
+
+/* CARDS */
+
+.cards {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.small-card {
+    padding:14px;
+    border-radius:19px;
+    background:rgba(255,255,255,.55);
+    border:1px solid rgba(255,255,255,.9);
+}
+
+.small-card h3 {
+    margin:0 0 5px;
+    font-size:15px;
+}
+
+.small-card p {
+    margin:0;
+    font-size:12px;
+    opacity:.75;
+}
+
+/* RIGHT */
+
+.mini-player {
+    padding:13px;
+    border-radius:19px;
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.8),rgba(174,244,250,.5));
+}
+
+.track-cover {
+    height:100px;
+    border-radius:16px;
+    background:
+        radial-gradient(circle at 25% 20%,white 0 8px,transparent 9px),
+        radial-gradient(circle at 70% 65%,rgba(255,255,255,.8) 0 13px,transparent 14px),
+        linear-gradient(135deg,#65d7ef,#70d9ae);
+    border:1px solid white;
+    box-shadow:inset 0 2px 8px rgba(255,255,255,.8);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+}
+
+.track-name {
+    margin-top:9px;
+    font-weight:900;
+}
+
+.track-meta {
+    font-size:11px;
+    opacity:.7;
+}
+
+.player-controls {
+    display:flex;
+    justify-content:center;
+    gap:7px;
+    margin-top:10px;
+}
+
+.player-controls button {
+    border:1px solid white;
+    width:35px;
+    height:35px;
+    border-radius:12px;
+    background:white;
+}
+
+.friend-list {
+    display:grid;
+    gap:8px;
+}
+
+.friend {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:7px;
+    border-radius:13px;
+    background:rgba(255,255,255,.35);
+}
+
+.friend-avatar {
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#91edfa,#68d9a3);
+    border:2px solid white;
+}
+
+.friend strong {
+    font-size:12px;
+}
+
+.friend small {
+    display:block;
+    font-size:10px;
+    opacity:.65;
+}
+
+/* PROFILE */
+
+.profile-cover {
+    height:190px;
+    position:relative;
+    background:
+        radial-gradient(circle at 25% 30%,rgba(255,255,255,.9) 0 35px,transparent 36px),
+        radial-gradient(circle at 75% 70%,rgba(255,255,255,.5) 0 70px,transparent 71px),
+        linear-gradient(135deg,#54cce9,#b4f1e8 60%,#9fe2a0);
+    border-radius:24px 24px 0 0;
+}
+
+.profile-main-avatar {
+    position:absolute;
+    width:115px;
+    height:115px;
+    bottom:-48px;
+    left:25px;
+    border-radius:50%;
+    border:5px solid white;
+    background:linear-gradient(145deg,#8deefa,#58bdde);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:50px;
+    box-shadow:0 8px 20px rgba(30,120,150,.25);
+    overflow:hidden;
+}
+
+.profile-main-avatar img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.profile-info {
+    padding:60px 25px 20px;
+}
+
+.profile-name {
+    font-size:29px;
+    font-weight:900;
+}
+
+.profile-bio {
+    margin-top:3px;
+    max-width:600px;
+    opacity:.75;
+}
+
+.profile-stats {
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:15px;
+}
+
+.stat {
+    padding:8px 12px;
+    background:rgba(255,255,255,.6);
+    border:1px solid white;
+    border-radius:14px;
+    font-size:12px;
+    font-weight:800;
+}
+
+.profile-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.badges {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.badge {
+    padding:9px 12px;
+    border-radius:15px;
+    background:linear-gradient(145deg,#fff,#c9f8ff);
+    border:1px solid white;
+    font-size:12px;
+    font-weight:800;
+}
+
+.top8 {
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+}
+
+.top8-item {
+    text-align:center;
+    padding:7px 3px;
+    border-radius:13px;
+    background:rgba(255,255,255,.42);
+}
+
+.top8-avatar {
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#72d9ec,#9de0ac);
+    border:2px solid white;
+}
+
+.top8 small {
+    display:block;
+    font-size:9px;
+    margin-top:3px;
+}
+
+/* SETTINGS */
+
+.settings-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.setting-card {
+    padding:17px;
+    border-radius:20px;
+    background:rgba(255,255,255,.5);
+    border:1px solid white;
+}
+
+.setting-card h3 {
+    margin:0 0 10px;
+}
+
+.color-options {
+    display:flex;
+    gap:8px;
+}
+
+.color-option {
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:3px solid white;
+    cursor:pointer;
+}
+
+.color-option.blue {
+    background:linear-gradient(135deg,#4bc7e9,#a6f2e8);
+}
+
+.color-option.pink {
+    background:linear-gradient(135deg,#ff9ed5,#bda7ff);
+}
+
+.color-option.green {
+    background:linear-gradient(135deg,#82e9a8,#8ee9f2);
+}
+
+.color-option.sun {
+    background:linear-gradient(135deg,#ffd879,#9be9f1);
+}
+
+/* MUSIC */
+
+.upload-box {
+    padding:25px;
+    text-align:center;
+    border:2px dashed rgba(55,160,190,.3);
+    border-radius:20px;
+    background:rgba(255,255,255,.25);
+}
+
+.upload-box input {
+    margin-top:10px;
+}
+
+.music-list {
+    display:grid;
+    gap:9px;
+    margin-top:15px;
+}
+
+.music-item {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px;
+    background:rgba(255,255,255,.58);
+    border:1px solid white;
+    border-radius:16px;
+}
+
+.music-art {
+    width:46px;
+    height:46px;
+    border-radius:13px;
+    background:linear-gradient(135deg,#6bd8ef,#76d6a2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.music-info {
+    flex:1;
+}
+
+.music-info strong {
+    display:block;
+}
+
+.music-info small {
+    opacity:.6;
+}
+
+/* MESSAGES */
+
+.message-list {
+    display:grid;
+    gap:9px;
+}
+
+.message {
+    padding:13px;
+    border-radius:17px;
+    background:rgba(255,255,255,.55);
+    border:1px solid white;
+}
+
+.message strong {
+    font-size:13px;
+}
+
+.message p {
+    margin:4px 0 0;
+    font-size:12px;
+}
+
+/* AQUARIUM */
+
+.aquarium {
+    min-height:270px;
+    position:relative;
+    overflow:hidden;
+    border-radius:22px;
+    background:
+        radial-gradient(circle at 20% 30%,rgba(255,255,255,.45) 0 3px,transparent 4px),
+        radial-gradient(circle at 75% 55%,rgba(255,255,255,.5) 0 4px,transparent 5px),
+        linear-gradient(180deg,#52cce8,#4caed5 60%,#65bd9b);
+    border:4px solid rgba(255,255,255,.7);
+}
+
+.aquarium::after {
+    content:"";
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:60px;
+    background:
+        linear-gradient(110deg,transparent 40%,#55a779 41% 45%,transparent 46%),
+        linear-gradient(70deg,transparent 45%,#4e9c72 46% 49%,transparent 50%);
+    opacity:.8;
+}
+
+.fish {
+    position:absolute;
+    font-size:35px;
+    animation:swim 8s linear infinite;
+}
+
+.fish:nth-child(1) {
+    top:60px;
+    left:15%;
+}
+
+.fish:nth-child(2) {
+    top:130px;
+    left:65%;
+    animation-delay:2s;
+}
+
+.fish:nth-child(3) {
+    top:185px;
+    left:35%;
+    animation-delay:4s;
+}
+
+@keyframes swim {
+    0%,100% { transform:translateX(0); }
+    50% { transform:translateX(80px); }
+}
+
+/* FOOTER */
+
+footer {
+    text-align:center;
+    padding:25px;
+    font-size:11px;
+    opacity:.65;
+}
+
+/* TOAST */
+
+#toast {
+    position:fixed;
+    left:50%;
+    bottom:22px;
+    transform:translateX(-50%) translateY(80px);
+    background:rgba(255,255,255,.9);
+    border:1px solid white;
+    padding:12px 18px;
+    border-radius:17px;
+    box-shadow:var(--shadow);
+    z-index:100;
+    transition:.3s;
+    font-weight:800;
+}
+
+#toast.show {
+    transform:translateX(-50%) translateY(0);
+}
+
+/* MOBILE */
+
+@media(max-width:950px) {
+    .layout {
+        grid-template-columns:190px minmax(0,1fr);
+    }
+
+    .rightbar {
+        display:none;
+    }
+}
+
+@media(max-width:700px) {
+    .topbar {
+        flex-wrap:wrap;
+        padding:8px;
+    }
+
+    .brand {
+        font-size:27px;
+    }
+
+    .search {
+        order:3;
+        flex-basis:100%;
+    }
+
+    .layout {
+        grid-template-columns:1fr;
+    }
+
+    .leftbar {
+        display:none;
+    }
+
+    .cards,
+    .profile-grid,
+    .settings-grid {
+        grid-template-columns:1fr;
+    }
+
+    .hero {
+        min-height:250px;
+    }
+
+    .hero-bubbles {
+        right:25px;
+        bottom:15px;
+    }
+
+    .profile-cover {
+        height:150px;
+    }
+
+    .profile-main-avatar {
+        width:95px;
+        height:95px;
+        bottom:-40px;
+        left:18px;
+    }
+
+    .profile-info {
+        padding:52px 18px 18px;
+    }
+
+    .top8 {
+        grid-template-columns:repeat(4,1fr);
+    }
+}
+
+@media(max-width:430px) {
+    .auth-box {
+        padding:22px;
+    }
+
+    .logo {
+        font-size:50px;
+    }
+
+    .top-actions .icon-btn:nth-child(3) {
+        display:none;
+    }
+
+    .hero h1 {
+        font-size:27px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="bubbles"></div>
+
+<!-- AUTH -->
+
+<section id="authScreen">
+
+    <div class="auth-box">
+
+        <div class="logo">bubbles</div>
+        <div class="logo-sub">your little place on the web ♡</div>
+
+        <div class="auth-tabs">
+            <button id="loginTab" class="active" onclick="switchAuth('login')">
+                Войти
+            </button>
+            <button id="registerTab" onclick="switchAuth('register')">
+                Создать профиль
+            </button>
+        </div>
+
+        <!-- LOGIN -->
+
+        <form id="loginForm" onsubmit="login(event)">
+
+            <div class="field">
+                <label>Имя пользователя</label>
+                <input id="loginName" required placeholder="например, bubblegirl">
+            </div>
+
+            <div class="field">
+                <label>Пароль</label>
+                <input id="loginPassword" type="password" required placeholder="••••••••">
+            </div>
+
+            <button class="main-btn">
+                Войти в bubbles 🫧
+            </button>
+
+        </form>
+
+        <!-- REGISTER -->
+
+        <form id="registerForm" class="hidden" onsubmit="register(event)">
+
+            <div class="field">
+                <label>Как тебя зовут в bubbles?</label>
+                <input id="regName" required maxlength="24"
+                       placeholder="придумай свой ник">
+            </div>
+
+            <div class="field">
+                <label>Пароль</label>
+                <input id="regPassword" type="password" required
+                       minlength="4" placeholder="минимум 4 символа">
+            </div>
+
+            <div class="field">
+                <label>Пол</label>
+
+                <div class="gender">
+
+                    <label>
+                        <input type="radio" name="gender" value="male" required>
+                        <span>♂ Мужской</span>
+                    </label>
+
+                    <label>
+                        <input type="radio" name="gender" value="female">
+                        <span>♀ Женский</span>
+                    </label>
+
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Немного о себе</label>
+                <textarea id="regBio" rows="3"
+                    placeholder="что-нибудь о тебе..."></textarea>
+            </div>
+
+            <button class="main-btn">
+                Создать мой bubbles ✨
+            </button>
+
+        </form>
+
+        <div class="auth-note">
+            маленькая соцсеть • большие пузырьки • никаких алгоритмов
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- APPLICATION -->
+
+<div id="app" class="hidden">
+
+    <!-- TOP -->
+
+    <header class="topbar">
+
+        <div class="brand">bubbles</div>
+
+        <div class="search">
+            <input id="searchInput"
+                   placeholder="найти кого-нибудь в bubbles..."
+                   oninput="searchUsers()">
+        </div>
+
+        <div class="top-actions">
+            <button class="icon-btn" onclick="showView('messages')">💌</button>
+            <button class="icon-btn" onclick="showView('friends')">🫧</button>
+            <button class="icon-btn" onclick="showView('settings')">⚙️</button>
+        </div>
+
+    </header>
+
+
+    <main class="layout">
+
+        <!-- LEFT -->
+
+        <aside class="panel leftbar">
+
+            <div class="panel-inner">
+
+                <div class="avatar" id="sideAvatar">🫧</div>
+
+                <div class="user-name" id="sideName">username</div>
+
+                <div class="user-status">
+                    <span class="dot"></span> online
+                </div>
+
+                <nav class="nav">
+
+                    <button onclick="showView('home')" class="active">
+                        <span class="nav-icon">🏠</span>
+                        Главная
+                    </button>
+
+                    <button onclick="showView('profile')">
+                        <span class="nav-icon">👤</span>
+                        Мой профиль
+                    </button>
+
+                    <button onclick="showView('friends')">
+                        <span class="nav-icon">🫂</span>
+                        Друзья
+                    </button>
+
+                    <button onclick="showView('messages')">
+                        <span class="nav-icon">💌</span>
+                        Сообщения
+                    </button>
+
+                    <button onclick="showView('music')">
+                        <span class="nav-icon">🎵</span>
+                        Моя музыка
+                    </button>
+
+                    <button onclick="showView('photos')">
+                        <span class="nav-icon">📷</span>
+                        Фотографии
+                    </button>
+
+                    <button onclick="showView('aquarium')">
+                        <span class="nav-icon">🐠</span>
+                        Аквариум
+                    </button>
+
+                    <button onclick="showView('settings')">
+                        <span class="nav-icon">⚙️</span>
+                        Настройки
+                    </button>
+
+                </nav>
+
+                <div class="mini-online">
+                    <span class="dot"></span>
+                    <strong>bubbles</strong><br>
+                    <span style="opacity:.7">
+                        somewhere on the web
+                    </span>
+                </div>
+
+                <button class="nav"
+                        style="margin-top:10px;border:0;width:100%;padding:9px;border-radius:14px;background:rgba(255,255,255,.4);color:#286e84;font-weight:800"
+                        onclick="logout()">
+                    ↪ Выйти
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- CENTER -->
+
+        <section>
+
+            <!-- HOME -->
+
+            <div id="view-home" class="view active">
+
+                <div class="panel hero">
+
+                    <h1>Hey, welcome to bubbles! 🫧</h1>
+
+                    <p>
+                        Маленькое место в интернете, где можно быть собой,
+                        слушать музыку, собирать друзей и просто немного
+                        зависать в пузырьках.
+                    </p>
+
+                    <div class="hero-bubbles">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                </div>
+
+
+                <div class="panel section">
+
+                    <div class="section-head">
+                        <h2>Твоя лента</h2>
+                        <span style="font-size:12px;opacity:.6">
+                            пока совершенно пусто
+                        </span>
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="empty">
+
+                            <div class="empty-icon">🫧</div>
+
+                            <h3>Здесь пока ничего нет</h3>
+
+                            <p>
+                                Никаких случайных постов, рекламных рекомендаций
+                                и бесконечного скролла. Добавь друзей — и
+                                пространство постепенно оживёт.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel section">
+
+                    <div class="section-head">
+                        <h2>Твой bubbles сегодня</h2>
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="cards">
+
+                            <div class="small-card">
+                                <h3>🎵 Музыка</h3>
+                                <p>
+                                    Добавь первую песню в свой профиль.
+                                </p>
+                            </div>
+
+                            <div class="small-card">
+                                <h3>📷 Фото</h3>
+                                <p>
+                                    Создай свой первый маленький альбом.
+                                </p>
+                            </div>
+
+                            <div class="small-card">
+                                <h3>🫂 Друзья</h3>
+                                <p>
+                                    Найди кого-нибудь и добавь в Top 8.
+                                </p>
+                            </div>
+
+                            <div class="small-card">
+                                <h3>🐠 Аквариум</h3>
+                                <p>
+                                    Загляни под воду. Там кое-что плавает.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PROFILE -->
+
+            <div id="view-profile" class="view">
+
+                <div class="panel">
+
+                    <div class="profile-cover">
+
+                        <div class="profile-main-avatar" id="profileAvatar">
+                            🫧
+                        </div>
+
+                    </div>
+
+                    <div class="profile-info">
+
+                        <div class="profile-name" id="profileName">
+                            username
+                        </div>
+
+                        <div class="profile-bio" id="profileBio">
+                            ничего не написано...
+                        </div>
+
+                        <div class="profile-stats">
+                            <div class="stat">🫂 <span id="friendCount">0</span> друзей</div>
+                            <div class="stat">🎵 <span id="musicCount">0</span> песен</div>
+                            <div class="stat">👀 <span id="visitorCount">1</span> посетитель</div>
+                            <div class="stat" id="genderStat">♀</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-grid section">
+
+                    <div class="panel">
+                        <div class="section-head">
+                            <h2>My Top 8</h2>
+                        </div>
+
+                        <div class="section-body">
+
+                            <div class="top8" id="top8">
+
+                                <div class="top8-item">
+                                    <div class="top8-avatar">+</div>
+                                    <small>добавить</small>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="panel">
+
+                        <div class="section-head">
+                            <h2>Мои badges</h2>
+                        </div>
+
+                        <div class="section-body">
+
+                            <div class="badges">
+
+                                <div class="badge">🫧 First Bubble</div>
+                                <div class="badge">🌊 Fresh User</div>
+                                <div class="badge">💿 Music Lover</div>
+                                <div class="badge">☁️ Good Vibes</div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel section">
+
+                    <div class="section-head">
+                        <h2>Гостевая книга</h2>
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="empty">
+
+                            <div class="empty-icon">💬</div>
+
+                            <h3>Пока никто не оставил сообщение</h3>
+
+                            <p>
+                                Здесь будут появляться сообщения от друзей.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FRIENDS -->
+
+            <div id="view-friends" class="view">
+
+                <div class="panel">
+
+                    <div class="section-head">
+                        <h2>🫂 Друзья</h2>
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="empty">
+
+                            <div class="empty-icon">🫧</div>
+
+                            <h3>У тебя пока нет друзей</h3>
+
+                            <p>
+                                Используй поиск сверху, чтобы найти людей
+                                в своём маленьком уголке bubbles.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MESSAGES -->
+
+            <div id="view-messages" class="view">
+
+                <div class="panel">
+
+                    <div class="section-head">
+                        <h2>💌 Сообщения</h2>
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="message-list">
+
+                            <div class="message">
+
+                                <strong>💌 Добро пожаловать!</strong>
+
+                                <p>
+                                    Это место для твоих личных сообщений.
+                                    Когда появятся друзья, здесь будет с кем
+                                    поговорить.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MUSIC -->
+
+            <div id="view-music" class="view">
+
+                <div class="panel">
+
+                    <div class="section-head">
+
+                        <h2>🎵 Моя музыка</h2>
+
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="upload-box">
+
+                            <div style="font-size:35px">💿</div>
+
+                            <h3>Добавь музыку в свой профиль</h3>
+
+                            <p style="font-size:12px;opacity:.7">
+                                mp3, wav, ogg и другие аудиофайлы.
+                            </p>
+
+                            <input
+                                type="file"
+                                id="musicUpload"
+                                accept="audio/*"
+                                multiple
+                                onchange="addMusic(event)"
+                            >
+
+                        </div>
+
+                        <div id="musicList" class="music-list"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PHOTOS -->
+
+            <div id="view-photos" class="view">
+
+                <div class="panel">
+
+                    <div class="section-head">
+
+                        <h2>📷 Фотографии</h2>
+
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="upload-box">
+
+                            <div style="font-size:35px">📸</div>
+
+                            <h3>Создай свой маленький фотоальбом</h3>
+
+                            <input
+                                type="file"
+                                id="photoUpload"
+                                accept="image/*"
+                                multiple
+                                onchange="addPhotos(event)"
+                            >
+
+                        </div>
+
+                        <div id="photoGrid"
+                             style="
+                             display:grid;
+                             grid-template-columns:repeat(3,1fr);
+                             gap:10px;
+                             margin-top:15px;">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- AQUARIUM -->
+
+            <div id="view-aquarium" class="view">
+
+                <div class="panel">
+
+                    <div class="section-head">
+
+                        <h2>🐠 My Aquarium</h2>
+
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="aquarium">
+
+                            <div class="fish">🐟</div>
+                            <div class="fish">🐠</div>
+                            <div class="fish">🐡</div>
+
+                        </div>
+
+                        <p style="font-size:12px;opacity:.7">
+                            Когда-нибудь здесь можно будет покупать рыбок,
+                            растения, ракушки и другие украшения.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SETTINGS -->
+
+            <div id="view-settings" class="view">
+
+                <div class="panel">
+
+                    <div class="section-head">
+
+                        <h2>⚙️ Настройки профиля</h2>
+
+                    </div>
+
+                    <div class="section-body">
+
+                        <div class="settings-grid">
+
+                            <div class="setting-card">
+
+                                <h3>👤 Основная информация</h3>
+
+                                <div class="field">
+                                    <label>Имя</label>
+                                    <input id="editName">
+                                </div>
+
+                                <div class="field">
+                                    <label>О себе</label>
+                                    <textarea id="editBio" rows="4"></textarea>
+                                </div>
+
+                                <button
+                                    class="main-btn"
+                                    onclick="saveProfile()">
+                                    Сохранить
+                                </button>
+
+                            </div>
+
+
+                            <div class="setting-card">
+
+                                <h3>🎨 Внешний вид</h3>
+
+                                <p style="font-size:12px;opacity:.7">
+                                    Выбери настроение своего bubbles.
+                                </p>
+
+                                <div class="color-options">
+
+                                    <div class="color-option blue"
+                                         onclick="theme('blue')"></div>
+
+                                    <div class="color-option pink"
+                                         onclick="theme('pink')"></div>
+
+                                    <div class="color-option green"
+                                         onclick="theme('green')"></div>
+
+                                    <div class="color-option sun"
+                                         onclick="theme('sun')"></div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="setting-card">
+
+                                <h3>🖼️ Аватар</h3>
+
+                                <p style="font-size:12px;opacity:.7">
+                                    Можно загрузить собственную фотографию.
+                                </p>
+
+                                <input
+                                    type="file"
+                                    id="avatarUpload"
+                                    accept="image/*"
+                                    onchange="changeAvatar(event)"
+                                >
+
+                            </div>
+
+
+                            <div class="setting-card">
+
+                                <h3>🌐 Старый интернет</h3>
+
+                                <p style="font-size:12px;opacity:.7">
+                                    Ты сейчас находишься внутри bubbles.
+                                </p>
+
+                                <button
+                                    class="main-btn"
+                                    onclick="randomSite()">
+                                    random bubbles →
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PHOTOS SEARCH -->
+
+            <div id="view-search" class="view">
+
+                <div class="panel">
+
+                    <div class="section-head">
+                        <h2>🔎 Результаты поиска</h2>
+                    </div>
+
+                    <div class="section-body">
+
+                        <div id="searchResults"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT -->
+
+        <aside class="panel rightbar">
+
+            <div class="panel-inner">
+
+                <div class="panel-title">
+                    🎵 now playing
+                </div>
+
+                <div class="mini-player">
+
+                    <div class="track-cover">
+                        🫧
+                    </div>
+
+                    <div class="track-name" id="sideTrack">
+                        nothing yet
+                    </div>
+
+                    <div class="track-meta">
+                        your bubbles player
+                    </div>
+
+                    <div class="player-controls">
+
+                        <button>⏮</button>
+                        <button onclick="playLatest()">▶</button>
+                        <button>⏭</button>
+
+                    </div>
+
+                </div>
+
+
+                <div style="height:18px"></div>
+
+
+                <div class="panel-title">
+                    🫂 your friends
+                </div>
+
+                <div class="friend-list">
+
+                    <div class="friend">
+
+                        <div class="friend-avatar">🫧</div>
+
+                        <div>
+                            <strong>пока никого</strong>
+                            <small>найди кого-нибудь!</small>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div style="height:18px"></div>
+
+
+                <div class="panel-title">
+                    🌊 web ring
+                </div>
+
+                <div class="small-card">
+
+                    <p style="text-align:center">
+                        ← previous<br><br>
+                        <strong>🫧 bubbles</strong><br><br>
+                        next →
+                    </p>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    </main>
+
+
+    <footer>
+        bubbles © 2007–2026 • made for people who miss the old web 🫧
+    </footer>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<script>
+
+/* ==========================================
+   BUBBLES
+========================================== */
+
+const defaultData = {
+    name: "",
+    password: "",
+    gender: "",
+    bio: "",
+    avatar: "",
+    theme: "blue",
+    music: [],
+    photos: [],
+    friends: [],
+    visitors: 1
+};
+
+let user = null;
+
+
+/* ==========================================
+   FLOATING BUBBLES
+========================================== */
+
+function createBubbles() {
+
+    const container = document.getElementById("bubbles");
+
+    for(let i = 0; i < 18; i++) {
+
+        const b = document.createElement("div");
+
+        b.className = "bubble";
+
+        const size = Math.floor(Math.random() * 45) + 12;
+
+        b.style.width = size + "px";
+        b.style.height = size + "px";
+        b.style.left = Math.random() * 100 + "%";
+        b.style.animationDuration =
+            (Math.random() * 15 + 12) + "s";
+
+        b.style.animationDelay =
+            "-" + Math.random() * 15 + "s";
+
+        container.appendChild(b);
+    }
+}
+
+createBubbles();
+
+
+/* ==========================================
+   AUTH
+========================================== */
+
+function switchAuth(type) {
+
+    const login = document.getElementById("loginForm");
+    const register = document.getElementById("registerForm");
+
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+
+    if(type === "login") {
+
+        login.classList.remove("hidden");
+        register.classList.add("hidden");
+
+        loginTab.classList.add("active");
+        registerTab.classList.remove("active");
+
+    } else {
+
+        login.classList.add("hidden");
+        register.classList.remove("hidden");
+
+        loginTab.classList.remove("active");
+        registerTab.classList.add("active");
+    }
+}
+
+
+function register(event) {
+    event.preventDefault();
+
+    try {
+        const nameInput = document.getElementById("regName");
+        const passwordInput = document.getElementById("regPassword");
+        const bioInput = document.getElementById("regBio");
+
+        const genderInput = document.querySelector(
+            'input[name="gender"]:checked'
+        );
+
+        const name = nameInput.value.trim();
+        const password = passwordInput.value;
+        const bio = bioInput.value.trim();
+
+        if (!name) {
+            toast("Придумай имя для своего профиля 🫧");
+            nameInput.focus();
+            return;
+        }
+
+        if (name.length < 2) {
+            toast("Имя должно содержать хотя бы 2 символа");
+            nameInput.focus();
+            return;
+        }
+
+        if (!password || password.length < 4) {
+            toast("Пароль должен быть минимум 4 символа");
+            passwordInput.focus();
+            return;
+        }
+
+        if (!genderInput) {
+            toast("Выбери пол профиля");
+            return;
+        }
+
+        const existingUser =
+            localStorage.getItem("bubblesUser");
+
+        if (existingUser) {
+            toast("На этом устройстве уже есть профиль 🫧");
+            return;
+        }
+
+        const newUser = {
+            name: name,
+            password: password,
+            gender: genderInput.value,
+            bio: bio,
+
+            avatar: "",
+            theme: "blue",
+
+            music: [],
+            photos: [],
+            friends: [],
+
+            visitors: 1,
+
+            created: Date.now()
+        };
+
+        localStorage.setItem(
+            "bubblesUser",
+            JSON.stringify(newUser)
+        );
+
+        // Проверяем, действительно ли данные сохранились
+        const check =
+            localStorage.getItem("bubblesUser");
+
+        if (!check) {
+            toast("Не удалось сохранить профиль 😢");
+            return;
+        }
+
+        user = JSON.parse(check);
+
+        // ВАЖНО: не отправляем форму и не перезагружаем страницу
+        document
+            .getElementById("authScreen")
+            .classList.add("hidden");
+
+        document
+            .getElementById("app")
+            .classList.remove("hidden");
+
+        updateUI();
+
+        toast("Добро пожаловать в bubbles! 🫧");
+
+    } catch (error) {
+
+        console.error(
+            "BUBBLES registration error:",
+            error
+        );
+
+        toast(
+            "Что-то пошло не так. Открой консоль браузера."
+        );
+    }
+}
+
+function login(event) {
+
+    event.preventDefault();
+
+    const saved =
+        JSON.parse(localStorage.getItem("bubblesUser"));
+
+    if(!saved) {
+
+        toast("Сначала создай профиль 🫧");
+        return;
+    }
+
+    const name =
+        document.getElementById("loginName").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    if(
+        name !== saved.name ||
+        password !== saved.password
+    ) {
+
+        toast("Имя или пароль не подходят");
+        return;
+    }
+
+    user = saved;
+
+    openApp();
+}
+
+
+function logout() {
+
+    user = null;
+
+    document
+        .getElementById("app")
+        .classList.add("hidden");
+
+    document
+        .getElementById("authScreen")
+        .classList.remove("hidden");
+}
+
+
+/* ==========================================
+   OPEN APP
+========================================== */
+
+function openApp() {
+
+    document
+        .getElementById("authScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("app")
+        .classList.remove("hidden");
+
+    updateUI();
+}
+
+
+/* ==========================================
+   UPDATE UI
+========================================== */
+
+function updateUI() {
+
+    if(!user) return;
+
+    document.getElementById("sideName").textContent =
+        user.name;
+
+    document.getElementById("profileName").textContent =
+        user.name;
+
+    document.getElementById("profileBio").textContent =
+        user.bio || "ничего не написано...";
+
+    document.getElementById("friendCount").textContent =
+        user.friends.length;
+
+    document.getElementById("musicCount").textContent =
+        user.music.length;
+
+    document.getElementById("visitorCount").textContent =
+        user.visitors || 1;
+
+    document.getElementById("genderStat").textContent =
+        user.gender === "female" ? "♀" : "♂";
+
+    document.getElementById("editName").value =
+        user.name;
+
+    document.getElementById("editBio").value =
+        user.bio || "";
+
+    if(user.avatar) {
+
+        document.getElementById("sideAvatar").innerHTML =
+            `<img src="${user.avatar}">`;
+
+        document.getElementById("profileAvatar").innerHTML =
+            `<img src="${user.avatar}">`;
+    }
+
+    renderMusic();
+    renderPhotos();
+
+    applyTheme(user.theme);
+}
+
+
+/* ==========================================
+   VIEWS
+========================================== */
+
+function showView(name) {
+
+    document
+        .querySelectorAll(".view")
+        .forEach(v => v.classList.remove("active"));
+
+    const view =
+        document.getElementById("view-" + name);
+
+    if(view) {
+        view.classList.add("active");
+    }
+
+    document
+        .querySelectorAll(".nav button")
+        .forEach(btn => btn.classList.remove("active"));
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+}
+
+
+/* ==========================================
+   PROFILE
+========================================== */
+
+function saveProfile() {
+
+    user.name =
+        document.getElementById("editName").value.trim();
+
+    user.bio =
+        document.getElementById("editBio").value.trim();
+
+    save();
+
+    updateUI();
+
+    toast("Профиль обновлён 🫧");
+}
+
+
+function changeAvatar(event) {
+
+    const file = event.target.files[0];
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        user.avatar = e.target.result;
+
+        save();
+        updateUI();
+
+        toast("Аватар изменён ✨");
+    };
+
+    reader.readAsDataURL(file);
+}
+
+
+/* ==========================================
+   MUSIC
+========================================== */
+
+function addMusic(event) {
+
+    const files = [...event.target.files];
+
+    files.forEach(file => {
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            user.music.push({
+                name:file.name,
+                data:e.target.result
+            });
+
+            save();
+            updateUI();
+
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    toast("Музыка добавлена 🎵");
+}
+
+
+function renderMusic() {
+
+    const list =
+        document.getElementById("musicList");
+
+    list.innerHTML = "";
+
+    if(user.music.length === 0) {
+
+        list.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">🎵</div>
+                <h3>Здесь пока тихо</h3>
+                <p>
+                    Добавь песню — она появится в твоём профиле.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    user.music.forEach((track,index) => {
+
+        const item =
+            document.createElement("div");
+
+        item.className = "music-item";
+
+        item.innerHTML = `
+            <div class="music-art">💿</div>
+
+            <div class="music-info">
+                <strong>${escapeHTML(track.name)}</strong>
+                <small>personal bubbles track</small>
+            </div>
+
+            <button
+                class="icon-btn"
+                onclick="playTrack(${index})">
+                ▶
+            </button>
+        `;
+
+        list.appendChild(item);
+    });
+}
+
+
+function playTrack(index) {
+
+    const track = user.music[index];
+
+    if(!track) return;
+
+    const audio = new Audio(track.data);
+
+    audio.play();
+
+    document.getElementById("sideTrack").textContent =
+        track.name;
+
+    toast("Playing: " + track.name + " 🎵");
+}
+
+
+function playLatest() {
+
+    if(!user.music.length) {
+
+        toast("Добавь сначала хотя бы одну песню 🫧");
+        return;
+    }
+
+    playTrack(user.music.length - 1);
+}
+
+
+/* ==========================================
+   PHOTOS
+========================================== */
+
+function addPhotos(event) {
+
+    const files = [...event.target.files];
+
+    files.forEach(file => {
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+
+            user.photos.push(e.target.result);
+
+            save();
+            renderPhotos();
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    toast("Фотографии добавлены 📷");
+}
+
+
+function renderPhotos() {
+
+    const grid =
+        document.getElementById("photoGrid");
+
+    grid.innerHTML = "";
+
+    if(user.photos.length === 0) {
+
+        grid.innerHTML = `
+            <div class="empty"
+                 style="grid-column:1/-1">
+                <div class="empty-icon">📷</div>
+                <h3>Альбом пока пуст</h3>
+                <p>
+                    Добавь фотографии из своей жизни.
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    user.photos.forEach(photo => {
+
+        const img =
+            document.createElement("img");
+
+        img.src = photo;
+
+        img.style.width = "100%";
+        img.style.aspectRatio = "1";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "17px";
+        img.style.border = "2px solid white";
+        img.style.boxShadow =
+            "0 5px 15px rgba(20,120,150,.15)";
+
+        grid.appendChild(img);
+    });
+}
+
+
+/* ==========================================
+   THEMES
+========================================== */
+
+function theme(type) {
+
+    user.theme = type;
+
+    save();
+
+    applyTheme(type);
+
+    toast("Внешний вид изменён ✨");
+}
+
+
+function applyTheme(type) {
+
+    if(type === "pink") {
+
+        document.documentElement.style.setProperty(
+            "--blue",
+            "#e7a3db"
+        );
+
+        document.body.style.background =
+            "linear-gradient(180deg,#bcefff,#ffd7f0,#e6dcff)";
+
+    } else if(type === "green") {
+
+        document.body.style.background =
+            "linear-gradient(180deg,#8ee9f2,#c9f7d5,#e6ffd4)";
+
+    } else if(type === "sun") {
+
+        document.body.style.background =
+            "linear-gradient(180deg,#8ee8f3,#fff0b0,#d8ffd2)";
+
+    } else {
+
+        document.body.style.background =
+            "linear-gradient(180deg,#71d9f4,#b7f5fa,#dfffd9)";
+    }
+}
+
+
+/* ==========================================
+   SEARCH
+========================================== */
+
+function searchUsers() {
+
+    const query =
+        document.getElementById("searchInput")
+        .value
+        .trim();
+
+    if(!query) return;
+
+    showView("search");
+
+    const results =
+        document.getElementById("searchResults");
+
+    /*
+       В прототипе существует только локальный
+       пользователь. Когда появится backend,
+       сюда можно подключить реальную базу.
+    */
+
+    if(
+        user &&
+        user.name
+            .toLowerCase()
+            .includes(query.toLowerCase())
+    ) {
+
+        results.innerHTML = `
+            <div class="friend">
+                <div class="friend-avatar">
+                    ${user.gender === "female" ? "♀" : "♂"}
+                </div>
+
+                <div style="flex:1">
+                    <strong>${escapeHTML(user.name)}</strong>
+                    <small>your profile</small>
+                </div>
+
+                <button
+                    class="icon-btn"
+                    onclick="showView('profile')">
+                    →
+                </button>
+            </div>
+        `;
+
+    } else {
+
+        results.innerHTML = `
+            <div class="empty">
+
+                <div class="empty-icon">🫧</div>
+
+                <h3>Никого не нашли</h3>
+
+                <p>
+                    Может быть, этот человек ещё не живёт
+                    в bubbles.
+                </p>
+
+            </div>
+        `;
+    }
+}
+
+
+/* ==========================================
+   RANDOM SITE
+========================================== */
+
+function randomSite() {
+
+    const messages = [
+        "Ты попал в случайный bubbles 🫧",
+        "Здесь ничего нет. И это прекрасно.",
+        "The web is still alive.",
+        "someone left a bubble here...",
+        "404? нет, просто немного воды 🌊"
+    ];
+
+    toast(
+        messages[
+            Math.floor(Math.random() * messages.length)
+        ]
+    );
+}
+
+
+/* ==========================================
+   STORAGE
+========================================== */
+
+function save() {
+
+    localStorage.setItem(
+        "bubblesUser",
+        JSON.stringify(user)
+    );
+}
+
+
+function escapeHTML(text) {
+
+    return String(text)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+
+/* ==========================================
+   TOAST
+========================================== */
+
+function toast(message) {
+
+    const element =
+        document.getElementById("toast");
+
+    element.textContent = message;
+
+    element.classList.add("show");
+
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer =
+        setTimeout(() => {
+            element.classList.remove("show");
+        },2600);
+}
+
+
+/* ==========================================
+   AUTO LOGIN
+========================================== */
+
+window.addEventListener("DOMContentLoaded", () => {
+
+    const saved =
+        localStorage.getItem("bubblesUser");
+
+    if(saved) {
+
+        user = JSON.parse(saved);
+
+        openApp();
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
