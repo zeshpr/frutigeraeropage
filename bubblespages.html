@@ -1,0 +1,4568 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dragonfly — your little internet</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --blue: #159dcc;
+    --deep-blue: #08749c;
+    --cyan: #63dceb;
+    --green: #65c978;
+    --light: #ecffff;
+    --glass: rgba(255,255,255,.68);
+    --border: rgba(255,255,255,.95);
+    --text: #286879;
+    --muted: #6d99a4;
+    --shadow: 0 10px 28px rgba(0,90,130,.15);
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color: var(--text);
+
+    background:
+        linear-gradient(
+            180deg,
+            #20c7ed 0%,
+            #7de6ef 35%,
+            #c9f3e0 67%,
+            #61bd79 100%
+        );
+
+    background-attachment: fixed;
+}
+
+/* =========================
+   BACKGROUND
+========================= */
+
+.sky {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -2;
+}
+
+.sun {
+    position: absolute;
+
+    width: 250px;
+    height: 250px;
+
+    top: -90px;
+    right: -60px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            white 0 7%,
+            #fff9a7 15%,
+            #ffe95b 48%,
+            #ffc72f
+        );
+
+    box-shadow:
+        0 0 90px rgba(255,239,72,.7);
+}
+
+.cloud {
+    position: absolute;
+
+    width: 240px;
+    height: 60px;
+
+    border-radius: 100px;
+
+    background:
+        rgba(255,255,255,.66);
+
+    box-shadow:
+        0 10px 25px rgba(0,90,120,.08),
+        inset 0 4px 8px rgba(255,255,255,.65);
+
+    animation: cloud 55s linear infinite;
+}
+
+.cloud:before,
+.cloud:after {
+    content: "";
+
+    position: absolute;
+
+    background: inherit;
+    border-radius: 50%;
+}
+
+.cloud:before {
+    width: 105px;
+    height: 105px;
+
+    left: 25px;
+    bottom: 5px;
+}
+
+.cloud:after {
+    width: 130px;
+    height: 130px;
+
+    right: 25px;
+    bottom: 0;
+}
+
+.cloud.one {
+    top: 12%;
+    left: -300px;
+}
+
+.cloud.two {
+    top: 38%;
+    left: -500px;
+
+    transform: scale(.65);
+
+    animation-duration: 72s;
+    animation-delay: -25s;
+}
+
+.cloud.three {
+    top: 67%;
+    left: -400px;
+
+    transform: scale(.45);
+
+    animation-duration: 85s;
+    animation-delay: -50s;
+}
+
+@keyframes cloud {
+    from {
+        margin-left: 0;
+    }
+
+    to {
+        margin-left: calc(100vw + 650px);
+    }
+}
+
+.water {
+    position: absolute;
+
+    left: -5%;
+    right: -5%;
+    bottom: -10%;
+
+    height: 28%;
+
+    border-radius: 50% 50% 0 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            #47d9e5,
+            #1aa7c3,
+            #138ba8
+        );
+
+    box-shadow:
+        inset 0 14px 25px rgba(255,255,255,.3);
+}
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    width: min(1180px, calc(100% - 28px));
+
+    margin: 18px auto 45px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 12px 16px;
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.8),
+            rgba(222,250,255,.48)
+        );
+
+    border: 1px solid var(--border);
+
+    box-shadow:
+        var(--shadow),
+        inset 0 1px white;
+
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    cursor: pointer;
+}
+
+.logo-dragonfly {
+    width: 42px;
+    height: 42px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #c9ffff,
+            #48cbe3
+        );
+
+    border: 2px solid white;
+
+    box-shadow:
+        inset 4px 4px 8px rgba(255,255,255,.75),
+        0 5px 12px rgba(0,110,150,.16);
+
+    font-size: 22px;
+}
+
+.logo-text {
+    color: var(--deep-blue);
+
+    font-size: 21px;
+    font-weight: 900;
+
+    letter-spacing: -.04em;
+}
+
+.logo-text small {
+    display: block;
+
+    color: #72a3ad;
+
+    font-size: 7px;
+    font-weight: 800;
+
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+.search {
+    flex: 1;
+
+    max-width: 430px;
+}
+
+.search input {
+    width: 100%;
+
+    padding: 11px 17px;
+
+    border-radius: 22px;
+
+    border: 1px solid rgba(255,255,255,.95);
+
+    outline: none;
+
+    background:
+        rgba(255,255,255,.62);
+
+    color: var(--text);
+
+    box-shadow:
+        inset 0 2px 6px rgba(0,100,130,.08);
+
+    font-family: inherit;
+}
+
+.search input:focus {
+    box-shadow:
+        0 0 0 3px rgba(70,207,231,.18),
+        inset 0 2px 6px rgba(0,100,130,.08);
+}
+
+.header-actions {
+    display: flex;
+    gap: 7px;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    font-family: inherit;
+}
+
+.aero-btn {
+    border: 1px solid rgba(255,255,255,.9);
+
+    border-radius: 17px;
+
+    padding: 9px 13px;
+
+    cursor: pointer;
+
+    color: #247489;
+
+    font-weight: 900;
+    font-size: 10px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.9),
+            rgba(179,239,247,.65)
+        );
+
+    box-shadow:
+        0 4px 10px rgba(0,100,130,.12),
+        inset 0 1px white;
+
+    transition:
+        transform .15s,
+        filter .15s;
+}
+
+.aero-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+}
+
+.aero-btn:active {
+    transform: scale(.96);
+}
+
+.aero-btn.primary {
+    color: white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #54d5e5,
+            #0b91bd
+        );
+}
+
+.aero-btn.green {
+    color: white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #9be7a0,
+            #42b969
+        );
+}
+
+.icon-btn {
+    width: 39px;
+    height: 39px;
+
+    padding: 0;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    font-size: 16px;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.layout {
+    display: grid;
+
+    grid-template-columns:
+        215px
+        minmax(0, 1fr)
+        235px;
+
+    gap: 12px;
+
+    margin-top: 12px;
+}
+
+.glass {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.75),
+            rgba(233,251,255,.43)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.9);
+
+    border-radius: 22px;
+
+    box-shadow:
+        var(--shadow),
+        inset 0 1px white;
+
+    backdrop-filter: blur(17px);
+    -webkit-backdrop-filter: blur(17px);
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    padding: 12px;
+
+    align-self: start;
+
+    position: sticky;
+    top: 18px;
+}
+
+.profile-mini {
+    text-align: center;
+
+    padding: 8px 5px 14px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.7);
+}
+
+.avatar {
+    width: 76px;
+    height: 76px;
+
+    margin: 0 auto 8px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #e6ffff,
+            #65d5e6
+        );
+
+    border:
+        3px solid white;
+
+    box-shadow:
+        0 7px 16px rgba(0,100,130,.16),
+        inset 5px 5px 10px rgba(255,255,255,.7);
+
+    overflow: hidden;
+
+    font-size: 32px;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.profile-mini strong {
+    display: block;
+
+    color: var(--deep-blue);
+
+    font-size: 13px;
+}
+
+.profile-mini span {
+    display: block;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    font-size: 8px;
+}
+
+.nav {
+    display: grid;
+    gap: 5px;
+
+    padding-top: 10px;
+}
+
+.nav button {
+    width: 100%;
+
+    border: 0;
+
+    border-radius: 13px;
+
+    padding: 10px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    color: #4d8391;
+
+    font-weight: 900;
+    font-size: 10px;
+
+    background: transparent;
+}
+
+.nav button:hover,
+.nav button.active {
+    color: #087b9f;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.72),
+            rgba(112,220,232,.3)
+        );
+
+    box-shadow:
+        inset 0 1px white;
+}
+
+.side-box {
+    margin-top: 12px;
+
+    padding: 11px;
+
+    border-radius: 16px;
+
+    background:
+        rgba(255,255,255,.3);
+
+    font-size: 8px;
+    line-height: 1.5;
+
+    color: #6b959e;
+}
+
+.side-box strong {
+    color: #23819a;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main {
+    min-width: 0;
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
+}
+
+/* =========================
+   HOME HERO
+========================= */
+
+.hero {
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 22px;
+
+    min-height: 155px;
+
+    background:
+        linear-gradient(
+            130deg,
+            rgba(255,255,255,.78),
+            rgba(93,221,232,.3)
+        );
+
+    border-radius: 25px;
+
+    border:
+        1px solid white;
+
+    box-shadow:
+        var(--shadow),
+        inset 0 1px white;
+}
+
+.hero h1 {
+    margin: 0;
+
+    color: #08779b;
+
+    font-size: 25px;
+}
+
+.hero p {
+    width: 65%;
+
+    margin: 7px 0 0;
+
+    color: #5f8f99;
+
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.hero-orb {
+    position: absolute;
+
+    width: 170px;
+    height: 170px;
+
+    right: 15px;
+    top: -55px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #dfffff,
+            #62d9e6 40%,
+            #0e99bf
+        );
+
+    box-shadow:
+        inset 15px 12px 20px rgba(255,255,255,.6),
+        0 0 30px rgba(42,195,218,.25);
+
+    opacity: .8;
+}
+
+.hero-orb:after {
+    content: "🪰";
+
+    position: absolute;
+
+    left: 45px;
+    top: 57px;
+
+    font-size: 58px;
+
+    filter:
+        drop-shadow(0 7px 5px rgba(0,80,100,.15));
+}
+
+/* =========================
+   COMPOSER
+========================= */
+
+.composer {
+    margin-top: 12px;
+
+    padding: 13px;
+}
+
+.composer-top {
+    display: flex;
+    gap: 10px;
+}
+
+.composer-avatar {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    display: grid;
+    place-items: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            white,
+            #75dce8
+        );
+
+    border: 2px solid white;
+}
+
+.composer textarea {
+    width: 100%;
+    min-height: 62px;
+
+    resize: vertical;
+
+    border: 0;
+    outline: none;
+
+    border-radius: 15px;
+
+    padding: 11px;
+
+    color: var(--text);
+
+    font-family: inherit;
+    font-size: 10px;
+
+    background:
+        rgba(255,255,255,.5);
+}
+
+.composer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-top: 7px;
+}
+
+.composer-bottom span {
+    color: #7ba0a8;
+    font-size: 8px;
+}
+
+/* =========================
+   POSTS
+========================= */
+
+.posts {
+    display: grid;
+    gap: 10px;
+
+    margin-top: 12px;
+}
+
+.post {
+    padding: 14px;
+
+    animation:
+        appear .25s ease;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.post-head {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+}
+
+.post-avatar {
+    width: 39px;
+    height: 39px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    overflow: hidden;
+
+    border: 2px solid white;
+
+    background:
+        linear-gradient(
+            145deg,
+            white,
+            #71dbe9
+        );
+}
+
+.post-avatar img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.post-user {
+    flex: 1;
+}
+
+.post-user strong {
+    display: block;
+
+    color: #287589;
+
+    font-size: 10px;
+}
+
+.post-user span {
+    color: #82a5ad;
+
+    font-size: 7px;
+}
+
+.post-text {
+    margin:
+        11px 2px;
+
+    color: #4f7e88;
+
+    font-size: 10px;
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+}
+
+.post-photo {
+    width: 100%;
+
+    max-height: 330px;
+
+    object-fit: cover;
+
+    border-radius: 15px;
+
+    border: 2px solid white;
+
+    box-shadow:
+        0 6px 15px rgba(0,90,120,.12);
+}
+
+.post-actions {
+    display: flex;
+    gap: 5px;
+
+    padding-top: 7px;
+
+    border-top:
+        1px solid rgba(255,255,255,.7);
+}
+
+.post-actions button {
+    border: 0;
+
+    background: transparent;
+
+    color: #65929d;
+
+    font-size: 9px;
+
+    cursor: pointer;
+
+    padding: 5px 8px;
+
+    border-radius: 10px;
+}
+
+.post-actions button:hover {
+    background: rgba(255,255,255,.5);
+}
+
+/* =========================
+   RIGHT COLUMN
+========================= */
+
+.right {
+    display: grid;
+    gap: 12px;
+
+    align-self: start;
+}
+
+.widget {
+    padding: 13px;
+}
+
+.widget-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 10px;
+}
+
+.widget-title strong {
+    color: #17738b;
+    font-size: 11px;
+}
+
+.widget-title span {
+    color: #7ca2a9;
+    font-size: 7px;
+}
+
+.friend {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px;
+
+    border-radius: 13px;
+
+    cursor: pointer;
+}
+
+.friend:hover {
+    background:
+        rgba(255,255,255,.48);
+}
+
+.friend-avatar {
+    width: 34px;
+    height: 34px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    border: 2px solid white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #eaffff,
+            #70dce9
+        );
+
+    overflow: hidden;
+}
+
+.friend-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.friend-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.friend-info strong {
+    display: block;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #397a89;
+    font-size: 8px;
+}
+
+.friend-info span {
+    color: #83a7ae;
+    font-size: 7px;
+}
+
+.online {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #58c974;
+
+    box-shadow:
+        0 0 7px #58c974;
+}
+
+/* =========================
+   MUSIC
+========================= */
+
+.music-card {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 8px;
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,.4);
+
+    margin-bottom: 6px;
+}
+
+.cover {
+    width: 43px;
+    height: 43px;
+
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #77e5ee,
+            #58b8df,
+            #88dc91
+        );
+
+    border: 2px solid white;
+
+    font-size: 19px;
+}
+
+.track {
+    flex: 1;
+    min-width: 0;
+}
+
+.track strong {
+    display: block;
+
+    color: #367889;
+
+    font-size: 8px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track span {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #84a7ad;
+
+    font-size: 7px;
+}
+
+.play {
+    width: 29px;
+    height: 29px;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #55d5e3,
+            #078db8
+        );
+}
+
+/* =========================
+   PROFILE VIEW
+========================= */
+
+.profile-cover {
+    position: relative;
+
+    height: 190px;
+
+    overflow: hidden;
+
+    border-radius: 25px 25px 0 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            #31c9e7,
+            #9ee8b0
+        );
+
+    border: 1px solid white;
+}
+
+.profile-cover:before {
+    content: "";
+
+    position: absolute;
+
+    width: 400px;
+    height: 130px;
+
+    left: -50px;
+    bottom: -65px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.35);
+
+    transform: rotate(-8deg);
+}
+
+.profile-cover:after {
+    content: "✦  ✧  ✦  ✧";
+
+    position: absolute;
+
+    right: 20px;
+    top: 25px;
+
+    color: rgba(255,255,255,.7);
+
+    font-size: 25px;
+}
+
+.profile-info {
+    position: relative;
+
+    padding: 0 20px 18px;
+
+    background:
+        rgba(255,255,255,.66);
+
+    border-radius: 0 0 25px 25px;
+
+    border:
+        1px solid white;
+}
+
+.profile-large-avatar {
+    position: relative;
+
+    margin-top: -52px;
+
+    width: 104px;
+    height: 104px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #efffff,
+            #61d7e6
+        );
+
+    border: 4px solid white;
+
+    box-shadow:
+        0 8px 20px rgba(0,90,120,.18);
+
+    overflow: hidden;
+
+    font-size: 42px;
+}
+
+.profile-large-avatar img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.profile-info h2 {
+    margin:
+        8px 0 3px;
+
+    color: #08769b;
+
+    font-size: 22px;
+}
+
+.profile-info .username {
+    color: #75a0a8;
+
+    font-size: 9px;
+}
+
+.profile-bio {
+    max-width: 600px;
+
+    margin-top: 9px;
+
+    color: #5e8c96;
+
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 25px;
+
+    margin-top: 14px;
+}
+
+.stat strong {
+    display: block;
+
+    color: #08799d;
+
+    font-size: 14px;
+}
+
+.stat span {
+    color: #7da1a9;
+    font-size: 7px;
+}
+
+/* =========================
+   MUSIC PAGE
+========================= */
+
+.music-page {
+    padding: 17px;
+}
+
+.music-page h2,
+.friends-page h2,
+.messages-page h2,
+.settings-page h2 {
+    margin: 0 0 12px;
+
+    color: #08779a;
+
+    font-size: 20px;
+}
+
+.add-track {
+    display: grid;
+
+    grid-template-columns:
+        1fr
+        1fr
+        auto;
+
+    gap: 7px;
+
+    margin-bottom: 12px;
+}
+
+.input {
+    width: 100%;
+
+    border: 1px solid white;
+
+    outline: none;
+
+    padding: 10px 12px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,.58);
+
+    color: var(--text);
+
+    font-family: inherit;
+
+    font-size: 9px;
+}
+
+.track-list {
+    display: grid;
+    gap: 7px;
+}
+
+.big-track {
+    display: flex;
+    align-items: center;
+
+    gap: 11px;
+
+    padding: 10px;
+
+    border-radius: 17px;
+
+    background:
+        rgba(255,255,255,.45);
+
+    border:
+        1px solid rgba(255,255,255,.75);
+}
+
+.big-track .cover {
+    width: 55px;
+    height: 55px;
+}
+
+/* =========================
+   FRIENDS
+========================= */
+
+.friends-page {
+    padding: 17px;
+}
+
+.friends-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 8px;
+}
+
+.friend-card {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 12px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(255,255,255,.45);
+
+    border:
+        1px solid rgba(255,255,255,.7);
+}
+
+.friend-card .friend-avatar {
+    width: 49px;
+    height: 49px;
+}
+
+/* =========================
+   MESSAGES
+========================= */
+
+.messages-page {
+    display: grid;
+
+    grid-template-columns:
+        190px
+        1fr;
+
+    height: 650px;
+
+    overflow: hidden;
+
+    border-radius: 24px;
+}
+
+.message-list {
+    padding: 10px;
+
+    border-right:
+        1px solid rgba(255,255,255,.7);
+}
+
+.message-person {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 9px;
+
+    border-radius: 13px;
+
+    cursor: pointer;
+}
+
+.message-person:hover,
+.message-person.selected {
+    background:
+        rgba(255,255,255,.6);
+}
+
+.chat {
+    display: flex;
+
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+.chat-head {
+    padding: 13px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.7);
+
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.chat-messages {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 15px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.bubble {
+    max-width: 70%;
+
+    padding: 9px 12px;
+
+    border-radius: 16px;
+
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.bubble.them {
+    align-self: flex-start;
+
+    background:
+        rgba(255,255,255,.7);
+
+    border-bottom-left-radius: 5px;
+}
+
+.bubble.me {
+    align-self: flex-end;
+
+    color: white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #61d7e4,
+            #138fb9
+        );
+
+    border-bottom-right-radius: 5px;
+}
+
+.chat-input {
+    display: flex;
+
+    gap: 7px;
+
+    padding: 9px;
+
+    border-top:
+        1px solid rgba(255,255,255,.7);
+}
+
+/* =========================
+   SETTINGS
+========================= */
+
+.settings-page {
+    padding: 17px;
+}
+
+.setting {
+    margin-bottom: 13px;
+
+    padding: 13px;
+
+    border-radius: 17px;
+
+    background:
+        rgba(255,255,255,.44);
+}
+
+.setting label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #3c7d8b;
+
+    font-size: 8px;
+    font-weight: 900;
+}
+
+.setting textarea {
+    width: 100%;
+
+    min-height: 70px;
+
+    resize: vertical;
+
+    border: 1px solid white;
+
+    outline: none;
+
+    border-radius: 13px;
+
+    padding: 10px;
+
+    background:
+        rgba(255,255,255,.55);
+
+    color: var(--text);
+
+    font-family: inherit;
+
+    font-size: 9px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 500;
+
+    display: none;
+    place-items: center;
+
+    padding: 18px;
+
+    background:
+        rgba(0,70,100,.25);
+
+    backdrop-filter: blur(6px);
+}
+
+.modal.show {
+    display: grid;
+}
+
+.modal-box {
+    width: min(430px, 100%);
+
+    padding: 20px;
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.9),
+            rgba(221,250,255,.76)
+        );
+
+    border:
+        1px solid white;
+
+    box-shadow:
+        0 20px 60px rgba(0,80,110,.25);
+
+    backdrop-filter: blur(20px);
+}
+
+.modal-box h2 {
+    margin: 0 0 5px;
+
+    color: #08769b;
+
+    font-size: 19px;
+}
+
+.modal-box p {
+    margin: 0 0 15px;
+
+    color: #759da5;
+
+    font-size: 9px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 7px;
+
+    margin-top: 12px;
+}
+
+.file-label {
+    display: inline-block;
+
+    cursor: pointer;
+
+    padding: 9px 12px;
+
+    border-radius: 14px;
+
+    color: #317889;
+
+    font-size: 8px;
+    font-weight: 900;
+
+    background:
+        rgba(255,255,255,.65);
+
+    border:
+        1px solid white;
+}
+
+.file-label input {
+    display: none;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast {
+    position: fixed;
+
+    z-index: 1000;
+
+    left: 50%;
+    bottom: 22px;
+
+    transform:
+        translate(-50%, 20px);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    padding: 10px 15px;
+
+    border-radius: 20px;
+
+    color: #2d7585;
+
+    font-size: 9px;
+    font-weight: 900;
+
+    background:
+        rgba(255,255,255,.83);
+
+    border:
+        1px solid white;
+
+    box-shadow:
+        0 10px 25px rgba(0,90,120,.18);
+
+    transition:
+        .25s;
+}
+
+.toast.show {
+    opacity: 1;
+
+    transform:
+        translate(-50%, 0);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+    .layout {
+        grid-template-columns:
+            175px
+            minmax(0, 1fr);
+    }
+
+    .right {
+        display: none;
+    }
+
+    .search {
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 650px) {
+
+    .app {
+        width:
+            calc(100% - 12px);
+
+        margin:
+            6px auto 25px;
+    }
+
+    .header {
+        padding: 8px;
+
+        border-radius: 18px;
+
+        flex-wrap: wrap;
+    }
+
+    .logo-text {
+        font-size: 17px;
+    }
+
+    .logo-dragonfly {
+        width: 35px;
+        height: 35px;
+    }
+
+    .search {
+        order: 3;
+
+        max-width: none;
+
+        flex-basis: 100%;
+    }
+
+    .header-actions {
+        margin-left: auto;
+    }
+
+    .header-actions .aero-btn:not(.icon-btn) {
+        display: none;
+    }
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        position: static;
+
+        padding: 7px;
+
+        display: flex;
+        align-items: center;
+
+        gap: 5px;
+    }
+
+    .profile-mini {
+        display: flex;
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 0;
+
+        border: 0;
+    }
+
+    .profile-mini .avatar {
+        width: 42px;
+        height: 42px;
+
+        margin: 0;
+    }
+
+    .profile-mini div:last-child {
+        text-align: left;
+    }
+
+    .nav {
+        display: flex;
+
+        overflow-x: auto;
+
+        padding: 0;
+
+        flex: 1;
+    }
+
+    .nav button {
+        width: auto;
+
+        flex-shrink: 0;
+
+        padding: 9px;
+    }
+
+    .side-box {
+        display: none;
+    }
+
+    .hero {
+        min-height: 135px;
+
+        padding: 16px;
+    }
+
+    .hero h1 {
+        font-size: 21px;
+    }
+
+    .hero p {
+        width: 65%;
+
+        font-size: 9px;
+    }
+
+    .hero-orb {
+        width: 125px;
+        height: 125px;
+    }
+
+    .hero-orb:after {
+        left: 32px;
+        top: 40px;
+
+        font-size: 42px;
+    }
+
+    .friends-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .add-track {
+        grid-template-columns: 1fr;
+    }
+
+    .messages-page {
+        grid-template-columns: 1fr;
+
+        height: 570px;
+    }
+
+    .message-list {
+        display: flex;
+
+        overflow-x: auto;
+
+        border-right: 0;
+
+        border-bottom:
+            1px solid rgba(255,255,255,.7);
+    }
+
+    .message-person {
+        min-width: 125px;
+    }
+
+    .profile-cover {
+        height: 145px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="sky">
+    <div class="sun"></div>
+
+    <div class="cloud one"></div>
+    <div class="cloud two"></div>
+    <div class="cloud three"></div>
+
+    <div class="water"></div>
+</div>
+
+
+<div class="app">
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <div
+            class="logo"
+            onclick="showView('home')"
+        >
+
+            <div class="logo-dragonfly">
+                🪽
+            </div>
+
+            <div class="logo-text">
+                dragonfly
+                <small>
+                    your little internet
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="search">
+
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="найти кого-нибудь..."
+                onkeydown="searchUsers(event)"
+            >
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <button
+                class="aero-btn icon-btn"
+                onclick="showView('messages')"
+                title="Сообщения"
+            >
+                ✉
+            </button>
+
+            <button
+                class="aero-btn primary"
+                onclick="showView('profile')"
+            >
+                мой профиль
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- LAYOUT -->
+
+    <div class="layout">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar glass">
+
+            <div class="profile-mini">
+
+                <div
+                    class="avatar"
+                    id="miniAvatar"
+                >
+                    🦋
+                </div>
+
+                <div>
+
+                    <strong id="miniName">
+                        Alayse
+                    </strong>
+
+                    <span id="miniStatus">
+                        floating around
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <nav class="nav">
+
+                <button
+                    class="active"
+                    data-view="home"
+                    onclick="showView('home')"
+                >
+                    🏠 главная
+                </button>
+
+                <button
+                    data-view="profile"
+                    onclick="showView('profile')"
+                >
+                    👤 профиль
+                </button>
+
+                <button
+                    data-view="friends"
+                    onclick="showView('friends')"
+                >
+                    🫂 друзья
+                </button>
+
+                <button
+                    data-view="music"
+                    onclick="showView('music')"
+                >
+                    🎧 музыка
+                </button>
+
+                <button
+                    data-view="messages"
+                    onclick="showView('messages')"
+                >
+                    💬 сообщения
+                </button>
+
+                <button
+                    data-view="settings"
+                    onclick="showView('settings')"
+                >
+                    ⚙ настройки
+                </button>
+
+            </nav>
+
+
+            <div class="side-box">
+
+                <strong>dragonfly</strong>
+                <br>
+
+                маленькое место в интернете,
+                где можно оставить кусочек
+                себя.
+
+                <br><br>
+
+                <span id="onlineCount">
+                    1,284 people online
+                </span>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN -->
+
+        <main class="main">
+
+
+            <!-- HOME -->
+
+            <section
+                id="home"
+                class="view active"
+            >
+
+                <div class="hero">
+
+                    <h1>
+                        привет, интернет ☁
+                    </h1>
+
+                    <p>
+                        Здесь можно написать что-нибудь,
+                        послушать музыку, посмотреть, чем
+                        занимаются друзья, или просто
+                        немного посидеть.
+                    </p>
+
+                    <div class="hero-orb"></div>
+
+                </div>
+
+
+                <div class="composer glass">
+
+                    <div class="composer-top">
+
+                        <div
+                            class="composer-avatar"
+                            id="composerAvatar"
+                        >
+                            🦋
+                        </div>
+
+                        <textarea
+                            id="postText"
+                            maxlength="500"
+                            placeholder="что происходит?"
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="composer-bottom">
+
+                        <span>
+                            <span id="charCount">
+                                0
+                            </span>
+                            / 500
+                        </span>
+
+                        <button
+                            class="aero-btn primary"
+                            onclick="createPost()"
+                        >
+                            опубликовать
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="posts"
+                    id="posts"
+                ></div>
+
+            </section>
+
+
+            <!-- PROFILE -->
+
+            <section
+                id="profile"
+                class="view"
+            >
+
+                <div class="profile-cover"></div>
+
+
+                <div class="profile-info">
+
+                    <div
+                        class="profile-large-avatar"
+                        id="profileAvatar"
+                    >
+                        🦋
+                    </div>
+
+                    <h2 id="profileName">
+                        Alayse
+                    </h2>
+
+                    <div
+                        class="username"
+                        id="profileUsername"
+                    >
+                        @alayse
+                    </div>
+
+                    <div
+                        class="profile-bio"
+                        id="profileBio"
+                    >
+                        somewhere between the clouds
+                        and the old internet.
+                    </div>
+
+
+                    <div class="profile-stats">
+
+                        <div class="stat">
+                            <strong id="postStat">
+                                0
+                            </strong>
+                            <span>
+                                постов
+                            </span>
+                        </div>
+
+                        <div class="stat">
+                            <strong>
+                                18
+                            </strong>
+                            <span>
+                                друзей
+                            </span>
+                        </div>
+
+                        <div class="stat">
+                            <strong>
+                                7
+                            </strong>
+                            <span>
+                                треков
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- FRIENDS -->
+
+            <section
+                id="friends"
+                class="view"
+            >
+
+                <div class="friends-page glass">
+
+                    <h2>
+                        твои друзья
+                    </h2>
+
+                    <div
+                        class="friends-grid"
+                        id="friendsGrid"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- MUSIC -->
+
+            <section
+                id="music"
+                class="view"
+            >
+
+                <div class="music-page glass">
+
+                    <h2>
+                        музыка
+                    </h2>
+
+                    <div class="add-track">
+
+                        <input
+                            class="input"
+                            id="trackName"
+                            placeholder="название трека"
+                        >
+
+                        <input
+                            class="input"
+                            id="trackUrl"
+                            placeholder="ссылка на audio-файл"
+                        >
+
+                        <button
+                            class="aero-btn primary"
+                            onclick="addTrack()"
+                        >
+                            + добавить
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="track-list"
+                        id="trackList"
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- MESSAGES -->
+
+            <section
+                id="messages"
+                class="view"
+            >
+
+                <div class="messages-page glass">
+
+                    <div
+                        class="message-list"
+                        id="messageList"
+                    ></div>
+
+
+                    <div class="chat">
+
+                        <div
+                            class="chat-head"
+                            id="chatHead"
+                        >
+                            выбери друга
+                        </div>
+
+
+                        <div
+                            class="chat-messages"
+                            id="chatMessages"
+                        ></div>
+
+
+                        <div class="chat-input">
+
+                            <input
+                                class="input"
+                                id="messageInput"
+                                placeholder="написать сообщение..."
+                                onkeydown="sendOnEnter(event)"
+                            >
+
+                            <button
+                                class="aero-btn primary"
+                                onclick="sendMessage()"
+                            >
+                                →
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SETTINGS -->
+
+            <section
+                id="settings"
+                class="view"
+            >
+
+                <div class="settings-page glass">
+
+                    <h2>
+                        твой профиль
+                    </h2>
+
+
+                    <div class="setting">
+
+                        <label>
+                            имя
+                        </label>
+
+                        <input
+                            class="input"
+                            id="settingName"
+                            placeholder="как тебя зовут?"
+                        >
+
+                    </div>
+
+
+                    <div class="setting">
+
+                        <label>
+                            username
+                        </label>
+
+                        <input
+                            class="input"
+                            id="settingUsername"
+                            placeholder="@username"
+                        >
+
+                    </div>
+
+
+                    <div class="setting">
+
+                        <label>
+                            статус
+                        </label>
+
+                        <input
+                            class="input"
+                            id="settingStatus"
+                            placeholder="что-нибудь короткое"
+                        >
+
+                    </div>
+
+
+                    <div class="setting">
+
+                        <label>
+                            о себе
+                        </label>
+
+                        <textarea
+                            id="settingBio"
+                            placeholder="расскажи немного о себе..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="setting">
+
+                        <label>
+                            фотография профиля
+                        </label>
+
+                        <label class="file-label">
+
+                            выбрать фотографию
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onchange="changeAvatar(event)"
+                            >
+
+                        </label>
+
+                    </div>
+
+
+                    <button
+                        class="aero-btn primary"
+                        onclick="saveProfile()"
+                    >
+                        сохранить изменения
+                    </button>
+
+                    <button
+                        class="aero-btn"
+                        onclick="resetEverything()"
+                    >
+                        очистить прототип
+                    </button>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- RIGHT COLUMN -->
+
+        <aside class="right">
+
+
+            <!-- FRIENDS WIDGET -->
+
+            <div class="widget glass">
+
+                <div class="widget-title">
+
+                    <strong>
+                        сейчас рядом
+                    </strong>
+
+                    <span>
+                        online
+                    </span>
+
+                </div>
+
+
+                <div id="onlineFriends"></div>
+
+            </div>
+
+
+            <!-- MUSIC WIDGET -->
+
+            <div class="widget glass">
+
+                <div class="widget-title">
+
+                    <strong>
+                        сейчас слушают
+                    </strong>
+
+                    <span>
+                        ♪
+                    </span>
+
+                </div>
+
+
+                <div class="music-card">
+
+                    <div class="cover">
+                        💿
+                    </div>
+
+                    <div class="track">
+
+                        <strong>
+                            underwater.mp3
+                        </strong>
+
+                        <span>
+                            dragonfly radio
+                        </span>
+
+                    </div>
+
+                    <button
+                        class="play"
+                        onclick="toggleRadio(this)"
+                    >
+                        ▶
+                    </button>
+
+                </div>
+
+
+                <audio
+                    id="radioAudio"
+                    loop
+                ></audio>
+
+            </div>
+
+
+            <!-- RANDOM -->
+
+            <div class="widget glass">
+
+                <div class="widget-title">
+
+                    <strong>
+                        маленькая мысль
+                    </strong>
+
+                </div>
+
+                <div
+                    style="
+                    font-size:9px;
+                    line-height:1.6;
+                    color:#6c969f;
+                    "
+                >
+                    Иногда лучший способ
+                    провести вечер —
+                    открыть старый сайт
+                    и посмотреть, куда он
+                    тебя приведёт.
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+
+<!-- PROFILE MODAL -->
+
+<div
+    class="modal"
+    id="profileModal"
+>
+
+    <div class="modal-box">
+
+        <h2>
+            добро пожаловать ☁
+        </h2>
+
+        <p>
+            Создай своего первого персонажа
+            для этого маленького интернета.
+        </p>
+
+
+        <div class="setting">
+
+            <label>
+                имя
+            </label>
+
+            <input
+                class="input"
+                id="firstName"
+                value="Alayse"
+            >
+
+        </div>
+
+
+        <div class="setting">
+
+            <label>
+                username
+            </label>
+
+            <input
+                class="input"
+                id="firstUsername"
+                value="alayse"
+            >
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                class="aero-btn primary"
+                onclick="createProfile()"
+            >
+                войти в dragonfly
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+
+/* =========================================================
+   DRAGONFLY PROTOTYPE
+   Всё хранится только в браузере.
+
+   Здесь нет сервера, базы данных или регистрации.
+   Это именно визуальный/функциональный прототип.
+========================================================= */
+
+
+/* =========================
+   DATA
+========================= */
+
+const defaultFriends = [
+
+    {
+        id: 1,
+        name: "Luna",
+        username: "@luna",
+        avatar: "🌙",
+        status: "watching clouds",
+        online: true
+    },
+
+    {
+        id: 2,
+        name: "Mika",
+        username: "@mika.exe",
+        avatar: "🐬",
+        status: "listening to music",
+        online: true
+    },
+
+    {
+        id: 3,
+        name: "Neko",
+        username: "@neko2004",
+        avatar: "🐱",
+        status: "probably sleeping",
+        online: false
+    },
+
+    {
+        id: 4,
+        name: "Aero",
+        username: "@aero",
+        avatar: "🌊",
+        status: "at the beach",
+        online: true
+    },
+
+    {
+        id: 5,
+        name: "Sora",
+        username: "@sora",
+        avatar: "☁️",
+        status: "doing nothing",
+        online: false
+    },
+
+    {
+        id: 6,
+        name: "Pixel",
+        username: "@pixel",
+        avatar: "🦎",
+        status: "building something",
+        online: true
+    }
+
+];
+
+
+let profile =
+    JSON.parse(
+        localStorage.getItem(
+            "dragonfly_profile"
+        )
+    );
+
+
+let posts =
+    JSON.parse(
+        localStorage.getItem(
+            "dragonfly_posts"
+        )
+    ) || [
+
+        {
+            id: 1,
+            author: "Luna",
+            username: "@luna",
+            avatar: "🌙",
+            time: "сегодня, 19:42",
+            text:
+                "сегодня небо какое-то особенно красивое. будто старый wallpaper из windows xp.",
+            likes: 12,
+            liked: false
+        },
+
+        {
+            id: 2,
+            author: "Mika",
+            username: "@mika.exe",
+            avatar: "🐬",
+            time: "сегодня, 18:17",
+            text:
+                "нашла старые наушники и теперь весь вечер слушаю музыку с 2007 года.",
+            likes: 8,
+            liked: false
+        }
+
+    ];
+
+
+let tracks =
+    JSON.parse(
+        localStorage.getItem(
+            "dragonfly_tracks"
+        )
+    ) || [
+
+        {
+            name: "underwater.mp3",
+            artist: "dragonfly radio",
+            url: ""
+        },
+
+        {
+            name: "blue sky",
+            artist: "Luna",
+            url: ""
+        },
+
+        {
+            name: "summer.exe",
+            artist: "Mika",
+            url: ""
+        }
+
+    ];
+
+
+let messages =
+    JSON.parse(
+        localStorage.getItem(
+            "dragonfly_messages"
+        )
+    ) || {};
+
+
+let selectedFriend =
+    null;
+
+
+/* =========================
+   PROFILE CREATION
+========================= */
+
+function createProfile() {
+
+    const name =
+        document
+            .getElementById(
+                "firstName"
+            )
+            .value
+            .trim()
+            ||
+            "Alayse";
+
+
+    const username =
+        document
+            .getElementById(
+                "firstUsername"
+            )
+            .value
+            .trim()
+            .replace(
+                /^@/,
+                ""
+            )
+            ||
+            "alayse";
+
+
+    profile = {
+
+        name,
+
+        username,
+
+        status:
+            "floating around",
+
+        bio:
+            "somewhere between the clouds and the old internet.",
+
+        avatar:
+            "",
+
+        posts: 0
+
+    };
+
+
+    saveProfileData();
+
+
+    document
+        .getElementById(
+            "profileModal"
+        )
+        .classList.remove(
+            "show"
+        );
+
+
+    updateUI();
+
+
+    showToast(
+        "профиль создан ☁"
+    );
+
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+function saveProfileData() {
+
+    localStorage.setItem(
+        "dragonfly_profile",
+        JSON.stringify(
+            profile
+        )
+    );
+
+}
+
+
+function savePosts() {
+
+    localStorage.setItem(
+        "dragonfly_posts",
+        JSON.stringify(
+            posts
+        )
+    );
+
+}
+
+
+function saveTracks() {
+
+    localStorage.setItem(
+        "dragonfly_tracks",
+        JSON.stringify(
+            tracks
+        )
+    );
+
+}
+
+
+function saveMessages() {
+
+    localStorage.setItem(
+        "dragonfly_messages",
+        JSON.stringify(
+            messages
+        )
+    );
+
+}
+
+
+/* =========================
+   PROFILE UI
+========================= */
+
+function updateUI() {
+
+    if (!profile) {
+        return;
+    }
+
+
+    document
+        .getElementById(
+            "miniName"
+        )
+        .textContent =
+        profile.name;
+
+
+    document
+        .getElementById(
+            "miniStatus"
+        )
+        .textContent =
+        profile.status;
+
+
+    document
+        .getElementById(
+            "profileName"
+        )
+        .textContent =
+        profile.name;
+
+
+    document
+        .getElementById(
+            "profileUsername"
+        )
+        .textContent =
+        "@" +
+        profile.username;
+
+
+    document
+        .getElementById(
+            "profileBio"
+        )
+        .textContent =
+        profile.bio;
+
+
+    document
+        .getElementById(
+            "postStat"
+        )
+        .textContent =
+        posts.filter(
+            post =>
+                post.username ===
+                "@" +
+                profile.username
+        ).length;
+
+
+    setAvatar(
+        "miniAvatar"
+    );
+
+
+    setAvatar(
+        "composerAvatar"
+    );
+
+
+    setAvatar(
+        "profileAvatar"
+    );
+
+
+    document
+        .getElementById(
+            "settingName"
+        )
+        .value =
+        profile.name;
+
+
+    document
+        .getElementById(
+            "settingUsername"
+        )
+        .value =
+        profile.username;
+
+
+    document
+        .getElementById(
+            "settingStatus"
+        )
+        .value =
+        profile.status;
+
+
+    document
+        .getElementById(
+            "settingBio"
+        )
+        .value =
+        profile.bio;
+
+
+    renderPosts();
+
+}
+
+
+/* =========================
+   AVATAR
+========================= */
+
+function setAvatar(
+    elementId
+) {
+
+    const element =
+        document.getElementById(
+            elementId
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    if (
+        profile &&
+        profile.avatar
+    ) {
+
+        element.innerHTML =
+            `<img src="${profile.avatar}">`;
+
+    }
+
+    else {
+
+        element.textContent =
+            "🦋";
+
+    }
+
+}
+
+
+function changeAvatar(
+    event
+) {
+
+    const file =
+        event.target.files[0];
+
+
+    if (!file) {
+        return;
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function () {
+
+            profile.avatar =
+                reader.result;
+
+
+            saveProfileData();
+
+            updateUI();
+
+            showToast(
+                "фотография обновлена"
+            );
+
+        };
+
+
+    reader.readAsDataURL(
+        file
+    );
+
+}
+
+
+/* =========================
+   SAVE SETTINGS
+========================= */
+
+function saveProfile() {
+
+    if (!profile) {
+        return;
+    }
+
+
+    profile.name =
+        document
+            .getElementById(
+                "settingName"
+            )
+            .value
+            .trim()
+            ||
+            "Alayse";
+
+
+    profile.username =
+        document
+            .getElementById(
+                "settingUsername"
+            )
+            .value
+            .trim()
+            .replace(
+                /^@/,
+                ""
+            )
+            ||
+            "alayse";
+
+
+    profile.status =
+        document
+            .getElementById(
+                "settingStatus"
+            )
+            .value
+            .trim()
+            ||
+            "floating around";
+
+
+    profile.bio =
+        document
+            .getElementById(
+                "settingBio"
+            )
+            .value
+            .trim()
+            ||
+            "somewhere between the clouds and the old internet.";
+
+
+    saveProfileData();
+
+    updateUI();
+
+    showToast(
+        "изменения сохранены"
+    );
+
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+function showView(
+    view
+) {
+
+    document
+        .querySelectorAll(
+            ".view"
+        )
+        .forEach(
+            section => {
+
+                section.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    const target =
+        document.getElementById(
+            view
+        );
+
+
+    if (target) {
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".nav button"
+        )
+        .forEach(
+            button => {
+
+                button.classList.toggle(
+                    "active",
+                    button.dataset.view ===
+                    view
+                );
+
+            }
+        );
+
+
+    if (
+        view ===
+        "friends"
+    ) {
+
+        renderFriends();
+
+    }
+
+
+    if (
+        view ===
+        "music"
+    ) {
+
+        renderTracks();
+
+    }
+
+
+    if (
+        view ===
+        "messages"
+    ) {
+
+        renderMessages();
+
+    }
+
+
+    window.scrollTo(
+        {
+            top: 0,
+            behavior: "smooth"
+        }
+    );
+
+}
+
+
+/* =========================
+   POSTS
+========================= */
+
+function createPost() {
+
+    if (!profile) {
+        return;
+    }
+
+
+    const textarea =
+        document.getElementById(
+            "postText"
+        );
+
+
+    const text =
+        textarea
+            .value
+            .trim();
+
+
+    if (!text) {
+
+        showToast(
+            "сначала что-нибудь напиши"
+        );
+
+        return;
+
+    }
+
+
+    const post = {
+
+        id:
+            Date.now(),
+
+        author:
+            profile.name,
+
+        username:
+            "@" +
+            profile.username,
+
+        avatar:
+            profile.avatar,
+
+        time:
+            "только что",
+
+        text,
+
+        likes: 0,
+
+        liked: false
+
+    };
+
+
+    posts.unshift(
+        post
+    );
+
+
+    textarea.value =
+        "";
+
+
+    document
+        .getElementById(
+            "charCount"
+        )
+        .textContent =
+        "0";
+
+
+    savePosts();
+
+    updateUI();
+
+    showToast(
+        "пост опубликован ✦"
+    );
+
+}
+
+
+function renderPosts() {
+
+    const container =
+        document.getElementById(
+            "posts"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    posts.forEach(
+        post => {
+
+            const article =
+                document.createElement(
+                    "article"
+                );
+
+
+            article.className =
+                "post glass";
+
+
+            const avatar =
+                post.avatar
+                    ?
+                    `<img src="${post.avatar}">`
+                    :
+                    "🦋";
+
+
+            article.innerHTML = `
+
+                <div class="post-head">
+
+                    <div class="post-avatar">
+                        ${avatar}
+                    </div>
+
+                    <div class="post-user">
+
+                        <strong>
+                            ${escapeHTML(post.author)}
+                        </strong>
+
+                        <span>
+                            ${escapeHTML(post.username)}
+                            ·
+                            ${escapeHTML(post.time)}
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="post-text">
+                    ${escapeHTML(post.text)}
+                </div>
+
+
+                <div class="post-actions">
+
+                    <button
+                        onclick="likePost(${post.id})"
+                    >
+                        ${post.liked ? "💙" : "♡"}
+                        ${post.likes}
+                    </button>
+
+                    <button
+                        onclick="showToast('комментарии появятся в следующей версии')"
+                    >
+                        💬 ответить
+                    </button>
+
+                    <button
+                        onclick="showToast('ссылка скопирована')"
+                    >
+                        ↗ поделиться
+                    </button>
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                article
+            );
+
+        }
+    );
+
+}
+
+
+function likePost(
+    id
+) {
+
+    const post =
+        posts.find(
+            item =>
+                item.id === id
+        );
+
+
+    if (!post) {
+        return;
+    }
+
+
+    post.liked =
+        !post.liked;
+
+
+    post.likes +=
+        post.liked
+            ?
+            1
+            :
+            -1;
+
+
+    savePosts();
+
+    renderPosts();
+
+}
+
+
+/* =========================
+   FRIENDS
+========================= */
+
+function renderFriends() {
+
+    const grid =
+        document.getElementById(
+            "friendsGrid"
+        );
+
+
+    grid.innerHTML =
+        "";
+
+
+    defaultFriends.forEach(
+        friend => {
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "friend-card";
+
+
+            card.innerHTML = `
+
+                <div class="friend-avatar">
+
+                    ${
+                        friend.avatar
+                    }
+
+                </div>
+
+                <div class="friend-info">
+
+                    <strong>
+                        ${escapeHTML(friend.name)}
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(friend.username)}
+                    </span>
+
+                </div>
+
+                <button
+                    class="aero-btn"
+                    onclick="openChat(${friend.id})"
+                >
+                    написать
+                </button>
+
+            `;
+
+
+            grid.appendChild(
+                card
+            );
+
+        }
+    );
+
+}
+
+
+function renderOnlineFriends() {
+
+    const container =
+        document.getElementById(
+            "onlineFriends"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    defaultFriends
+        .filter(
+            friend =>
+                friend.online
+        )
+        .slice(
+            0,
+            4
+        )
+        .forEach(
+            friend => {
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                row.className =
+                    "friend";
+
+
+                row.onclick =
+                    () =>
+                        openChat(
+                            friend.id
+                        );
+
+
+                row.innerHTML = `
+
+                    <div class="friend-avatar">
+                        ${friend.avatar}
+                    </div>
+
+                    <div class="friend-info">
+
+                        <strong>
+                            ${escapeHTML(friend.name)}
+                        </strong>
+
+                        <span>
+                            ${escapeHTML(friend.status)}
+                        </span>
+
+                    </div>
+
+                    <div class="online"></div>
+
+                `;
+
+
+                container.appendChild(
+                    row
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================
+   MUSIC
+========================= */
+
+function renderTracks() {
+
+    const container =
+        document.getElementById(
+            "trackList"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    tracks.forEach(
+        (
+            track,
+            index
+        ) => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "big-track";
+
+
+            row.innerHTML = `
+
+                <div class="cover">
+                    🎵
+                </div>
+
+                <div class="track">
+
+                    <strong>
+                        ${escapeHTML(track.name)}
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(track.artist)}
+                    </span>
+
+                </div>
+
+                <button
+                    class="play"
+                    onclick="playTrack(${index})"
+                >
+                    ▶
+                </button>
+
+            `;
+
+
+            container.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+let currentAudio =
+    null;
+
+
+function playTrack(
+    index
+) {
+
+    const track =
+        tracks[index];
+
+
+    if (!track.url) {
+
+        showToast(
+            "у этого трека пока нет аудиофайла"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        currentAudio
+    ) {
+
+        currentAudio.pause();
+
+    }
+
+
+    currentAudio =
+        new Audio(
+            track.url
+        );
+
+
+    currentAudio.play();
+
+
+    showToast(
+        "играет: " +
+        track.name
+    );
+
+}
+
+
+function addTrack() {
+
+    const name =
+        document
+            .getElementById(
+                "trackName"
+            )
+            .value
+            .trim();
+
+
+    const url =
+        document
+            .getElementById(
+                "trackUrl"
+            )
+            .value
+            .trim();
+
+
+    if (!name) {
+
+        showToast(
+            "напиши название трека"
+        );
+
+        return;
+
+    }
+
+
+    tracks.push({
+
+        name,
+
+        artist:
+            profile
+                ?
+                profile.name
+                :
+                "unknown",
+
+        url
+
+    });
+
+
+    saveTracks();
+
+    renderTracks();
+
+
+    document
+        .getElementById(
+            "trackName"
+        )
+        .value =
+        "";
+
+
+    document
+        .getElementById(
+            "trackUrl"
+        )
+        .value =
+        "";
+
+
+    showToast(
+        "трек добавлен 🎧"
+    );
+
+}
+
+
+/* =========================
+   MESSAGES
+========================= */
+
+function renderMessages() {
+
+    const list =
+        document.getElementById(
+            "messageList"
+        );
+
+
+    list.innerHTML =
+        "";
+
+
+    defaultFriends.forEach(
+        friend => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+
+            row.className =
+                "message-person" +
+                (
+                    selectedFriend === friend.id
+                        ?
+                        " selected"
+                        :
+                        ""
+                );
+
+
+            row.onclick =
+                () =>
+                    openChat(
+                        friend.id
+                    );
+
+
+            row.innerHTML = `
+
+                <div class="friend-avatar">
+                    ${friend.avatar}
+                </div>
+
+                <div class="friend-info">
+
+                    <strong>
+                        ${escapeHTML(friend.name)}
+                    </strong>
+
+                    <span>
+                        ${escapeHTML(friend.status)}
+                    </span>
+
+                </div>
+
+            `;
+
+
+            list.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    if (
+        selectedFriend
+    ) {
+
+        renderChat();
+
+    }
+
+}
+
+
+function openChat(
+    friendId
+) {
+
+    selectedFriend =
+        friendId;
+
+
+    showView(
+        "messages"
+    );
+
+
+    renderMessages();
+
+}
+
+
+function renderChat() {
+
+    const friend =
+        defaultFriends.find(
+            item =>
+                item.id ===
+                selectedFriend
+        );
+
+
+    if (!friend) {
+        return;
+    }
+
+
+    document
+        .getElementById(
+            "chatHead"
+        )
+        .textContent =
+        friend.name +
+        " · " +
+        friend.status;
+
+
+    const container =
+        document.getElementById(
+            "chatMessages"
+        );
+
+
+    const key =
+        String(
+            selectedFriend
+        );
+
+
+    const chat =
+        messages[key] ||
+        [];
+
+
+    container.innerHTML =
+        "";
+
+
+    if (
+        chat.length ===
+        0
+    ) {
+
+        container.innerHTML = `
+
+            <div
+                style="
+                margin:auto;
+                text-align:center;
+                color:#7da3aa;
+                font-size:9px;
+                "
+            >
+                здесь пока тихо ☁<br>
+                напиши что-нибудь первым
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    chat.forEach(
+        message => {
+
+            const bubble =
+                document.createElement(
+                    "div"
+                );
+
+
+            bubble.className =
+                "bubble " +
+                (
+                    message.me
+                        ?
+                        "me"
+                        :
+                        "them"
+                );
+
+
+            bubble.textContent =
+                message.text;
+
+
+            container.appendChild(
+                bubble
+            );
+
+        }
+    );
+
+
+    container.scrollTop =
+        container.scrollHeight;
+
+}
+
+
+function sendMessage() {
+
+    if (
+        !selectedFriend
+    ) {
+
+        showToast(
+            "сначала выбери друга"
+        );
+
+        return;
+
+    }
+
+
+    const input =
+        document.getElementById(
+            "messageInput"
+        );
+
+
+    const text =
+        input
+            .value
+            .trim();
+
+
+    if (!text) {
+        return;
+    }
+
+
+    const key =
+        String(
+            selectedFriend
+        );
+
+
+    if (
+        !messages[key]
+    ) {
+
+        messages[key] =
+            [];
+
+    }
+
+
+    messages[key].push({
+
+        text,
+
+        me: true
+
+    });
+
+
+    input.value =
+        "";
+
+
+    saveMessages();
+
+    renderChat();
+
+
+    /*
+        Маленький прототипный ответ.
+        В настоящей версии здесь уже
+        можно подключить сервер/WebSocket.
+    */
+
+    setTimeout(
+        () => {
+
+            const friend =
+                defaultFriends.find(
+                    item =>
+                        item.id ===
+                        selectedFriend
+                );
+
+
+            messages[key].push({
+
+                text:
+                    getFakeReply(
+                        friend
+                    ),
+
+                me: false
+
+            });
+
+
+            saveMessages();
+
+            renderChat();
+
+        },
+        800 +
+        Math.random() * 1200
+    );
+
+}
+
+
+function getFakeReply(
+    friend
+) {
+
+    const replies = [
+
+        "ахаха, да :D",
+
+        "я сейчас буквально смотрю в окно",
+
+        "прикольно звучит",
+
+        "о, расскажи подробнее",
+
+        "я тоже такое люблю ☁",
+
+        "секунду, я слушаю музыку",
+
+        "это очень в духе dragonfly"
+
+    ];
+
+
+    return replies[
+        Math.floor(
+            Math.random() *
+            replies.length
+        )
+    ];
+
+}
+
+
+function sendOnEnter(
+    event
+) {
+
+    if (
+        event.key ===
+        "Enter"
+    ) {
+
+        event.preventDefault();
+
+        sendMessage();
+
+    }
+
+}
+
+
+/* =========================
+   RADIO
+========================= */
+
+function toggleRadio(
+    button
+) {
+
+    const audio =
+        document.getElementById(
+            "radioAudio"
+        );
+
+
+    if (
+        audio.paused
+    ) {
+
+        if (!audio.src) {
+
+            showToast(
+                "добавь audio-файл для radio"
+            );
+
+            return;
+
+        }
+
+
+        audio.play();
+
+        button.textContent =
+            "Ⅱ";
+
+    }
+
+    else {
+
+        audio.pause();
+
+        button.textContent =
+            "▶";
+
+    }
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+function searchUsers(
+    event
+) {
+
+    if (
+        event.key !==
+        "Enter"
+    ) {
+
+        return;
+
+    }
+
+
+    const query =
+        event.target.value
+            .trim()
+            .toLowerCase();
+
+
+    if (!query) {
+        return;
+    }
+
+
+    const friend =
+        defaultFriends.find(
+            item =>
+                item.name
+                    .toLowerCase()
+                    .includes(query)
+                ||
+                item.username
+                    .toLowerCase()
+                    .includes(query)
+        );
+
+
+    if (friend) {
+
+        openChat(
+            friend.id
+        );
+
+        showToast(
+            "нашёл: " +
+            friend.name
+        );
+
+    }
+
+    else {
+
+        showToast(
+            "никого не нашёл :("
+        );
+
+    }
+
+}
+
+
+/* =========================
+   CHARACTER COUNTER
+========================= */
+
+document
+    .getElementById(
+        "postText"
+    )
+    .addEventListener(
+        "input",
+        function () {
+
+            document
+                .getElementById(
+                    "charCount"
+                )
+                .textContent =
+                this.value.length;
+
+        }
+    );
+
+
+/* =========================
+   RESET
+========================= */
+
+function resetEverything() {
+
+    if (
+        !confirm(
+            "Точно очистить локальный профиль и посты?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    localStorage.removeItem(
+        "dragonfly_profile"
+    );
+
+    localStorage.removeItem(
+        "dragonfly_posts"
+    );
+
+    localStorage.removeItem(
+        "dragonfly_tracks"
+    );
+
+    localStorage.removeItem(
+        "dragonfly_messages"
+    );
+
+
+    location.reload();
+
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer;
+
+
+function showToast(
+    text
+) {
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        text;
+
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            1800
+        );
+
+}
+
+
+/* =========================
+   HTML SAFETY
+========================= */
+
+function escapeHTML(
+    text
+) {
+
+    return String(
+        text
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* =========================
+   INITIALIZATION
+========================= */
+
+if (!profile) {
+
+    document
+        .getElementById(
+            "profileModal"
+        )
+        .classList.add(
+            "show"
+        );
+
+}
+
+else {
+
+    updateUI();
+
+}
+
+
+renderOnlineFriends();
+
+renderFriends();
+
+renderTracks();
+
+
+/* =========================
+   LITTLE RANDOM DETAILS
+========================= */
+
+const online =
+    1200 +
+    Math.floor(
+        Math.random() * 150
+    );
+
+
+document
+    .getElementById(
+        "onlineCount"
+    )
+    .textContent =
+    online.toLocaleString(
+        "en-US"
+    ) +
+    " people online";
+
+
+/*
+    Несколько случайных изменений
+    создают ощущение живого сайта.
+*/
+
+setInterval(
+    () => {
+
+        const counter =
+            document
+                .getElementById(
+                    "onlineCount"
+                );
+
+
+        if (!counter) {
+            return;
+        }
+
+
+        const number =
+            1200 +
+            Math.floor(
+                Math.random() * 150
+            );
+
+
+        counter.textContent =
+            number.toLocaleString(
+                "en-US"
+            ) +
+            " people online";
+
+    },
+    7000
+);
+
+</script>
+
+</body>
+</html>
