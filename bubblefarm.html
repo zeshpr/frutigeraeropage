@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Bubble Farm — Frutiger Aero</title>
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    font-family:Arial,sans-serif;
+    color:#075d7b;
+    background:
+        linear-gradient(
+            180deg,
+            #62dcff 0%,
+            #c7f9ff 43%,
+            #65e7c0 100%
+        );
+}
+button{
+    font:inherit;
+    cursor:pointer;
+    border:0;
+}
+#app{
+    min-height:100vh;
+    position:relative;
+    overflow:hidden;
+}
+/* =========================
+   SKY
+========================= */
+.sun{
+    position:fixed;
+    width:180px;
+    height:180px;
+    right:7%;
+    top:5%;
+    border-radius:50%;
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            white,
+            #fff9a4 40%,
+            #ffe05d 75%
+        );
+    box-shadow:0 0 70px #fff5a0;
+    opacity:.9;
+}
+.cloud{
+    position:fixed;
+    width:230px;
+    height:65px;
+    border-radius:60px;
+    background:rgba(255,255,255,.7);
+    animation:cloud linear infinite;
+    pointer-events:none;
+}
+.cloud:before,
+.cloud:after{
+    content:"";
+    position:absolute;
+    border-radius:50%;
+    background:inherit;
+}
+.cloud:before{
+    width:100px;
+    height:100px;
+    left:35px;
+    bottom:15px;
+}
+.cloud:after{
+    width:80px;
+    height:80px;
+    right:35px;
+    bottom:12px;
+}
+.cloud.a{
+    top:12%;
+    left:-260px;
+    animation-duration:55s;
+}
+.cloud.b{
+    top:28%;
+    left:-300px;
+    transform:scale(.7);
+    animation-duration:70s;
+    animation-delay:-30s;
+}
+@keyframes cloud{
+    to{transform:translateX(140vw)}
+}
+/* =========================
+   HEADER
+========================= */
+header{
+    position:relative;
+    z-index:10;
+    width:min(1150px,94%);
+    margin:auto;
+    padding:20px 0 10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+}
+.logo{
+    font-size:clamp(30px,5vw,54px);
+    font-weight:1000;
+    font-style:italic;
+    letter-spacing:-4px;
+    color:#09a9d2;
+    text-shadow:
+        3px 4px white,
+        0 0 20px rgba(0,220,255,.5);
+}
+.stats{
+    display:flex;
+    gap:9px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+.stat{
+    padding:9px 14px;
+    border-radius:20px;
+    background:rgba(255,255,255,.52);
+    border:2px solid rgba(255,255,255,.8);
+    box-shadow:
+        inset 0 2px 8px white,
+        0 6px 15px rgba(0,100,140,.13);
+    backdrop-filter:blur(10px);
+}
+.stat small{
+    display:block;
+    font-size:9px;
+    opacity:.7;
+    font-weight:bold;
+}
+.stat b{
+    font-size:18px;
+}
+/* =========================
+   MAIN
+========================= */
+.main{
+    position:relative;
+    z-index:5;
+    width:min(1150px,94%);
+    margin:15px auto 40px;
+    display:grid;
+    grid-template-columns:1.35fr .65fr;
+    gap:18px;
+}
+/* =========================
+   FARM
+========================= */
+.farm{
+    position:relative;
+    min-height:620px;
+    border-radius:38px;
+    overflow:hidden;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.65),
+            rgba(126,244,220,.48)
+        );
+    border:3px solid rgba(255,255,255,.85);
+    box-shadow:
+        inset 0 4px 18px white,
+        0 20px 50px rgba(0,100,130,.2);
+}
+.farm:before{
+    content:"";
+    position:absolute;
+    left:-10%;
+    right:-10%;
+    bottom:-90px;
+    height:300px;
+    border-radius:50% 50% 0 0;
+    background:
+        radial-gradient(
+            ellipse at center,
+            #74e8b0,
+            #35c992 60%,
+            #16a777
+        );
+}
+.farm-title{
+    position:relative;
+    z-index:2;
+    padding:22px;
+    text-align:center;
+}
+.farm-title h2{
+    font-size:26px;
+    color:#0789ad;
+}
+.farm-title p{
+    font-size:12px;
+    opacity:.7;
+    margin-top:4px;
+}
+.plot{
+    position:absolute;
+    z-index:3;
+    left:50%;
+    bottom:50px;
+    transform:translateX(-50%);
+    width:min(90%,620px);
+    height:440px;
+}
+/* =========================
+   BUBBLES
+========================= */
+.bubble{
+    position:absolute;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    user-select:none;
+    touch-action:none;
+    transition:
+        transform .12s,
+        filter .15s;
+    animation:float 3s ease-in-out infinite;
+}
+.bubble:hover{
+    filter:brightness(1.08);
+}
+.bubble:before{
+    content:"";
+    position:absolute;
+    width:24%;
+    height:14%;
+    left:20%;
+    top:17%;
+    border-radius:50%;
+    background:white;
+    opacity:.85;
+    transform:rotate(-25deg);
+}
+.bubble:after{
+    content:"";
+    position:absolute;
+    width:10%;
+    height:7%;
+    left:28%;
+    top:32%;
+    border-radius:50%;
+    background:white;
+    opacity:.7;
+}
+@keyframes float{
+    50%{
+        transform:
+            translate(-50%,-55%)
+            rotate(3deg);
+    }
+}
+.bubble.common{
+    width:75px;
+    height:75px;
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            #fff,
+            #bfffff 20%,
+            #4dddf1 55%,
+            #0aa7ce
+        );
+    border:3px solid white;
+    box-shadow:
+        inset -9px -12px 18px rgba(0,80,160,.18),
+        0 0 20px rgba(50,240,255,.6);
+}
+.bubble.uncommon{
+    width:82px;
+    height:82px;
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            white,
+            #e6ff9b 18%,
+            #8bdd55 55%,
+            #34ae69
+        );
+    border:3px solid white;
+    box-shadow:
+        0 0 25px #9dff7b,
+        inset -10px -10px 15px rgba(0,120,80,.15);
+}
+.bubble.rare{
+    width:90px;
+    height:90px;
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            white,
+            #ffcaff 20%,
+            #e76ce2 55%,
+            #9140c5
+        );
+    border:3px solid white;
+    box-shadow:
+        0 0 30px #f18cff,
+        inset -10px -10px 15px rgba(100,0,120,.18);
+}
+.bubble.epic{
+    width:98px;
+    height:98px;
+    background:
+        conic-gradient(
+            #ff6bd6,
+            #ffe86b,
+            #75ffb3,
+            #62dcff,
+            #b86bff,
+            #ff6bd6
+        );
+    border:4px solid white;
+    box-shadow:
+        0 0 35px #fff,
+        0 0 60px rgba(255,80,240,.6);
+}
+.bubble.legendary{
+    width:108px;
+    height:108px;
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            white,
+            #fffbd0 15%,
+            #ffd52f 38%,
+            #ff8a00 68%,
+            #ff4f00
+        );
+    border:4px solid white;
+    box-shadow:
+        0 0 45px #fff36b,
+        0 0 80px #ff9b31;
+}
+.bubble.mythic{
+    width:118px;
+    height:118px;
+    background:
+        conic-gradient(
+            #ff42c8,
+            #6e55ff,
+            #29eaff,
+            #6aff8c,
+            #ffe75b,
+            #ff42c8
+        );
+    border:4px solid white;
+    box-shadow:
+        0 0 45px white,
+        0 0 100px #5cecff;
+    animation:
+        float 2.2s ease-in-out infinite,
+        rainbow 3s linear infinite;
+}
+@keyframes rainbow{
+    to{filter:hue-rotate(360deg)}
+}
+/* =========================
+   BUBBLE LABEL
+========================= */
+.bubble-label{
+    position:absolute;
+    left:50%;
+    top:calc(100% + 9px);
+    transform:translateX(-50%);
+    white-space:nowrap;
+    font-size:10px;
+    font-weight:900;
+    color:#08708d;
+    background:rgba(255,255,255,.72);
+    padding:4px 8px;
+    border-radius:10px;
+}
+/* =========================
+   SIDE PANEL
+========================= */
+.panel{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+.box{
+    padding:18px;
+    border-radius:28px;
+    background:rgba(255,255,255,.55);
+    border:2px solid rgba(255,255,255,.8);
+    box-shadow:
+        inset 0 2px 10px white,
+        0 10px 25px rgba(0,100,130,.12);
+    backdrop-filter:blur(12px);
+}
+.box h3{
+    color:#078bad;
+    margin-bottom:12px;
+}
+.btn{
+    width:100%;
+    padding:12px;
+    margin-top:7px;
+    border-radius:17px;
+    background:linear-gradient(#f3ffff,#91eafb);
+    border:2px solid white;
+    color:#08627c;
+    font-weight:900;
+    box-shadow:
+        inset 0 3px 7px white,
+        0 5px 0 #25a9c9;
+    transition:.12s;
+}
+.btn:active{
+    transform:translateY(4px);
+    box-shadow:inset 0 3px 7px white,0 1px 0 #25a9c9;
+}
+.btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+}
+/* =========================
+   PROGRESS
+========================= */
+.progress{
+    height:16px;
+    border-radius:20px;
+    background:rgba(0,130,160,.13);
+    overflow:hidden;
+    border:2px solid rgba(255,255,255,.6);
+}
+.progress div{
+    height:100%;
+    width:0%;
+    border-radius:inherit;
+    background:
+        linear-gradient(
+            90deg,
+            #46dfff,
+            #79f5c1,
+            #fff275
+        );
+    box-shadow:0 0 12px white;
+    transition:.3s;
+}
+/* =========================
+   COLLECTION
+========================= */
+.collection{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:7px;
+}
+.collect-item{
+    min-height:60px;
+    border-radius:14px;
+    background:rgba(255,255,255,.4);
+    border:2px solid rgba(255,255,255,.6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:10px;
+    font-weight:bold;
+}
+.collect-item.locked{
+    filter:grayscale(1);
+    opacity:.35;
+}
+/* =========================
+   NOTIFICATION
+========================= */
+#notice{
+    position:fixed;
+    z-index:1000;
+    left:50%;
+    top:105px;
+    transform:translate(-50%,-20px);
+    opacity:0;
+    pointer-events:none;
+    padding:12px 20px;
+    border-radius:25px;
+    background:rgba(255,255,255,.8);
+    border:2px solid white;
+    box-shadow:0 10px 30px rgba(0,100,140,.2);
+    backdrop-filter:blur(12px);
+    font-weight:900;
+    transition:.25s;
+}
+#notice.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+/* =========================
+   RESPONSIVE
+========================= */
+@media(max-width:850px){
+    .main{
+        grid-template-columns:1fr;
+    }
+    .farm{
+        min-height:570px;
+    }
+    .panel{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+    }
+    .box:last-child{
+        grid-column:1/-1;
+    }
+}
+@media(max-width:600px){
+    .sun{
+        width:100px;
+        height:100px;
+    }
+    header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+    .stats{
+        width:100%;
+        justify-content:flex-start;
+    }
+    .stat{
+        padding:7px 10px;
+    }
+    .stat b{
+        font-size:15px;
+    }
+    .farm{
+        min-height:520px;
+        border-radius:28px;
+    }
+    .plot{
+        height:370px;
+        bottom:40px;
+    }
+    .bubble.common{
+        width:62px;
+        height:62px;
+    }
+    .bubble.uncommon{
+        width:68px;
+        height:68px;
+    }
+    .bubble.rare{
+        width:74px;
+        height:74px;
+    }
+    .bubble.epic{
+        width:80px;
+        height:80px;
+    }
+    .bubble.legendary{
+        width:88px;
+        height:88px;
+    }
+    .bubble.mythic{
+        width:94px;
+        height:94px;
+    }
+    .panel{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="sun"></div>
+<div class="cloud a"></div>
+<div class="cloud b"></div>
+<header>
+    <div class="logo">
+        BUBBLE FARM
+    </div>
+    <div class="stats">
+        <div class="stat">
+            <small>🫧 ПУЗЫРИ</small>
+            <b id="bubbleCount">0</b>
+        </div>
+        <div class="stat">
+            <small>💎 МОНЕТЫ</small>
+            <b id="coins">0</b>
+        </div>
+        <div class="stat">
+            <small>🏆 РЕКОРД</small>
+            <b id="best">0</b>
+        </div>
+    </div>
+</header>
+<main class="main">
+    <section class="farm">
+        <div class="farm-title">
+            <h2>🌱 YOUR BUBBLE GARDEN</h2>
+            <p>выращивай • собирай • мутируй</p>
+        </div>
+        <div class="plot" id="plot"></div>
+    </section>
+    <aside class="panel">
+        <div class="box">
+            <h3>🌱 Выращивание</h3>
+            <div style="font-size:12px;margin-bottom:8px">
+                Следующий пузырь:
+            </div>
+            <div class="progress">
+                <div id="growProgress"></div>
+            </div>
+            <div
+                id="growText"
+                style="
+                    text-align:center;
+                    margin-top:7px;
+                    font-size:11px;
+                    font-weight:bold;
+                "
+            >
+                0%
+            </div>
+            <button
+                class="btn"
+                id="growBtn"
+                onclick="growBubble()"
+            >
+                🫧 ВЫРАСТИТЬ ПУЗЫРЬ
+            </button>
+        </div>
+        <div class="box">
+            <h3>⚗️ Лаборатория</h3>
+            <p style="font-size:11px;line-height:1.5">
+                Объединяй одинаковые пузыри,
+                чтобы получить более редкий!
+            </p>
+            <button
+                class="btn"
+                onclick="mutateBubbles()"
+            >
+                ✨ МУТИРОВАТЬ
+            </button>
+            <button
+                class="btn"
+                onclick="sellBubbles()"
+            >
+                💰 ПРОДАТЬ ВСЕ
+            </button>
+        </div>
+        <div class="box">
+            <h3>🤖 Авто-ферма</h3>
+            <p
+                id="autoText"
+                style="
+                    font-size:11px;
+                    line-height:1.5;
+                "
+            >
+                Автоматически выращивает
+                пузыри каждые несколько секунд.
+            </p>
+            <button
+                class="btn"
+                id="autoBtn"
+                onclick="buyAutoFarm()"
+            >
+                Купить · 💎 100
+            </button>
+        </div>
+        <div class="box">
+            <h3>📖 Коллекция</h3>
+            <div
+                class="collection"
+                id="collection"
+            ></div>
+        </div>
+    </aside>
+</main>
+<div id="notice"></div>
+</div>
+<script>
+/* ================================================
+   BUBBLE FARM
+================================================ */
+const plot =
+    document.getElementById("plot");
+const bubbleCountEl =
+    document.getElementById("bubbleCount");
+const coinsEl =
+    document.getElementById("coins");
+const bestEl =
+    document.getElementById("best");
+const progressEl =
+    document.getElementById("growProgress");
+const growText =
+    document.getElementById("growText");
+const growBtn =
+    document.getElementById("growBtn");
+const notice =
+    document.getElementById("notice");
+/* ================================================
+   DATA
+================================================ */
+const types = [
+    {
+        id:"common",
+        name:"Aqua Bubble",
+        rarity:"Обычный",
+        value:1,
+        chance:60
+    },
+    {
+        id:"uncommon",
+        name:"Lime Bubble",
+        rarity:"Необычный",
+        value:4,
+        chance:25
+    },
+    {
+        id:"rare",
+        name:"Bubblegum",
+        rarity:"Редкий",
+        value:12,
+        chance:10
+    },
+    {
+        id:"epic",
+        name:"Rainbow",
+        rarity:"Эпический",
+        value:35,
+        chance:4
+    },
+    {
+        id:"legendary",
+        name:"Sun Bubble",
+        rarity:"Легендарный",
+        value:100,
+        chance:.9
+    },
+    {
+        id:"mythic",
+        name:"AERO CORE",
+        rarity:"Мифический",
+        value:500,
+        chance:.1
+    }
+];
+/* ================================================
+   SAVE
+================================================ */
+let bubbles =
+    JSON.parse(
+        localStorage.getItem("bubbleFarmBubbles")
+        || "{}"
+    );
+let coins =
+    Number(
+        localStorage.getItem("bubbleFarmCoins")
+        || 0
+    );
+let best =
+    Number(
+        localStorage.getItem("bubbleFarmBest")
+        || 0
+    );
+let discovered =
+    JSON.parse(
+        localStorage.getItem("bubbleFarmDiscovered")
+        || "[]"
+    );
+let autoFarm =
+    Number(
+        localStorage.getItem("bubbleFarmAuto")
+        || 0
+    );
+let growProgress = 0;
+let totalCollected = 0;
+/* ================================================
+   HELPERS
+================================================ */
+function save(){
+    localStorage.setItem(
+        "bubbleFarmBubbles",
+        JSON.stringify(bubbles)
+    );
+    localStorage.setItem(
+        "bubbleFarmCoins",
+        coins
+    );
+    localStorage.setItem(
+        "bubbleFarmBest",
+        best
+    );
+    localStorage.setItem(
+        "bubbleFarmDiscovered",
+        JSON.stringify(discovered)
+    );
+    localStorage.setItem(
+        "bubbleFarmAuto",
+        autoFarm
+    );
+}
+function notify(text){
+    notice.textContent = text;
+    notice.classList.add("show");
+    clearTimeout(
+        notify.timer
+    );
+    notify.timer =
+        setTimeout(
+            ()=>{
+                notice.classList.remove("show");
+            },
+            1800
+        );
+}
+/* ================================================
+   RANDOM TYPE
+================================================ */
+function randomType(){
+    const roll =
+        Math.random()*100;
+    let sum = 0;
+    for(const type of types){
+        sum += type.chance;
+        if(roll <= sum)
+            return type;
+    }
+    return types[0];
+}
+/* ================================================
+   CREATE BUBBLE
+================================================ */
+function addBubble(type){
+    bubbles[type.id] =
+        (bubbles[type.id] || 0)+1;
+    totalCollected++;
+    if(
+        !discovered.includes(type.id)
+    ){
+        discovered.push(type.id);
+        notify(
+            "✨ Открыта новая форма: "+
+            type.name
+        );
+    }
+    if(totalCollected > best){
+        best = totalCollected;
+    }
+    save();
+    updateUI();
+}
+/* ================================================
+   GROW
+================================================ */
+function growBubble(){
+    growProgress += 20;
+    if(growProgress >= 100){
+        growProgress = 0;
+        const type =
+            randomType();
+        addBubble(type);
+        spawnVisualBubble(type);
+        notify(
+            "🫧 Вырос пузырь: "+
+            type.name
+        );
+    }
+    updateGrow();
+}
+function updateGrow(){
+    progressEl.style.width =
+        growProgress+"%";
+    growText.textContent =
+        growProgress+"%";
+}
+/* ================================================
+   VISUAL BUBBLE
+================================================ */
+function spawnVisualBubble(type){
+    const el =
+        document.createElement("div");
+    el.className =
+        "bubble "+type.id;
+    const x =
+        12 +
+        Math.random()*76;
+    const y =
+        18 +
+        Math.random()*63;
+    el.style.left =
+        x+"%";
+    el.style.top =
+        y+"%";
+    const label =
+        document.createElement("div");
+    label.className =
+        "bubble-label";
+    label.textContent =
+        type.name;
+    el.appendChild(label);
+    el.onclick = ()=>{
+        el.style.transform =
+            "translate(-50%,-50%) scale(.5)";
+        el.style.opacity = "0";
+        setTimeout(
+            ()=>el.remove(),
+            150
+        );
+    };
+    plot.appendChild(el);
+}
+/* ================================================
+   MUTATION
+================================================ */
+function mutateBubbles(){
+    let mutated = false;
+    for(let i=0;i<types.length-1;i++){
+        const current =
+            types[i];
+        const next =
+            types[i+1];
+        const amount =
+            Math.floor(
+                (bubbles[current.id] || 0)/3
+            );
+        if(amount > 0){
+            bubbles[current.id] -=
+                amount*3;
+            bubbles[next.id] =
+                (bubbles[next.id] || 0)+amount;
+            discovered.includes(next.id)
+            || discovered.push(next.id);
+            mutated = true;
+            notify(
+                "✨ "+amount+
+                " × "+
+                current.name+
+                " → "+
+                next.name
+            );
+            break;
+        }
+    }
+    if(!mutated){
+        notify(
+            "Нужно 3 одинаковых пузыря!"
+        );
+    }
+    save();
+    updateUI();
+}
+/* ================================================
+   SELL
+================================================ */
+function sellBubbles(){
+    let earned = 0;
+    types.forEach(type=>{
+        const amount =
+            bubbles[type.id] || 0;
+        earned +=
+            amount*type.value;
+        bubbles[type.id] = 0;
+    });
+    if(earned <= 0){
+        notify(
+            "У тебя пока нечего продавать!"
+        );
+        return;
+    }
+    coins += earned;
+    save();
+    updateUI();
+    notify(
+        "💰 Получено "+earned+" монет!"
+    );
+}
+/* ================================================
+   AUTO FARM
+================================================ */
+function buyAutoFarm(){
+    const price =
+        100 +
+        autoFarm*150;
+    if(coins < price){
+        notify(
+            "Не хватает "+(price-coins)+" монет!"
+        );
+        return;
+    }
+    coins -= price;
+    autoFarm++;
+    save();
+    updateUI();
+    notify(
+        "🤖 Авто-ферма улучшена!"
+    );
+}
+setInterval(
+    ()=>{
+        if(autoFarm <= 0)
+            return;
+        for(
+            let i=0;
+            i<autoFarm;
+            i++
+        ){
+            const type =
+                randomType();
+            addBubble(type);
+        }
+    },
+    5000
+);
+/* ================================================
+   COLLECTION
+================================================ */
+function renderCollection(){
+    const container =
+        document.getElementById("collection");
+    container.innerHTML = "";
+    types.forEach(type=>{
+        const item =
+            document.createElement("div");
+        const unlocked =
+            discovered.includes(
+                type.id
+            );
+        item.className =
+            "collect-item "+
+            (!unlocked ? "locked":"");
+        item.innerHTML =
+            unlocked
+            ? `
+                <div>
+                    🫧<br>
+                    ${type.name}
+                </div>
+            `
+            : `
+                <div>
+                    ❔<br>
+                    ???
+                </div>
+            `;
+        container.appendChild(item);
+    });
+}
+/* ================================================
+   UI
+================================================ */
+function updateUI(){
+    let count = 0;
+    types.forEach(
+        type=>{
+            count +=
+                bubbles[type.id] || 0;
+        }
+    );
+    bubbleCountEl.textContent =
+        count;
+    coinsEl.textContent =
+        coins;
+    bestEl.textContent =
+        best;
+    const price =
+        100+
+        autoFarm*150;
+    document.getElementById("autoBtn")
+        .textContent =
+        `Купить · 💎 ${price}`;
+    document.getElementById("autoText")
+        .innerHTML =
+        autoFarm > 0
+        ? `
+            🤖 Уровень авто-фермы:
+            <b>${autoFarm}</b><br>
+            Производит ${autoFarm}
+            пузырей каждые 5 секунд.
+        `
+        : `
+            Автоматически выращивает
+            пузыри каждые несколько секунд.
+        `;
+    renderCollection();
+}
+/* ================================================
+   INITIAL VISUALS
+================================================ */
+function loadVisualBubbles(){
+    types.forEach(type=>{
+        const amount =
+            Math.min(
+                8,
+                bubbles[type.id] || 0
+            );
+        for(let i=0;i<amount;i++){
+            spawnVisualBubble(type);
+        }
+    });
+}
+loadVisualBubbles();
+updateGrow();
+updateUI();
+/* ================================================
+   RANDOM AMBIENT BUBBLES
+================================================ */
+setInterval(
+    ()=>{
+        const b =
+            document.createElement("div");
+        b.style.position =
+            "fixed";
+        b.style.width =
+            "12px";
+        b.style.height =
+            "12px";
+        b.style.left =
+            Math.random()*100+"vw";
+        b.style.bottom =
+            "-20px";
+        b.style.borderRadius =
+            "50%";
+        b.style.border =
+            "2px solid rgba(255,255,255,.6)";
+        b.style.background =
+            "rgba(255,255,255,.18)";
+        b.style.pointerEvents =
+            "none";
+        b.style.zIndex = "1";
+        document.body.appendChild(b);
+        const duration =
+            5000+
+            Math.random()*5000;
+        b.animate(
+            [
+                {
+                    transform:"translateY(0)",
+                    opacity:.2
+                },
+                {
+                    transform:
+                        `translateY(-${innerHeight+100}px)`,
+                    opacity:.7
+                }
+            ],
+            {
+                duration,
+                easing:"linear"
+            }
+        );
+        setTimeout(
+            ()=>b.remove(),
+            duration
+        );
+    },
+    500
+);
+</script>
+</body>
+</html>
