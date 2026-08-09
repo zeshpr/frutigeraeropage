@@ -3,1138 +3,1422 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bubbles — social network</title>
+<title>bubbles — Frutiger Aero Social Network</title>
 
 <style>
-* {
-    box-sizing: border-box;
+:root{
+    --blue:#4fc9f5;
+    --blue2:#168fd0;
+    --cyan:#bff5ff;
+    --green:#7ee56d;
+    --green2:#35b95b;
+    --white:rgba(255,255,255,.92);
+    --text:#164c68;
+    --muted:#7196a8;
+    --shadow:0 12px 35px rgba(35,125,160,.22);
 }
 
-:root {
-    --blue: #54c8f5;
-    --blue-dark: #218fc5;
-    --cyan: #bdf5ff;
-    --white: rgba(255,255,255,.88);
-    --glass: rgba(255,255,255,.72);
-    --glass-strong: rgba(255,255,255,.9);
-    --text: #22566d;
-    --muted: #6691a4;
-    --green: #63d6a1;
-    --pink: #f39dcc;
-    --shadow: 0 10px 30px rgba(24,122,163,.18);
+*{
+    box-sizing:border-box;
 }
 
-html,
-body {
-    margin: 0;
-    min-height: 100%;
-    font-family: Arial, Helvetica, sans-serif;
-    color: var(--text);
+html,body{
+    margin:0;
+    min-height:100%;
+    font-family:Arial,Helvetica,sans-serif;
+    color:var(--text);
 }
 
-body {
-    min-height: 100vh;
-    overflow-x: hidden;
+body{
     background:
-        radial-gradient(circle at 10% 10%, rgba(255,255,255,.95), transparent 25%),
-        radial-gradient(circle at 90% 15%, rgba(255,255,255,.8), transparent 22%),
-        linear-gradient(180deg, #8ee8ff 0%, #d9faff 45%, #b7f2e8 100%);
+        radial-gradient(circle at 15% 15%,rgba(255,255,255,.95) 0 5%,transparent 18%),
+        radial-gradient(circle at 85% 20%,rgba(255,255,255,.8) 0 4%,transparent 16%),
+        linear-gradient(180deg,#72dcff 0%,#b8f5ff 42%,#e9fff7 100%);
+    background-attachment:fixed;
+    overflow-x:hidden;
 }
 
-/* decorative bubbles */
-
-.sky-bubble {
-    position: fixed;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: -1;
-    background: radial-gradient(circle at 30% 25%,
-        rgba(255,255,255,.95),
-        rgba(255,255,255,.3) 35%,
-        rgba(255,255,255,.08) 65%);
-    border: 1px solid rgba(255,255,255,.7);
-    box-shadow:
-        inset -10px -12px 20px rgba(65,180,220,.08),
-        0 8px 25px rgba(255,255,255,.2);
-    animation: float 8s ease-in-out infinite;
+body:before{
+    content:"";
+    position:fixed;
+    width:420px;
+    height:180px;
+    top:60px;
+    left:-100px;
+    border-radius:50%;
+    background:rgba(255,255,255,.45);
+    filter:blur(25px);
+    pointer-events:none;
 }
 
-.b1 { width: 110px; height: 110px; left: 4%; top: 18%; }
-.b2 { width: 55px; height: 55px; right: 10%; top: 25%; animation-delay: -2s; }
-.b3 { width: 150px; height: 150px; right: -30px; bottom: 8%; animation-delay: -4s; }
-.b4 { width: 70px; height: 70px; left: 15%; bottom: 7%; animation-delay: -1s; }
+body:after{
+    content:"";
+    position:fixed;
+    width:360px;
+    height:150px;
+    right:-100px;
+    top:180px;
+    border-radius:50%;
+    background:rgba(255,255,255,.35);
+    filter:blur(25px);
+    pointer-events:none;
+}
 
-@keyframes float {
-    0%,100% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-22px) rotate(5deg); }
+button,
+input,
+textarea{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+#app{
+    min-height:100vh;
 }
 
 /* AUTH */
 
-#authScreen {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 25px;
+.auth-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:25px;
 }
 
-.auth-card {
-    width: min(460px, 100%);
-    background: var(--glass);
-    backdrop-filter: blur(20px);
-    border: 2px solid rgba(255,255,255,.75);
-    border-radius: 35px;
-    box-shadow: var(--shadow);
-    padding: 35px;
+.auth-box{
+    width:min(480px,100%);
+    padding:30px;
+    border-radius:35px;
+    background:rgba(255,255,255,.86);
+    border:2px solid rgba(255,255,255,.9);
+    box-shadow:0 25px 70px rgba(29,116,145,.3);
+    backdrop-filter:blur(18px);
 }
 
-.logo {
-    text-align: center;
-    font-size: 55px;
-    font-weight: 900;
-    letter-spacing: -4px;
-    color: #fff;
+.logo{
+    text-align:center;
+    font-size:54px;
+    font-weight:1000;
+    letter-spacing:-4px;
+    color:#fff;
     text-shadow:
-        0 3px 0 #35a8d7,
-        0 6px 15px rgba(28,120,160,.25);
+        0 3px 0 #34a9dc,
+        0 7px 15px rgba(26,132,176,.3);
+    margin-bottom:5px;
 }
 
-.logo span {
-    color: #f7ffff;
+.logo-sub{
+    text-align:center;
+    color:#5d91a8;
+    margin-bottom:25px;
 }
 
-.subtitle {
-    text-align: center;
-    color: var(--muted);
-    margin: 4px 0 28px;
+.form-group{
+    margin-bottom:15px;
 }
 
-.auth-tabs {
-    display: flex;
-    gap: 8px;
-    padding: 6px;
-    border-radius: 18px;
-    background: rgba(80,190,225,.12);
-    margin-bottom: 20px;
-}
-
-.auth-tabs button {
-    flex: 1;
+.form-group label{
+    display:block;
+    margin:0 0 6px 5px;
+    font-size:13px;
+    font-weight:800;
 }
 
 input,
 textarea,
-select {
-    width: 100%;
-    border: 1px solid rgba(71,171,207,.25);
-    background: rgba(255,255,255,.8);
-    color: var(--text);
-    border-radius: 15px;
-    padding: 13px 15px;
-    outline: none;
-    font: inherit;
-    margin-bottom: 11px;
+select{
+    width:100%;
+    border:2px solid #c2eaf4;
+    background:rgba(255,255,255,.82);
+    color:var(--text);
+    border-radius:15px;
+    padding:12px 14px;
+    outline:none;
+    transition:.2s;
 }
 
-textarea {
-    min-height: 100px;
-    resize: vertical;
+textarea{
+    resize:vertical;
+    min-height:100px;
 }
 
 input:focus,
 textarea:focus,
-select:focus {
-    border-color: #55c8ee;
-    box-shadow: 0 0 0 4px rgba(85,200,238,.12);
+select:focus{
+    border-color:#62c9eb;
+    box-shadow:0 0 0 4px rgba(98,201,235,.13);
 }
 
-button {
-    border: 0;
-    border-radius: 15px;
-    padding: 12px 17px;
-    cursor: pointer;
-    color: #226078;
-    background: rgba(255,255,255,.82);
-    box-shadow: 0 4px 12px rgba(35,130,165,.12);
-    font-weight: 700;
-    transition: .18s;
+.radio-row{
+    display:flex;
+    gap:10px;
 }
 
-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 7px 17px rgba(35,130,165,.18);
+.gender-btn{
+    flex:1;
+    border:2px solid #c6e9f3;
+    border-radius:14px;
+    padding:11px;
+    background:#fff;
+    color:var(--text);
 }
 
-button:active {
-    transform: translateY(0) scale(.98);
+.gender-btn.active{
+    background:#d8f7ff;
+    border-color:#5ac9ed;
 }
 
-.primary {
-    width: 100%;
-    color: white;
-    background: linear-gradient(180deg, #70dafb, #39addd);
+.primary,
+.secondary,
+.danger{
+    border:0;
+    border-radius:15px;
+    padding:12px 18px;
+    font-weight:900;
+    color:#fff;
+    box-shadow:0 5px 12px rgba(30,120,155,.2);
 }
 
-.green {
-    background: linear-gradient(180deg, #8ae6bd, #54c995);
-    color: white;
+.primary{
+    background:linear-gradient(#68dcff,#1b9bd2);
 }
 
-.pink {
-    background: linear-gradient(180deg, #f7b5d9, #e986bd);
-    color: white;
+.secondary{
+    background:linear-gradient(#9cf38b,#42bd62);
 }
 
-.hidden {
-    display: none !important;
+.danger{
+    background:linear-gradient(#ff9caa,#e45870);
 }
 
-.error {
-    background: rgba(255,100,130,.13);
-    color: #c95478;
-    padding: 10px 13px;
-    border-radius: 13px;
-    margin-bottom: 12px;
-    display: none;
+.primary:hover,
+.secondary:hover,
+.danger:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.04);
 }
 
-/* APP */
-
-#app {
-    display: none;
+.full{
+    width:100%;
 }
 
-.topbar {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    height: 72px;
-    background: rgba(255,255,255,.74);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(255,255,255,.8);
-    box-shadow: 0 5px 20px rgba(28,120,160,.08);
+.auth-switch{
+    margin-top:18px;
+    text-align:center;
+    color:#6d98aa;
 }
 
-.topbar-inner {
-    max-width: 1250px;
-    height: 100%;
-    margin: auto;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 0 18px;
+.auth-switch button{
+    border:0;
+    background:none;
+    color:#168fca;
+    font-weight:900;
 }
 
-.mini-logo {
-    font-size: 30px;
-    font-weight: 900;
-    color: white;
-    text-shadow: 0 2px 0 #31a6d3;
-    margin-right: 10px;
+/* HEADER */
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    height:72px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:10px max(18px,calc((100vw - 1200px)/2));
+    background:rgba(255,255,255,.78);
+    border-bottom:2px solid rgba(255,255,255,.85);
+    backdrop-filter:blur(18px);
+    box-shadow:0 5px 25px rgba(30,125,155,.12);
 }
 
-.search {
-    flex: 1;
-    max-width: 430px;
-    position: relative;
+.top-logo{
+    font-size:31px;
+    font-weight:1000;
+    letter-spacing:-2px;
+    color:#fff;
+    text-shadow:0 2px 0 #35a6d5;
+    flex-shrink:0;
 }
 
-.search input {
-    margin: 0;
-    padding-left: 42px;
-    border-radius: 25px;
+.search{
+    flex:1;
+    max-width:390px;
+    margin-left:auto;
 }
 
-.search-icon {
-    position: absolute;
-    left: 15px;
-    top: 11px;
+.search input{
+    border-radius:25px;
+    padding:10px 16px;
 }
 
-.top-actions {
-    display: flex;
-    gap: 6px;
-    margin-left: auto;
+.top-user{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
 }
 
-.icon-btn {
-    min-width: 43px;
-    padding: 10px;
+.mini-avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #fff;
+    box-shadow:0 3px 10px rgba(30,120,150,.2);
+    background:#d5f7ff;
 }
 
-.avatar-small {
-    width: 43px;
-    height: 43px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid white;
-    box-shadow: 0 4px 12px rgba(30,120,160,.15);
-    cursor: pointer;
+.top-user span{
+    max-width:120px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-weight:900;
 }
 
-.layout {
-    width: min(1250px, calc(100% - 30px));
-    margin: 25px auto 60px;
-    display: grid;
-    grid-template-columns: 210px minmax(0, 1fr) 250px;
-    gap: 20px;
+/* LAYOUT */
+
+.layout{
+    width:min(1200px,calc(100% - 30px));
+    margin:22px auto 130px;
+    display:grid;
+    grid-template-columns:220px minmax(0,1fr);
+    gap:20px;
 }
 
-.sidebar,
-.rightbar,
-.card,
-.post,
-.profile-card,
-.music-card,
-.message-box {
-    background: var(--glass);
-    backdrop-filter: blur(18px);
-    border: 1px solid rgba(255,255,255,.78);
-    box-shadow: var(--shadow);
+.sidebar{
+    position:sticky;
+    top:92px;
+    height:max-content;
+    padding:13px;
+    border-radius:25px;
+    background:rgba(255,255,255,.75);
+    border:2px solid rgba(255,255,255,.8);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(15px);
 }
 
-.sidebar {
-    border-radius: 25px;
-    padding: 12px;
-    height: max-content;
-    position: sticky;
-    top: 95px;
+.nav-btn{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:#39768e;
+    padding:12px 13px;
+    margin-bottom:4px;
+    border-radius:15px;
+    text-align:left;
+    font-weight:900;
+    transition:.15s;
 }
 
-.nav-btn {
-    width: 100%;
-    text-align: left;
-    background: transparent;
-    box-shadow: none;
-    margin-bottom: 4px;
+.nav-btn:hover{
+    background:rgba(111,218,245,.18);
 }
 
-.nav-btn:hover,
-.nav-btn.active {
-    background: rgba(76,190,229,.16);
+.nav-btn.active{
+    color:#fff;
+    background:linear-gradient(135deg,#64d9fa,#319fce);
+    box-shadow:0 5px 14px rgba(31,151,196,.22);
 }
 
-.nav-icon {
-    display: inline-block;
-    width: 28px;
+.back-button{
+    margin-top:12px;
+    border-top:1px solid #c9ebf2;
+    padding-top:12px;
 }
 
-.rightbar {
-    border-radius: 25px;
-    padding: 18px;
-    height: max-content;
-    position: sticky;
-    top: 95px;
+.content{
+    min-width:0;
 }
 
-.page {
-    min-width: 0;
+.section-title{
+    margin:4px 0 16px;
+    font-size:30px;
+    letter-spacing:-1px;
 }
 
-.section-title {
-    font-size: 27px;
-    margin: 0 0 15px;
+/* CARDS */
+
+.card{
+    width:100%;
+    background:rgba(255,255,255,.84);
+    border:2px solid rgba(255,255,255,.88);
+    border-radius:25px;
+    padding:18px;
+    margin-bottom:16px;
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(13px);
+    overflow:hidden;
 }
 
-.card,
-.post,
-.music-card,
-.message-box {
-    border-radius: 25px;
-    padding: 18px;
-    margin-bottom: 17px;
+.card h3{
+    margin-top:0;
 }
 
-/* FEED */
-
-.create-post textarea {
-    min-height: 80px;
+.empty{
+    text-align:center;
+    padding:45px 20px;
+    color:#7297a8;
 }
 
-.create-tools {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
+.empty-icon{
+    font-size:48px;
+    margin-bottom:10px;
 }
 
-.create-tools button {
-    white-space: nowrap;
+/* POSTS */
+
+.post{
+    overflow:hidden;
 }
 
-.post-image {
-    display: block;
-    width: 100%;
-    max-height: 600px;
-    object-fit: cover;
-    border-radius: 20px;
-    margin-top: 13px;
+.post-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
 }
 
-.post-head {
-    display: flex;
-    gap: 12px;
-    align-items: center;
+.post-author{
+    min-width:0;
 }
 
-.post-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid white;
+.post-author strong,
+.post-author small{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
-.post-author {
-    cursor: pointer;
-    font-weight: 800;
+.post-author small{
+    color:#82a1ae;
 }
 
-.post-time {
-    font-size: 12px;
-    color: #8aa9b7;
+.post-content{
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+    line-height:1.5;
 }
 
-.post-text {
-    line-height: 1.6;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-    margin: 15px 0;
+.post-image{
+    display:block;
+    width:100%;
+    max-height:550px;
+    object-fit:cover;
+    margin-top:13px;
+    border-radius:19px;
 }
 
-.post-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    border-top: 1px solid rgba(50,150,180,.12);
-    padding-top: 12px;
+.post-actions{
+    display:flex;
+    gap:7px;
+    flex-wrap:wrap;
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px solid #d6edf2;
 }
 
-.like.active {
-    color: #e85e9f;
-    background: rgba(240,130,185,.15);
+.action-btn{
+    border:0;
+    background:#effcff;
+    color:#4a8499;
+    padding:8px 12px;
+    border-radius:13px;
+    font-weight:800;
 }
 
-.comments {
-    margin-top: 12px;
+.action-btn:hover{
+    background:#d7f7ff;
 }
 
-.comment {
-    padding: 8px 12px;
-    background: rgba(255,255,255,.48);
-    border-radius: 14px;
-    margin-top: 6px;
-    overflow-wrap: anywhere;
+.action-btn.liked{
+    color:#ef5877;
+    background:#ffe8ee;
 }
 
-.comment-form {
-    display: flex;
-    gap: 6px;
-    margin-top: 9px;
+.comment-list{
+    margin-top:10px;
 }
 
-.comment-form input {
-    margin: 0;
+.comment{
+    padding:8px 10px;
+    border-radius:12px;
+    background:#effaff;
+    margin-top:6px;
+    overflow-wrap:anywhere;
 }
 
-.comment-form button {
-    flex-shrink: 0;
+.comment strong{
+    margin-right:5px;
 }
 
 /* PROFILE */
 
-.profile-cover {
-    height: 220px;
-    border-radius: 25px 25px 0 0;
+.cover{
+    height:250px;
+    border-radius:25px;
     background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,.9), transparent 16%),
-        linear-gradient(135deg, #75dbfa, #b0f4ec 55%, #83dfc4);
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    overflow: hidden;
+        linear-gradient(135deg,rgba(0,190,255,.55),rgba(70,230,150,.45)),
+        #8ceeff;
+    background-size:cover;
+    background-position:center;
+    position:relative;
+    overflow:hidden;
 }
 
-.profile-cover::after {
-    content: "";
-    position: absolute;
-    inset: 0;
+.cover:after{
+    content:"";
+    position:absolute;
+    inset:0;
     background:
-        radial-gradient(circle at 75% 30%, rgba(255,255,255,.45) 0 35px, transparent 36px),
-        radial-gradient(circle at 85% 65%, rgba(255,255,255,.25) 0 55px, transparent 56px);
+        radial-gradient(circle at 20% 40%,rgba(255,255,255,.7) 0 3%,transparent 4%),
+        radial-gradient(circle at 70% 25%,rgba(255,255,255,.5) 0 4%,transparent 5%);
+    pointer-events:none;
 }
 
-.profile-info {
-    padding: 0 22px 22px;
-    position: relative;
+.profile-main{
+    position:relative;
+    padding:0 20px 20px;
 }
 
-.profile-big-avatar {
-    width: 125px;
-    height: 125px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 6px solid rgba(255,255,255,.95);
-    margin-top: -65px;
-    position: relative;
-    z-index: 2;
-    background: #d9faff;
+.profile-avatar{
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+    border:6px solid white;
+    box-shadow:0 8px 25px rgba(28,112,140,.22);
+    margin-top:-60px;
+    background:#d8f7ff;
 }
 
-.profile-name {
-    font-size: 28px;
-    font-weight: 900;
-    margin-top: 10px;
-    overflow-wrap: anywhere;
+.profile-info{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    align-items:flex-end;
 }
 
-.profile-username {
-    color: #6b98aa;
+.profile-name{
+    min-width:0;
 }
 
-.profile-bio {
-    margin: 10px 0;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
+.profile-name h1{
+    margin:8px 0 2px;
+    overflow-wrap:anywhere;
 }
 
-.profile-stats {
-    display: flex;
-    gap: 25px;
-    margin-top: 14px;
-    flex-wrap: wrap;
+.username{
+    color:#7599a8;
 }
 
-.stat b {
-    display: block;
-    font-size: 20px;
+.bio{
+    margin:12px 0 0;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
 }
 
-.stat span {
-    color: #759aaa;
-    font-size: 13px;
+.profile-actions{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
 }
 
-.profile-buttons {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 15px;
+.stats{
+    display:flex;
+    gap:25px;
+    margin-top:17px;
+    flex-wrap:wrap;
+}
+
+.stat strong{
+    display:block;
+    font-size:20px;
+}
+
+.stat span{
+    color:#789aaa;
+    font-size:12px;
 }
 
 /* FRIENDS */
 
-.user-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 13px;
+.friend-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+    gap:13px;
 }
 
-.user-card {
-    background: rgba(255,255,255,.6);
-    border-radius: 20px;
-    padding: 14px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    min-width: 0;
+.friend-card{
+    padding:15px;
+    border-radius:20px;
+    background:#f1fcff;
+    text-align:center;
+    border:2px solid #d9f4f8;
+    overflow:hidden;
 }
 
-.user-card img {
-    width: 58px;
-    height: 58px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
+.friend-card img{
+    width:75px;
+    height:75px;
+    border-radius:50%;
+    object-fit:cover;
 }
 
-.user-card-info {
-    min-width: 0;
-    flex: 1;
+.friend-card h4{
+    margin:8px 0 2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
-.user-card-name {
-    font-weight: 800;
-    overflow-wrap: anywhere;
-}
-
-.user-card-username {
-    color: #759aaa;
-    font-size: 13px;
-    overflow-wrap: anywhere;
-}
-
-/* MUSIC */
-
-.music-cover {
-    width: 75px;
-    height: 75px;
-    object-fit: cover;
-    border-radius: 17px;
-    background: linear-gradient(135deg, #7bdff9, #f5b4db);
-    flex-shrink: 0;
-}
-
-.music-row {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.music-info {
-    min-width: 0;
-    flex: 1;
-}
-
-.music-title {
-    font-weight: 900;
-    font-size: 17px;
-    overflow-wrap: anywhere;
-}
-
-.music-artist {
-    color: #759aaa;
-    font-size: 13px;
-    overflow-wrap: anywhere;
-}
-
-audio {
-    width: 100%;
-    margin-top: 12px;
+.friend-card p{
+    color:#7c9daa;
+    margin:0 0 10px;
+    font-size:12px;
+    overflow:hidden;
+    text-overflow:ellipsis;
 }
 
 /* MESSAGES */
 
-.messages-layout {
-    display: grid;
-    grid-template-columns: 260px minmax(0,1fr);
-    min-height: 600px;
-    overflow: hidden;
-    border-radius: 25px;
+.messages-layout{
+    display:grid;
+    grid-template-columns:260px minmax(0,1fr);
+    min-height:600px;
+    overflow:hidden;
 }
 
-.conversations {
-    background: rgba(255,255,255,.45);
-    padding: 10px;
-    border-right: 1px solid rgba(40,150,180,.1);
-    overflow-y: auto;
+.conversation-list{
+    border-right:2px solid #d5eef3;
 }
 
-.conversation {
-    padding: 11px;
-    border-radius: 16px;
-    cursor: pointer;
-    display: flex;
-    gap: 9px;
-    align-items: center;
-    margin-bottom: 5px;
+.conversation{
+    display:flex;
+    gap:9px;
+    align-items:center;
+    padding:10px;
+    cursor:pointer;
+    border-radius:14px;
 }
 
 .conversation:hover,
-.conversation.active {
-    background: rgba(75,190,225,.15);
+.conversation.active{
+    background:#e4faff;
 }
 
-.conversation img {
-    width: 43px;
-    height: 43px;
-    border-radius: 50%;
-    object-fit: cover;
+.conversation-info{
+    min-width:0;
 }
 
-.chat {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+.conversation-info strong,
+.conversation-info small{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
-.chat-header {
-    padding: 15px;
-    border-bottom: 1px solid rgba(40,150,180,.1);
-    font-weight: 800;
+.conversation-info small{
+    color:#7a9ca9;
 }
 
-.chat-messages {
-    flex: 1;
-    padding: 17px;
-    overflow-y: auto;
-    max-height: 450px;
+.chat{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
 }
 
-.message {
-    max-width: 75%;
-    width: fit-content;
-    background: rgba(255,255,255,.7);
-    padding: 10px 14px;
-    border-radius: 18px 18px 18px 5px;
-    margin-bottom: 9px;
-    overflow-wrap: anywhere;
+.chat-header{
+    padding:10px 14px;
+    border-bottom:2px solid #d5eef3;
+    font-weight:900;
 }
 
-.message.mine {
-    margin-left: auto;
-    background: rgba(92,207,245,.35);
-    border-radius: 18px 18px 5px 18px;
+.chat-messages{
+    flex:1;
+    padding:15px;
+    min-height:400px;
+    max-height:500px;
+    overflow-y:auto;
 }
 
-.chat-form {
-    display: flex;
-    gap: 8px;
-    padding: 12px;
-    border-top: 1px solid rgba(40,150,180,.1);
+.message{
+    max-width:75%;
+    padding:10px 13px;
+    border-radius:17px;
+    margin-bottom:8px;
+    overflow-wrap:anywhere;
 }
 
-.chat-form input {
-    margin: 0;
+.message.me{
+    margin-left:auto;
+    background:#c9f4ff;
+    border-bottom-right-radius:5px;
 }
 
-/* EDIT PROFILE */
-
-.file-preview {
-    width: 100%;
-    max-height: 180px;
-    object-fit: cover;
-    border-radius: 18px;
-    margin: 5px 0 13px;
-    display: none;
+.message.them{
+    background:#edfaff;
+    border-bottom-left-radius:5px;
 }
 
-/* EMPTY */
-
-.empty {
-    padding: 40px 20px;
-    text-align: center;
-    color: #759aaa;
+.message small{
+    display:block;
+    margin-top:4px;
+    color:#82a1ad;
+    font-size:10px;
 }
 
-.empty-icon {
-    font-size: 45px;
-    margin-bottom: 8px;
+.chat-input{
+    display:flex;
+    gap:8px;
+    padding:12px;
+    border-top:2px solid #d5eef3;
+}
+
+.chat-input input{
+    flex:1;
+}
+
+/* MUSIC */
+
+.music-card{
+    background:rgba(255,255,255,.86);
+    border:2px solid rgba(255,255,255,.9);
+    border-radius:22px;
+    padding:14px;
+    margin-bottom:13px;
+    box-shadow:0 7px 20px rgba(40,120,145,.12);
+}
+
+.music-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+}
+
+.music-cover{
+    width:68px;
+    height:68px;
+    border-radius:17px;
+    object-fit:cover;
+    flex-shrink:0;
+    background:#d5f7ff;
+}
+
+.music-info{
+    flex:1;
+    min-width:0;
+}
+
+.music-title{
+    font-size:17px;
+    font-weight:900;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.music-artist{
+    color:#779aa8;
+    font-size:12px;
+    margin-top:4px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.music-row button{
+    flex-shrink:0;
+    border:0;
+    border-radius:13px;
+    padding:9px 11px;
+    background:#dff9ff;
+    color:#267b99;
+    font-weight:900;
+}
+
+.music-row button:hover{
+    background:#c8f3fc;
+}
+
+/* PLAYER */
+
+.global-player{
+    position:fixed;
+    left:50%;
+    bottom:18px;
+    transform:translateX(-50%);
+    z-index:9999;
+    width:min(760px,calc(100% - 24px));
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 13px;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(20px);
+    border:2px solid rgba(255,255,255,.95);
+    border-radius:22px;
+    box-shadow:0 15px 45px rgba(25,115,150,.27);
+}
+
+.global-player-info{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:220px;
+    min-width:0;
+}
+
+.global-player-info img{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    object-fit:cover;
+    flex-shrink:0;
+}
+
+.global-player-text{
+    min-width:0;
+}
+
+.global-player-text div{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.global-player-text div:first-child{
+    font-weight:900;
+}
+
+.global-player-text div:last-child{
+    color:#7899a7;
+    font-size:12px;
+}
+
+.global-player audio{
+    flex:1;
+    min-width:0;
+}
+
+.global-player > button{
+    width:38px;
+    height:38px;
+    padding:0;
+    border:0;
+    border-radius:12px;
+    background:#ffe9ef;
+    color:#d95774;
+    font-weight:900;
+}
+
+/* PROFILE EDIT */
+
+.edit-preview{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:17px;
+}
+
+.edit-preview img{
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    object-fit:cover;
 }
 
 /* TOAST */
 
-.toast {
-    position: fixed;
-    right: 20px;
-    bottom: 20px;
-    background: rgba(255,255,255,.94);
-    border: 1px solid white;
-    box-shadow: var(--shadow);
-    border-radius: 17px;
-    padding: 13px 17px;
-    z-index: 100;
-    transform: translateY(120px);
-    opacity: 0;
-    transition: .25s;
+#toastContainer{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    z-index:20000;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    pointer-events:none;
 }
 
-.toast.show {
-    transform: translateY(0);
-    opacity: 1;
+.toast{
+    max-width:min(350px,calc(100vw - 36px));
+    background:rgba(255,255,255,.95);
+    border:2px solid white;
+    box-shadow:0 10px 30px rgba(30,120,150,.2);
+    padding:12px 15px;
+    border-radius:16px;
+    color:#316c83;
+    font-weight:800;
+    animation:toastIn .2s ease;
 }
 
-/* MOBILE */
-
-@media (max-width: 1050px) {
-    .layout {
-        grid-template-columns: 185px minmax(0,1fr);
+@keyframes toastIn{
+    from{
+        opacity:0;
+        transform:translateY(10px);
     }
-
-    .rightbar {
-        display: none;
-    }
-}
-
-@media (max-width: 720px) {
-    .topbar {
-        height: auto;
-    }
-
-    .topbar-inner {
-        flex-wrap: wrap;
-        padding: 9px 12px;
-    }
-
-    .mini-logo {
-        font-size: 26px;
-    }
-
-    .search {
-        order: 3;
-        flex-basis: 100%;
-        max-width: none;
-    }
-
-    .top-actions {
-        margin-left: auto;
-    }
-
-    .layout {
-        width: calc(100% - 14px);
-        margin-top: 10px;
-        display: block;
-    }
-
-    .sidebar {
-        position: static;
-        display: flex;
-        overflow-x: auto;
-        padding: 7px;
-        border-radius: 18px;
-        margin-bottom: 12px;
-        gap: 4px;
-    }
-
-    .nav-btn {
-        width: auto;
-        white-space: nowrap;
-        margin: 0;
-    }
-
-    .nav-btn span:not(.nav-icon) {
-        display: none;
-    }
-
-    .card,
-    .post,
-    .music-card {
-        border-radius: 20px;
-        padding: 14px;
-    }
-
-    .profile-cover {
-        height: 160px;
-    }
-
-    .profile-big-avatar {
-        width: 100px;
-        height: 100px;
-        margin-top: -50px;
-    }
-
-    .profile-info {
-        padding: 0 15px 18px;
-    }
-
-    .messages-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .conversations {
-        max-height: 160px;
-        border-right: 0;
-        border-bottom: 1px solid rgba(40,150,180,.1);
-    }
-
-    .chat-messages {
-        max-height: 400px;
+    to{
+        opacity:1;
+        transform:none;
     }
 }
 
-@media (max-width: 450px) {
-    .logo {
-        font-size: 45px;
+/* RESPONSIVE */
+
+@media(max-width:850px){
+
+    .layout{
+        grid-template-columns:1fr;
     }
 
-    .auth-card {
-        padding: 22px;
-        border-radius: 27px;
+    .sidebar{
+        position:sticky;
+        top:72px;
+        z-index:500;
+        display:flex;
+        gap:5px;
+        overflow-x:auto;
+        padding:7px;
     }
 
-    .top-actions .icon-btn:nth-child(2) {
-        display: none;
+    .nav-btn{
+        width:auto;
+        white-space:nowrap;
+        margin:0;
     }
 
-    .profile-stats {
-        gap: 15px;
+    .back-button{
+        margin:0;
+        padding:0;
+        border:0;
     }
+
+    .search{
+        display:none;
+    }
+
+    .topbar{
+        padding:10px 13px;
+    }
+
+    .top-user{
+        margin-left:auto;
+    }
+
+    .messages-layout{
+        grid-template-columns:1fr;
+    }
+
+    .conversation-list{
+        border-right:0;
+        border-bottom:2px solid #d5eef3;
+        max-height:180px;
+        overflow-y:auto;
+    }
+
+    .chat-messages{
+        min-height:300px;
+    }
+
+    .profile-info{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+}
+
+@media(max-width:600px){
+
+    .layout{
+        width:calc(100% - 14px);
+        margin-top:10px;
+    }
+
+    .card{
+        border-radius:20px;
+        padding:14px;
+    }
+
+    .section-title{
+        font-size:25px;
+    }
+
+    .cover{
+        height:180px;
+    }
+
+    .profile-avatar{
+        width:95px;
+        height:95px;
+        margin-top:-48px;
+    }
+
+    .profile-main{
+        padding:0 13px 15px;
+    }
+
+    .top-logo{
+        font-size:28px;
+    }
+
+    .top-user span{
+        display:none;
+    }
+
+    .global-player{
+        bottom:8px;
+        flex-wrap:wrap;
+    }
+
+    .global-player-info{
+        width:calc(100% - 50px);
+    }
+
+    .global-player audio{
+        flex-basis:100%;
+        width:100%;
+    }
+
+    .friend-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
 }
 </style>
 </head>
 
 <body>
 
-<div class="sky-bubble b1"></div>
-<div class="sky-bubble b2"></div>
-<div class="sky-bubble b3"></div>
-<div class="sky-bubble b4"></div>
+<div id="app"></div>
 
-<!-- AUTH -->
+<!-- GLOBAL AUDIO PLAYER: НЕ УДАЛЯЕТСЯ ПРИ ПЕРЕКЛЮЧЕНИИ СТРАНИЦ -->
+<div id="globalPlayer" class="global-player hidden">
 
-<section id="authScreen">
+    <div class="global-player-info">
 
-    <div class="auth-card">
+        <img id="globalPlayerCover" src="" alt="">
 
-        <div class="logo">bubbles</div>
-        <div class="subtitle">a little place on the internet</div>
-
-        <div class="auth-tabs">
-            <button id="loginTab" onclick="showAuth('login')">Войти</button>
-            <button id="registerTab" onclick="showAuth('register')">Создать аккаунт</button>
+        <div class="global-player-text">
+            <div id="globalPlayerTitle">Ничего не играет</div>
+            <div id="globalPlayerArtist"></div>
         </div>
-
-        <div id="authError" class="error"></div>
-
-        <form id="loginForm">
-            <input id="loginUsername" placeholder="Username" autocomplete="username" required>
-            <input id="loginPassword" type="password" placeholder="Пароль" autocomplete="current-password" required>
-            <button class="primary" type="submit">Войти в bubbles</button>
-        </form>
-
-        <form id="registerForm" class="hidden">
-
-            <input id="regUsername" placeholder="Username" maxlength="25" required>
-
-            <input id="regDisplayName" placeholder="Имя, которое увидят другие" maxlength="35" required>
-
-            <select id="regGender" required>
-                <option value="">Пол</option>
-                <option value="male">Мужской</option>
-                <option value="female">Женский</option>
-            </select>
-
-            <textarea
-                id="regBio"
-                maxlength="160"
-                placeholder="Немного о себе..."
-            ></textarea>
-
-            <input
-                id="regPassword"
-                type="password"
-                placeholder="Пароль"
-                minlength="4"
-                required
-            >
-
-            <button class="primary" type="submit">Создать bubbles</button>
-
-        </form>
 
     </div>
 
-</section>
+    <audio id="globalAudio" controls preload="metadata"></audio>
 
-
-<!-- APP -->
-
-<div id="app">
-
-    <header class="topbar">
-
-        <div class="topbar-inner">
-
-            <div class="mini-logo">bubbles</div>
-
-            <div class="search">
-                <span class="search-icon">🔎</span>
-                <input
-                    id="searchInput"
-                    placeholder="Найти людей, посты..."
-                    oninput="searchEverything(this.value)"
-                >
-            </div>
-
-            <div class="top-actions">
-                <button class="icon-btn" onclick="openPage('messages')">💌</button>
-                <button class="icon-btn" onclick="openPage('friends')">👥</button>
-                <button class="icon-btn" onclick="openPage('music')">🎵</button>
-
-                <img
-                    id="topAvatar"
-                    class="avatar-small"
-                    onclick="openOwnProfile()"
-                    alt="avatar"
-                >
-            </div>
-
-        </div>
-
-    </header>
-
-
-    <div class="layout">
-
-        <!-- NAV -->
-
-        <aside class="sidebar">
-
-            <button class="nav-btn active" data-page="feed" onclick="openPage('feed')">
-                <span class="nav-icon">🏠</span><span>Лента</span>
-            </button>
-
-            <button class="nav-btn" data-page="profile" onclick="openOwnProfile()">
-                <span class="nav-icon">👤</span><span>Профиль</span>
-            </button>
-
-            <button class="nav-btn" data-page="friends" onclick="openPage('friends')">
-                <span class="nav-icon">👥</span><span>Друзья</span>
-            </button>
-
-            <button class="nav-btn" data-page="messages" onclick="openPage('messages')">
-                <span class="nav-icon">💌</span><span>Сообщения</span>
-            </button>
-
-            <button class="nav-btn" data-page="music" onclick="openPage('music')">
-                <span class="nav-icon">🎵</span><span>Музыка</span>
-            </button>
-
-            <button class="nav-btn" data-page="edit" onclick="openPage('edit')">
-                <span class="nav-icon">⚙️</span><span>Настройки</span>
-            </button>
-
-            <button
-                class="nav-btn"
-                onclick="window.location.href='https://zeshpr.github.io/frutigeraeropage/bubbling.html'"
-            >
-                <span class="nav-icon">🌐</span><span>На главную</span>
-            </button>
-
-            <button class="nav-btn" onclick="logout()">
-                <span class="nav-icon">🚪</span><span>Выйти</span>
-            </button>
-
-        </aside>
-
-
-        <!-- MAIN -->
-
-        <main id="page" class="page"></main>
-
-
-        <!-- RIGHT -->
-
-        <aside class="rightbar">
-
-            <h3 style="margin-top:0;">🌊 bubbles</h3>
-
-            <p style="line-height:1.5;color:#7098a8;">
-                Маленькая социальная сеть,
-                которая выглядит так, будто интернет
-                никогда не перестал быть добрым.
-            </p>
-
-            <hr style="border:0;border-top:1px solid rgba(50,150,180,.12);">
-
-            <div id="onlineWidget"></div>
-
-        </aside>
-
-    </div>
+    <button onclick="closeMusicPlayer()" title="Закрыть">
+        ✕
+    </button>
 
 </div>
 
-
-<div id="toast" class="toast"></div>
-
+<div id="toastContainer"></div>
 
 <script>
 /* ============================================================
-   BUBBLES — LOCAL PROTOTYPE
+   BUBBLES
+   Local prototype social network
    ============================================================ */
 
-const DB_KEY = "bubbles_social_database_v4";
-const SESSION_KEY = "bubbles_current_user_v4";
+const DB_KEY = "bubbles_social_database_v7";
+const SESSION_KEY = "bubbles_current_user_v7";
 
-let db = loadDB();
-let currentUserId = localStorage.getItem(SESSION_KEY);
+const MAX_MUSIC_SIZE = 15 * 1024 * 1024;
+
+let db = {
+    users: [],
+    posts: [],
+    comments: [],
+    friends: [],
+    messages: [],
+    music: []
+};
+
+let currentUserId = localStorage.getItem(SESSION_KEY) || null;
 let currentPage = "feed";
-let selectedChatUser = null;
+let selectedProfileId = null;
+let selectedChatId = null;
+let genderValue = "female";
+
+let musicDB = null;
+let globalAudioURL = null;
+let currentlyPlayingMusicId = null;
+
+
+/* ============================================================
+   INDEXED DB
+   ============================================================ */
+
+function openMusicDB(){
+
+    return new Promise((resolve,reject)=>{
+
+        const request = indexedDB.open(
+            "bubbles_music_storage",
+            1
+        );
+
+        request.onupgradeneeded = event => {
+
+            const database = event.target.result;
+
+            if(!database.objectStoreNames.contains("tracks")){
+
+                database.createObjectStore("tracks",{
+                    keyPath:"id"
+                });
+
+            }
+
+        };
+
+        request.onsuccess = event => {
+
+            musicDB = event.target.result;
+
+            resolve(musicDB);
+
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+
+    });
+
+}
+
+
+function saveAudioFile(id,file){
+
+    return new Promise((resolve,reject)=>{
+
+        const tx = musicDB.transaction(
+            "tracks",
+            "readwrite"
+        );
+
+        tx.objectStore("tracks").put({
+            id:id,
+            blob:file
+        });
+
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+
+    });
+
+}
+
+
+function getAudioFile(id){
+
+    return new Promise((resolve,reject)=>{
+
+        const tx = musicDB.transaction(
+            "tracks",
+            "readonly"
+        );
+
+        const request =
+            tx.objectStore("tracks").get(id);
+
+        request.onsuccess = () => {
+
+            resolve(
+                request.result
+                ? request.result.blob
+                : null
+            );
+
+        };
+
+        request.onerror = () => {
+            reject(request.error);
+        };
+
+    });
+
+}
+
+
+function deleteAudioFile(id){
+
+    return new Promise((resolve,reject)=>{
+
+        const tx = musicDB.transaction(
+            "tracks",
+            "readwrite"
+        );
+
+        tx.objectStore("tracks").delete(id);
+
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+
+    });
+
+}
 
 
 /* ============================================================
    DATABASE
    ============================================================ */
 
-function loadDB() {
+function loadDB(){
 
-    try {
-        const saved = localStorage.getItem(DB_KEY);
+    try{
 
-        if (saved) {
+        const saved =
+            localStorage.getItem(DB_KEY);
+
+        if(saved){
+
             const parsed = JSON.parse(saved);
 
-            return {
-                users: parsed.users || [],
-                posts: parsed.posts || [],
-                music: parsed.music || [],
-                messages: parsed.messages || []
+            db = {
+                users:parsed.users || [],
+                posts:parsed.posts || [],
+                comments:parsed.comments || [],
+                friends:parsed.friends || [],
+                messages:parsed.messages || [],
+                music:parsed.music || []
             };
+
         }
 
-    } catch(e) {
-        console.error(e);
+    }catch(error){
+
+        console.error(error);
+
     }
 
-    return {
-        users: [],
-        posts: [],
-        music: [],
-        messages: []
-    };
 }
 
 
-function saveDB() {
-    localStorage.setItem(DB_KEY, JSON.stringify(db));
-}
+function saveDB(){
 
+    try{
 
-function saveSession() {
-    if (currentUserId) {
-        localStorage.setItem(SESSION_KEY, currentUserId);
-    } else {
-        localStorage.removeItem(SESSION_KEY);
+        localStorage.setItem(
+            DB_KEY,
+            JSON.stringify(db)
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        toast(
+            "Локальное хранилище переполнено. Музыка теперь хранится отдельно."
+        );
+
     }
+
 }
 
 
-function uid(prefix = "id") {
-    return prefix + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,9);
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function uid(prefix="id"){
+
+    return prefix +
+        "_" +
+        Date.now().toString(36) +
+        "_" +
+        Math.random()
+        .toString(36)
+        .slice(2,8);
+
 }
 
 
-function getUser(id) {
-    return db.users.find(u => u.id === id);
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
 }
 
 
-function getCurrentUser() {
+function getUser(id){
+
+    return db.users.find(
+        user => user.id === id
+    );
+
+}
+
+
+function getCurrentUser(){
+
     return getUser(currentUserId);
+
 }
 
 
-function defaultAvatar(name = "B") {
+function isFriend(userId){
 
-    const letter = (name || "B").trim().charAt(0).toUpperCase();
+    return db.friends.some(
+        f =>
+            (f.user1 === currentUserId && f.user2 === userId) ||
+            (f.user2 === currentUserId && f.user1 === userId)
+    );
 
-    const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
-        <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                <stop stop-color="#73dcfa"/>
-                <stop offset="1" stop-color="#91e5c5"/>
-            </linearGradient>
-        </defs>
-        <rect width="400" height="400" rx="200" fill="url(#g)"/>
-        <circle cx="120" cy="100" r="55" fill="white" opacity=".35"/>
-        <text x="200" y="245"
-              text-anchor="middle"
-              font-family="Arial"
-              font-size="150"
-              font-weight="bold"
-              fill="white">${escapeSvg(letter)}</text>
-    </svg>`;
-
-    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
 }
 
 
-function defaultCover() {
-    return "";
+function defaultAvatar(){
+
+    return "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+                <defs>
+                    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                        <stop stop-color="#8deaff"/>
+                        <stop offset="1" stop-color="#56d57c"/>
+                    </linearGradient>
+                </defs>
+                <rect width="200" height="200" rx="100" fill="url(#g)"/>
+                <circle cx="100" cy="78" r="35" fill="white" opacity=".9"/>
+                <path d="M42 174c8-42 35-59 58-59s50 17 58 59" fill="white" opacity=".9"/>
+            </svg>
+        `);
+
+}
+
+
+function defaultMusicCover(){
+
+    return "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(`
+            <svg xmlns="http://www.w3.org/2000/svg" width="300" height="300">
+                <defs>
+                    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+                        <stop stop-color="#62dcff"/>
+                        <stop offset=".5" stop-color="#a0f58d"/>
+                        <stop offset="1" stop-color="#4ab9ed"/>
+                    </linearGradient>
+                </defs>
+                <rect width="300" height="300" rx="50" fill="url(#g)"/>
+                <circle cx="100" cy="100" r="48" fill="white" opacity=".35"/>
+                <circle cx="220" cy="210" r="70" fill="white" opacity=".25"/>
+                <text x="150" y="175"
+                    text-anchor="middle"
+                    font-family="Arial"
+                    font-size="65"
+                    font-weight="900"
+                    fill="white">
+                    ♪
+                </text>
+            </svg>
+        `);
+
+}
+
+
+function timeAgo(timestamp){
+
+    const diff =
+        Date.now() - timestamp;
+
+    const sec =
+        Math.floor(diff / 1000);
+
+    if(sec < 60)
+        return "только что";
+
+    const min =
+        Math.floor(sec / 60);
+
+    if(min < 60)
+        return min + " мин.";
+
+    const hours =
+        Math.floor(min / 60);
+
+    if(hours < 24)
+        return hours + " ч.";
+
+    const days =
+        Math.floor(hours / 24);
+
+    if(days < 30)
+        return days + " д.";
+
+    return new Date(timestamp)
+        .toLocaleDateString("ru-RU");
+
+}
+
+
+function toast(text){
+
+    const container =
+        document.getElementById("toastContainer");
+
+    const el =
+        document.createElement("div");
+
+    el.className = "toast";
+
+    el.textContent = text;
+
+    container.appendChild(el);
+
+    setTimeout(()=>{
+        el.remove();
+    },3000);
+
+}
+
+
+function fileToDataURL(file){
+
+    return new Promise((resolve,reject)=>{
+
+        const reader =
+            new FileReader();
+
+        reader.onload =
+            e => resolve(e.target.result);
+
+        reader.onerror = reject;
+
+        reader.readAsDataURL(file);
+
+    });
+
+}
+
+
+function emptyState(icon,title,text){
+
+    return `
+        <div class="card empty">
+            <div class="empty-icon">${icon}</div>
+            <strong>${escapeHtml(title)}</strong>
+            <p>${escapeHtml(text)}</p>
+        </div>
+    `;
+
 }
 
 
@@ -1142,172 +1426,562 @@ function defaultCover() {
    AUTH
    ============================================================ */
 
-function showAuth(type) {
+function showAuth(mode="login"){
 
-    document.getElementById("loginForm").classList.toggle("hidden", type !== "login");
-    document.getElementById("registerForm").classList.toggle("hidden", type !== "register");
+    document.getElementById("app").innerHTML = `
 
-    document.getElementById("loginTab").classList.toggle("primary", type === "login");
-    document.getElementById("registerTab").classList.toggle("primary", type === "register");
+        <div class="auth-screen">
 
-    hideError();
+            <div class="auth-box">
+
+                <div class="logo">bubbles</div>
+
+                <div class="logo-sub">
+                    маленькая социальная сеть с большим количеством пузырьков
+                </div>
+
+
+                ${
+                    mode === "login"
+                    ? loginForm()
+                    : registerForm()
+                }
+
+            </div>
+
+        </div>
+    `;
+
 }
 
 
-function showError(text) {
-    const el = document.getElementById("authError");
-    el.textContent = text;
-    el.style.display = "block";
+function loginForm(){
+
+    return `
+
+        <form onsubmit="login(event)">
+
+            <div class="form-group">
+                <label>Юзернейм</label>
+                <input
+                    id="loginUsername"
+                    autocomplete="username"
+                    required
+                    placeholder="например bubbles_user"
+                >
+            </div>
+
+
+            <div class="form-group">
+                <label>Пароль</label>
+                <input
+                    id="loginPassword"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                    placeholder="••••••••"
+                >
+            </div>
+
+
+            <button class="primary full">
+                Войти в bubbles
+            </button>
+
+        </form>
+
+
+        <div class="auth-switch">
+
+            Нет аккаунта?
+
+            <button onclick="showAuth('register')">
+                Создать аккаунт
+            </button>
+
+        </div>
+
+    `;
+
 }
 
 
-function hideError() {
-    const el = document.getElementById("authError");
-    el.textContent = "";
-    el.style.display = "none";
+function registerForm(){
+
+    return `
+
+        <form onsubmit="register(event)">
+
+            <div class="form-group">
+
+                <label>Юзернейм</label>
+
+                <input
+                    id="registerUsername"
+                    required
+                    minlength="3"
+                    maxlength="25"
+                    pattern="[A-Za-z0-9_.-]+"
+                    placeholder="например bubbles_user"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Имя</label>
+
+                <input
+                    id="registerName"
+                    required
+                    maxlength="40"
+                    placeholder="Как тебя будут видеть"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Пароль</label>
+
+                <input
+                    id="registerPassword"
+                    type="password"
+                    required
+                    minlength="6"
+                    placeholder="минимум 6 символов"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Пол</label>
+
+                <div class="radio-row">
+
+                    <button
+                        type="button"
+                        class="gender-btn active"
+                        id="femaleGender"
+                        onclick="selectGender('female')"
+                    >
+                        ♀ Женский
+                    </button>
+
+                    <button
+                        type="button"
+                        class="gender-btn"
+                        id="maleGender"
+                        onclick="selectGender('male')"
+                    >
+                        ♂ Мужской
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <button class="primary full">
+                Создать аккаунт
+            </button>
+
+        </form>
+
+
+        <div class="auth-switch">
+
+            Уже есть аккаунт?
+
+            <button onclick="showAuth('login')">
+                Войти
+            </button>
+
+        </div>
+
+    `;
+
 }
 
 
-document.getElementById("registerForm").addEventListener("submit", function(e) {
+function selectGender(gender){
 
-    e.preventDefault();
+    genderValue = gender;
 
-    const username = document.getElementById("regUsername").value.trim().toLowerCase();
-    const displayName = document.getElementById("regDisplayName").value.trim();
-    const gender = document.getElementById("regGender").value;
-    const bio = document.getElementById("regBio").value.trim();
-    const password = document.getElementById("regPassword").value;
+    document
+        .getElementById("femaleGender")
+        ?.classList.toggle(
+            "active",
+            gender === "female"
+        );
 
-    if (!/^[a-zA-Z0-9_.-]{3,25}$/.test(username)) {
-        showError("Username: только латиница, цифры, _ . - и минимум 3 символа.");
+    document
+        .getElementById("maleGender")
+        ?.classList.toggle(
+            "active",
+            gender === "male"
+        );
+
+}
+
+
+function register(event){
+
+    event.preventDefault();
+
+    const username =
+        document
+        .getElementById("registerUsername")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const displayName =
+        document
+        .getElementById("registerName")
+        .value
+        .trim();
+
+    const password =
+        document
+        .getElementById("registerPassword")
+        .value;
+
+
+    if(
+        db.users.some(
+            u => u.username === username
+        )
+    ){
+
+        toast("Такой юзернейм уже занят.");
+
         return;
+
     }
 
-    if (db.users.some(u => u.username === username)) {
-        showError("Такой username уже занят.");
-        return;
-    }
 
     const user = {
-        id: uid("user"),
+
+        id:uid("user"),
+
         username,
+
         displayName,
-        gender,
-        bio,
+
         password,
-        avatar: defaultAvatar(displayName),
-        cover: defaultCover(),
-        friends: [],
-        friendRequests: [],
-        createdAt: Date.now()
+
+        gender:genderValue,
+
+        avatar:defaultAvatar(),
+
+        cover:"",
+
+        bio:"",
+
+        createdAt:Date.now()
+
     };
 
+
     db.users.push(user);
+
     saveDB();
 
     currentUserId = user.id;
-    saveSession();
 
-    document.getElementById("registerForm").reset();
-
-    startApp();
-
-    toast("Добро пожаловать в bubbles 🫧");
-});
-
-
-document.getElementById("loginForm").addEventListener("submit", function(e) {
-
-    e.preventDefault();
-
-    const username = document.getElementById("loginUsername").value.trim().toLowerCase();
-    const password = document.getElementById("loginPassword").value;
-
-    const user = db.users.find(
-        u => u.username === username && u.password === password
+    localStorage.setItem(
+        SESSION_KEY,
+        currentUserId
     );
 
-    if (!user) {
-        showError("Неверный username или пароль.");
+    startApp();
+
+}
+
+
+function login(event){
+
+    event.preventDefault();
+
+    const username =
+        document
+        .getElementById("loginUsername")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const password =
+        document
+        .getElementById("loginPassword")
+        .value;
+
+
+    const user =
+        db.users.find(
+            u =>
+                u.username === username &&
+                u.password === password
+        );
+
+
+    if(!user){
+
+        toast("Неверный юзернейм или пароль.");
+
         return;
+
     }
 
-    currentUserId = user.id;
-    saveSession();
 
-    document.getElementById("loginForm").reset();
+    currentUserId = user.id;
+
+    localStorage.setItem(
+        SESSION_KEY,
+        currentUserId
+    );
 
     startApp();
 
-    toast("С возвращением, " + user.displayName + " 🫧");
-});
+}
 
 
-function logout() {
+function logout(){
+
+    closeMusicPlayer();
 
     currentUserId = null;
-    saveSession();
 
-    document.getElementById("app").style.display = "none";
-    document.getElementById("authScreen").style.display = "flex";
+    localStorage.removeItem(
+        SESSION_KEY
+    );
 
     showAuth("login");
+
 }
 
 
 /* ============================================================
-   APP START
+   MAIN APP
    ============================================================ */
 
-function startApp() {
+function startApp(){
 
-    const user = getCurrentUser();
+    if(!getCurrentUser()){
 
-    if (!user) {
         logout();
+
         return;
+
     }
 
-    document.getElementById("authScreen").style.display = "none";
-    document.getElementById("app").style.display = "block";
 
-    updateTopbar();
+    renderApp();
 
-    openPage("feed");
-
-    updateOnlineWidget();
 }
 
 
-function updateTopbar() {
+function renderApp(){
 
-    const user = getCurrentUser();
+    const user =
+        getCurrentUser();
 
-    if (!user) return;
 
-    document.getElementById("topAvatar").src = user.avatar || defaultAvatar(user.displayName);
+    document.getElementById("app").innerHTML = `
+
+        <header class="topbar">
+
+            <div
+                class="top-logo"
+                onclick="navigate('feed')"
+                style="cursor:pointer"
+            >
+                bubbles
+            </div>
+
+
+            <div class="search">
+
+                <input
+                    id="searchInput"
+                    placeholder="Поиск пользователей..."
+                    oninput="searchUsers(this.value)"
+                >
+
+            </div>
+
+
+            <div class="top-user">
+
+                <img
+                    class="mini-avatar"
+                    src="${user.avatar || defaultAvatar()}"
+                >
+
+                <span>
+                    ${escapeHtml(user.displayName)}
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <div class="layout">
+
+            <aside class="sidebar">
+
+                <button
+                    class="nav-btn"
+                    data-page="feed"
+                    onclick="navigate('feed')"
+                >
+                    🏠 Лента
+                </button>
+
+                <button
+                    class="nav-btn"
+                    data-page="profile"
+                    onclick="navigate('profile')"
+                >
+                    👤 Профиль
+                </button>
+
+                <button
+                    class="nav-btn"
+                    data-page="friends"
+                    onclick="navigate('friends')"
+                >
+                    🫂 Друзья
+                </button>
+
+                <button
+                    class="nav-btn"
+                    data-page="messages"
+                    onclick="navigate('messages')"
+                >
+                    💬 Сообщения
+                </button>
+
+                <button
+                    class="nav-btn"
+                    data-page="music"
+                    onclick="navigate('music')"
+                >
+                    🎵 Музыка
+                </button>
+
+                <button
+                    class="nav-btn"
+                    data-page="edit"
+                    onclick="navigate('edit')"
+                >
+                    ⚙️ Настройки
+                </button>
+
+
+                <div class="back-button">
+
+                    <button
+                        class="nav-btn"
+                        onclick="location.href='https://zeshpr.github.io/frutigeraeropage/bubbling.html'"
+                    >
+                        🫧 На главную
+                    </button>
+
+                    <button
+                        class="nav-btn"
+                        onclick="logout()"
+                    >
+                        🚪 Выйти
+                    </button>
+
+                </div>
+
+            </aside>
+
+
+            <main
+                id="page"
+                class="content"
+            ></main>
+
+        </div>
+
+    `;
+
+    navigate(currentPage);
+
 }
 
 
-function openPage(page) {
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+
+function navigate(page,id=null){
 
     currentPage = page;
 
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.page === page);
-    });
-
-    if (page === "feed") renderFeed();
-    if (page === "profile") renderProfile(currentUserId);
-    if (page === "friends") renderFriends();
-    if (page === "messages") renderMessages();
-    if (page === "music") renderMusic();
-    if (page === "edit") renderEditProfile();
-}
+    selectedProfileId =
+        id || selectedProfileId;
 
 
-function openOwnProfile() {
-    openPage("profile");
+    document
+        .querySelectorAll(".nav-btn[data-page]")
+        .forEach(btn => {
+
+            btn.classList.toggle(
+                "active",
+                btn.dataset.page === page
+            );
+
+        });
+
+
+    switch(page){
+
+        case "feed":
+            renderFeed();
+            break;
+
+        case "profile":
+            renderProfile(
+                id || currentUserId
+            );
+            break;
+
+        case "friends":
+            renderFriends();
+            break;
+
+        case "messages":
+            renderMessages();
+            break;
+
+        case "music":
+            renderMusic();
+            break;
+
+        case "edit":
+            renderEditProfile();
+            break;
+
+        case "search":
+            renderSearchResults(
+                id || ""
+            );
+            break;
+
+        default:
+            renderFeed();
+
+    }
+
 }
 
 
@@ -1315,39 +1989,58 @@ function openOwnProfile() {
    FEED
    ============================================================ */
 
-function renderFeed() {
+function renderFeed(){
 
-    const page = document.getElementById("page");
+    const page =
+        document.getElementById("page");
 
-    const posts = [...db.posts].sort((a,b) => b.createdAt - a.createdAt);
+
+    const posts =
+        [...db.posts]
+        .sort(
+            (a,b) =>
+                b.createdAt - a.createdAt
+        );
+
 
     page.innerHTML = `
-        <h1 class="section-title">Лента 🌊</h1>
 
-        <div class="card create-post">
+        <h1 class="section-title">
+            🫧 Лента
+        </h1>
+
+
+        <div class="card">
+
+            <h3>Что нового?</h3>
 
             <textarea
-                id="newPostText"
+                id="postText"
                 maxlength="1000"
-                placeholder="Что нового в твоём маленьком интернете?"
+                placeholder="Напиши что-нибудь..."
             ></textarea>
 
-            <input
-                type="file"
-                id="postImageInput"
-                accept="image/png,image/jpeg,image/webp,image/gif"
-                hidden
-            >
 
-            <div class="create-tools">
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                gap:10px;
+                margin-top:10px;
+                flex-wrap:wrap;
+            ">
 
-                <button onclick="document.getElementById('postImageInput').click()">
-                    📷 Фотография
-                </button>
+                <input
+                    id="postImage"
+                    type="file"
+                    accept="image/*"
+                    style="max-width:100%;"
+                >
 
-                <span id="postImageName" style="color:#7899a7;font-size:13px;"></span>
-
-                <button class="primary" style="width:auto;margin-left:auto;" onclick="createPost()">
+                <button
+                    class="primary"
+                    onclick="createPost()"
+                >
                     Опубликовать
                 </button>
 
@@ -1355,253 +2048,469 @@ function renderFeed() {
 
         </div>
 
-        <div id="feedPosts">
-            ${
-                posts.length
-                ? posts.map(renderPost).join("")
-                : emptyState("🫧", "Здесь пока тихо", "Создай первый пост в bubbles.")
-            }
-        </div>
+
+        ${
+            posts.length
+            ? posts.map(renderPost).join("")
+            : emptyState(
+                "🌊",
+                "Лента пока пустая",
+                "Опубликуй что-нибудь первым."
+            )
+        }
+
     `;
 
-    document.getElementById("postImageInput").addEventListener("change", function() {
-        const file = this.files[0];
-        document.getElementById("postImageName").textContent =
-            file ? file.name : "";
-    });
 }
 
 
-function createPost() {
+function renderPost(post){
 
-    const text = document.getElementById("newPostText").value.trim();
-    const input = document.getElementById("postImageInput");
-    const file = input.files[0];
+    const author =
+        getUser(post.authorId);
 
-    if (!text && !file) {
-        toast("Напиши что-нибудь или добавь фотографию.");
-        return;
-    }
-
-    if (file && !file.type.startsWith("image/")) {
-        toast("Можно загружать только изображения.");
-        return;
-    }
-
-    const finish = image => {
-
-        db.posts.push({
-            id: uid("post"),
-            authorId: currentUserId,
-            text,
-            image: image || "",
-            likes: [],
-            comments: [],
-            createdAt: Date.now()
-        });
-
-        saveDB();
-        renderFeed();
-        toast("Пост опубликован 🫧");
-    };
-
-    if (file) {
-
-        const reader = new FileReader();
-
-        reader.onload = e => finish(e.target.result);
-
-        reader.readAsDataURL(file);
-
-    } else {
-        finish("");
-    }
-}
+    if(!author) return "";
 
 
-function renderPost(post) {
+    const liked =
+        post.likes?.includes(
+            currentUserId
+        );
 
-    const author = getUser(post.authorId);
 
-    if (!author) return "";
+    const comments =
+        db.comments
+        .filter(
+            c => c.postId === post.id
+        )
+        .sort(
+            (a,b) =>
+                a.createdAt-b.createdAt
+        );
 
-    const liked = post.likes.includes(currentUserId);
-
-    const comments = post.comments || [];
 
     return `
-        <article class="post">
+
+        <article class="card post">
 
             <div class="post-head">
 
                 <img
-                    class="post-avatar"
-                    src="${author.avatar || defaultAvatar(author.displayName)}"
-                    onclick="renderProfile('${author.id}')"
-                    alt=""
+                    class="mini-avatar"
+                    src="${author.avatar || defaultAvatar()}"
+                    onclick="navigate('profile','${author.id}')"
+                    style="cursor:pointer"
                 >
 
-                <div style="min-width:0;">
-                    <div
-                        class="post-author"
-                        onclick="renderProfile('${author.id}')"
-                    >
-                        ${escapeHtml(author.displayName)}
-                    </div>
 
-                    <div class="post-time">
-                        @${escapeHtml(author.username)} · ${formatDate(post.createdAt)}
-                    </div>
+                <div
+                    class="post-author"
+                    onclick="navigate('profile','${author.id}')"
+                    style="cursor:pointer"
+                >
+
+                    <strong>
+                        ${escapeHtml(author.displayName)}
+                    </strong>
+
+                    <small>
+                        @${escapeHtml(author.username)}
+                        · ${timeAgo(post.createdAt)}
+                    </small>
+
                 </div>
 
             </div>
 
+
             ${
                 post.text
-                ? `<div class="post-text">${escapeHtml(post.text)}</div>`
+                ? `
+                    <div class="post-content">
+                        ${escapeHtml(post.text)}
+                    </div>
+                `
                 : ""
             }
 
+
             ${
                 post.image
-                ? `<img class="post-image" src="${post.image}" alt="post image">`
+                ? `
+                    <img
+                        class="post-image"
+                        src="${post.image}"
+                        alt=""
+                    >
+                `
                 : ""
             }
+
 
             <div class="post-actions">
 
                 <button
-                    class="like ${liked ? "active" : ""}"
+                    class="action-btn ${liked ? "liked" : ""}"
                     onclick="toggleLike('${post.id}')"
                 >
-                    ${liked ? "💗" : "♡"} ${post.likes.length}
+                    ${liked ? "♥" : "♡"}
+                    ${post.likes?.length || 0}
                 </button>
 
-                <button onclick="focusComment('${post.id}')">
+
+                <button
+                    class="action-btn"
+                    onclick="focusComment('${post.id}')"
+                >
                     💬 ${comments.length}
                 </button>
 
-                <button onclick="openProfileFromPost('${post.authorId}')">
-                    👤 Профиль
+
+                <button
+                    class="action-btn"
+                    onclick="sharePost('${post.id}')"
+                >
+                    ↗ Поделиться
                 </button>
+
 
                 ${
                     post.authorId === currentUserId
-                    ? `<button onclick="deletePost('${post.id}')">🗑️</button>`
+                    ? `
+                        <button
+                            class="action-btn"
+                            onclick="deletePost('${post.id}')"
+                        >
+                            🗑️
+                        </button>
+                    `
                     : ""
                 }
 
             </div>
 
-            <div class="comments">
+
+            <div class="comment-list">
 
                 ${
-                    comments.map(c => {
+                    comments
+                    .map(comment => {
 
-                        const user = getUser(c.userId);
+                        const user =
+                            getUser(comment.authorId);
 
                         return `
                             <div class="comment">
-                                <b>@${escapeHtml(user?.username || "user")}</b>
-                                ${escapeHtml(c.text)}
+
+                                <strong>
+                                    ${escapeHtml(
+                                        user?.displayName ||
+                                        "Пользователь"
+                                    )}
+                                </strong>
+
+                                ${escapeHtml(comment.text)}
+
                             </div>
                         `;
 
-                    }).join("")
+                    })
+                    .join("")
                 }
 
-                <div class="comment-form">
+
+                <div
+                    style="
+                        display:flex;
+                        gap:7px;
+                        margin-top:8px;
+                    "
+                >
 
                     <input
                         id="comment-${post.id}"
                         placeholder="Написать комментарий..."
                         maxlength="300"
-                        onkeydown="if(event.key==='Enter') addComment('${post.id}')"
                     >
 
-                    <button onclick="addComment('${post.id}')">➤</button>
+                    <button
+                        class="primary"
+                        onclick="addComment('${post.id}')"
+                    >
+                        →
+                    </button>
 
                 </div>
 
             </div>
 
         </article>
+
     `;
+
 }
 
 
-function toggleLike(postId) {
+async function createPost(){
 
-    const post = db.posts.find(p => p.id === postId);
+    const text =
+        document
+        .getElementById("postText")
+        .value
+        .trim();
 
-    if (!post) return;
+    const file =
+        document
+        .getElementById("postImage")
+        .files[0];
 
-    if (post.likes.includes(currentUserId)) {
-        post.likes = post.likes.filter(id => id !== currentUserId);
-    } else {
-        post.likes.push(currentUserId);
+
+    if(!text && !file){
+
+        toast("Добавь текст или изображение.");
+
+        return;
+
     }
 
-    saveDB();
-    renderFeed();
-}
+
+    let image = "";
+
+    if(file){
+
+        if(!file.type.startsWith("image/")){
+
+            toast("Можно загружать только изображения.");
+
+            return;
+
+        }
+
+        if(file.size > 8 * 1024 * 1024){
+
+            toast("Изображение слишком большое. Максимум 8 МБ.");
+
+            return;
+
+        }
+
+        image =
+            await fileToDataURL(file);
+
+    }
 
 
-function addComment(postId) {
+    db.posts.push({
 
-    const input = document.getElementById("comment-" + postId);
+        id:uid("post"),
 
-    if (!input) return;
+        authorId:currentUserId,
 
-    const text = input.value.trim();
-
-    if (!text) return;
-
-    const post = db.posts.find(p => p.id === postId);
-
-    if (!post) return;
-
-    post.comments.push({
-        id: uid("comment"),
-        userId: currentUserId,
         text,
-        createdAt: Date.now()
+
+        image,
+
+        likes:[],
+
+        createdAt:Date.now()
+
     });
 
+
     saveDB();
+
+    toast("Пост опубликован!");
+
     renderFeed();
+
 }
 
 
-function focusComment(postId) {
+function toggleLike(postId){
 
-    const input = document.getElementById("comment-" + postId);
+    const post =
+        db.posts.find(
+            p => p.id === postId
+        );
 
-    if (input) {
-        input.focus();
-        input.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
+    if(!post) return;
+
+
+    if(!post.likes)
+        post.likes = [];
+
+
+    const index =
+        post.likes.indexOf(
+            currentUserId
+        );
+
+
+    if(index >= 0){
+
+        post.likes.splice(index,1);
+
+    }else{
+
+        post.likes.push(
+            currentUserId
+        );
+
     }
-}
 
-
-function deletePost(id) {
-
-    if (!confirm("Удалить этот пост?")) return;
-
-    db.posts = db.posts.filter(p => p.id !== id);
 
     saveDB();
+
     renderFeed();
 
-    toast("Пост удалён.");
 }
 
 
-function openProfileFromPost(id) {
-    renderProfile(id);
+function addComment(postId){
+
+    const input =
+        document.getElementById(
+            "comment-" + postId
+        );
+
+
+    if(!input) return;
+
+
+    const text =
+        input.value.trim();
+
+
+    if(!text) return;
+
+
+    db.comments.push({
+
+        id:uid("comment"),
+
+        postId,
+
+        authorId:currentUserId,
+
+        text,
+
+        createdAt:Date.now()
+
+    });
+
+
+    saveDB();
+
+    renderFeed();
+
+}
+
+
+function focusComment(postId){
+
+    const input =
+        document.getElementById(
+            "comment-" + postId
+        );
+
+    if(input){
+
+        input.focus();
+
+        input.scrollIntoView({
+            behavior:"smooth",
+            block:"center"
+        });
+
+    }
+
+}
+
+
+async function sharePost(postId){
+
+    const post =
+        db.posts.find(
+            p => p.id === postId
+        );
+
+    if(!post) return;
+
+
+    const author =
+        getUser(post.authorId);
+
+
+    const text =
+        `Пост ${author?.displayName || ""} в bubbles`;
+
+
+    if(
+        navigator.share
+    ){
+
+        try{
+
+            await navigator.share({
+                title:"bubbles",
+                text
+            });
+
+        }catch{}
+
+    }else{
+
+        try{
+
+            await navigator.clipboard.writeText(
+                location.href
+            );
+
+            toast("Ссылка скопирована.");
+
+        }catch{
+
+            toast("Не удалось скопировать ссылку.");
+
+        }
+
+    }
+
+}
+
+
+function deletePost(postId){
+
+    const post =
+        db.posts.find(
+            p => p.id === postId
+        );
+
+
+    if(!post || post.authorId !== currentUserId)
+        return;
+
+
+    if(!confirm("Удалить пост?"))
+        return;
+
+
+    db.posts =
+        db.posts.filter(
+            p => p.id !== postId
+        );
+
+
+    db.comments =
+        db.comments.filter(
+            c => c.postId !== postId
+        );
+
+
+    saveDB();
+
+    renderFeed();
+
 }
 
 
@@ -1609,100 +2518,156 @@ function openProfileFromPost(id) {
    PROFILE
    ============================================================ */
 
-function renderProfile(userId) {
+function renderProfile(userId){
 
-    currentPage = "profile";
+    const user =
+        getUser(userId);
 
-    const user = getUser(userId);
 
-    if (!user) return;
+    if(!user){
 
-    const own = user.id === currentUserId;
+        navigate("feed");
 
-    const posts = db.posts
-        .filter(p => p.authorId === user.id)
-        .sort((a,b) => b.createdAt - a.createdAt);
+        return;
 
-    const userMusic = db.music
-        .filter(m => m.authorId === user.id)
-        .sort((a,b) => b.createdAt - a.createdAt);
+    }
 
-    const friend = getCurrentUser()?.friends?.includes(user.id);
 
-    const incoming = user.friendRequests?.includes(currentUserId);
+    const posts =
+        db.posts
+        .filter(
+            p => p.authorId === user.id
+        )
+        .sort(
+            (a,b) =>
+                b.createdAt-a.createdAt
+        );
 
-    const coverStyle = user.cover
-        ? `background-image:url("${user.cover}")`
-        : "";
+
+    const friends =
+        db.friends
+        .filter(
+            f =>
+                f.user1 === user.id ||
+                f.user2 === user.id
+        );
+
+
+    const music =
+        db.music
+        .filter(
+            m => m.authorId === user.id
+        );
+
+
+    const isMe =
+        user.id === currentUserId;
+
+
+    const friend =
+        isFriend(user.id);
+
 
     document.getElementById("page").innerHTML = `
 
-        <div class="profile-card">
+        <div class="card" style="padding:0;">
 
-            <div class="profile-cover" style="${coverStyle}"></div>
+            <div
+                class="cover"
+                style="
+                    ${
+                        user.cover
+                        ? `background-image:url('${user.cover}')`
+                        : ""
+                    }
+                "
+            ></div>
 
-            <div class="profile-info">
+
+            <div class="profile-main">
 
                 <img
-                    class="profile-big-avatar"
-                    src="${user.avatar || defaultAvatar(user.displayName)}"
-                    alt=""
+                    class="profile-avatar"
+                    src="${user.avatar || defaultAvatar()}"
                 >
 
-                <div class="profile-name">
-                    ${escapeHtml(user.displayName)}
-                </div>
 
-                <div class="profile-username">
-                    @${escapeHtml(user.username)}
-                </div>
+                <div class="profile-info">
 
-                <div class="profile-bio">
-                    ${escapeHtml(user.bio || "Этот пользователь пока ничего о себе не написал.")}
-                </div>
+                    <div class="profile-name">
 
-                <div class="profile-stats">
+                        <h1>
+                            ${escapeHtml(user.displayName)}
+                        </h1>
 
-                    <div class="stat">
-                        <b>${user.friends?.length || 0}</b>
-                        <span>друзей</span>
+                        <div class="username">
+                            @${escapeHtml(user.username)}
+                        </div>
+
                     </div>
 
+
+                    <div class="profile-actions">
+
+                        ${
+                            isMe
+                            ? `
+                                <button
+                                    class="primary"
+                                    onclick="navigate('edit')"
+                                >
+                                    ⚙️ Редактировать
+                                </button>
+                            `
+                            : `
+                                <button
+                                    class="${friend ? "danger" : "secondary"}"
+                                    onclick="toggleFriend('${user.id}')"
+                                >
+                                    ${friend ? "− Удалить из друзей" : "+ Добавить в друзья"}
+                                </button>
+
+                                <button
+                                    class="primary"
+                                    onclick="openChat('${user.id}')"
+                                >
+                                    💬 Написать
+                                </button>
+                            `
+                        }
+
+                    </div>
+
+                </div>
+
+
+                ${
+                    user.bio
+                    ? `
+                        <div class="bio">
+                            ${escapeHtml(user.bio)}
+                        </div>
+                    `
+                    : ""
+                }
+
+
+                <div class="stats">
+
                     <div class="stat">
-                        <b>${posts.length}</b>
+                        <strong>${posts.length}</strong>
                         <span>постов</span>
                     </div>
 
                     <div class="stat">
-                        <b>${userMusic.length}</b>
-                        <span>музыки</span>
+                        <strong>${friends.length}</strong>
+                        <span>друзей</span>
                     </div>
 
-                </div>
-
-                <div class="profile-buttons">
-
-                    ${
-                        own
-                        ? `
-                            <button onclick="openPage('edit')">
-                                ✏️ Редактировать
-                            </button>
-                        `
-                        : `
-                            ${
-                                friend
-                                ? `<button class="green" onclick="removeFriend('${user.id}')">✓ В друзьях</button>`
-                                : incoming
-                                ? `<button class="green" onclick="acceptFriend('${user.id}')">✓ Принять заявку</button>`
-                                : `<button class="primary" style="width:auto" onclick="sendFriendRequest('${user.id}')">＋ Добавить в друзья</button>`
-                            }
-
-                            <button onclick="openChat('${user.id}')">
-                                💌 Написать
-                            </button>
-                        `
-                    }
+                    <div class="stat">
+                        <strong>${music.length}</strong>
+                        <span>треков</span>
+                    </div>
 
                 </div>
 
@@ -1711,357 +2676,95 @@ function renderProfile(userId) {
         </div>
 
 
-        ${
-            userMusic.length
-            ? `
-                <h2 class="section-title" style="margin-top:25px;">
-                    🎵 Музыка
-                </h2>
+        <h2 class="section-title">
+            🎵 Музыка
+        </h2>
 
-                ${userMusic.map(renderMusicCard).join("")}
-            `
-            : ""
+
+        ${
+            music.length
+            ? music.map(musicProfileCard).join("")
+            : emptyState(
+                "🎵",
+                "Здесь пока нет музыки",
+                isMe
+                ? "Опубликуй первый трек во вкладке «Музыка»."
+                : "Пользователь ещё ничего не публиковал."
+            )
         }
 
 
-        <h2 class="section-title" style="margin-top:25px;">
-            📰 Посты
+        <h2 class="section-title">
+            🫂 Друзья
         </h2>
+
+
+        ${
+            friends.length
+            ? `
+                <div class="friend-grid">
+
+                    ${
+                        friends
+                        .map(f => {
+
+                            const id =
+                                f.user1 === user.id
+                                ? f.user2
+                                : f.user1;
+
+                            const friendUser =
+                                getUser(id);
+
+                            if(!friendUser)
+                                return "";
+
+                            return friendCard(
+                                friendUser
+                            );
+
+                        })
+                        .join("")
+                    }
+
+                </div>
+            `
+            : emptyState(
+                "🫂",
+                "Друзей пока нет",
+                "Здесь появятся друзья пользователя."
+            )
+        }
+
+
+        <h2 class="section-title">
+            📝 Посты
+        </h2>
+
 
         ${
             posts.length
             ? posts.map(renderPost).join("")
-            : emptyState("🌊", "Пока нет постов", "Здесь появятся публикации пользователя.")
+            : emptyState(
+                "🫧",
+                "Постов пока нет",
+                "Здесь появятся публикации пользователя."
+            )
         }
 
     `;
 
-    document.querySelectorAll(".nav-btn").forEach(btn => {
-        btn.classList.toggle("active", btn.dataset.page === "profile");
-    });
 }
 
 
-/* ============================================================
-   FRIENDS
-   ============================================================ */
+function musicProfileCard(music){
 
-function sendFriendRequest(userId) {
+    const author =
+        getUser(music.authorId);
 
-    const target = getUser(userId);
-    const me = getCurrentUser();
-
-    if (!target || !me || userId === currentUserId) return;
-
-    if (!target.friendRequests) target.friendRequests = [];
-
-    if (!target.friendRequests.includes(currentUserId)) {
-        target.friendRequests.push(currentUserId);
-    }
-
-    saveDB();
-
-    renderProfile(userId);
-
-    toast("Заявка отправлена 👥");
-}
-
-
-function acceptFriend(userId) {
-
-    const me = getCurrentUser();
-    const other = getUser(userId);
-
-    if (!me || !other) return;
-
-    if (!me.friends) me.friends = [];
-    if (!other.friends) other.friends = [];
-
-    if (!me.friends.includes(userId)) me.friends.push(userId);
-    if (!other.friends.includes(currentUserId)) other.friends.push(currentUserId);
-
-    me.friendRequests = (me.friendRequests || [])
-        .filter(id => id !== userId);
-
-    saveDB();
-
-    renderProfile(userId);
-
-    toast("Теперь вы друзья 🫧");
-}
-
-
-function removeFriend(userId) {
-
-    const me = getCurrentUser();
-    const other = getUser(userId);
-
-    if (!me || !other) return;
-
-    me.friends = (me.friends || []).filter(id => id !== userId);
-    other.friends = (other.friends || []).filter(id => id !== currentUserId);
-
-    saveDB();
-
-    renderProfile(userId);
-
-    toast("Пользователь удалён из друзей.");
-}
-
-
-function renderFriends() {
-
-    const me = getCurrentUser();
-
-    const friends = (me.friends || [])
-        .map(getUser)
-        .filter(Boolean);
-
-    const requests = (me.friendRequests || [])
-        .map(getUser)
-        .filter(Boolean);
-
-    const others = db.users
-        .filter(u => u.id !== currentUserId)
-        .filter(u => !friends.some(f => f.id === u.id))
-        .slice(0, 12);
-
-    document.getElementById("page").innerHTML = `
-
-        <h1 class="section-title">👥 Друзья</h1>
-
-        ${
-            requests.length
-            ? `
-                <div class="card">
-
-                    <h3 style="margin-top:0;">
-                        Новые заявки
-                    </h3>
-
-                    <div class="user-list">
-                        ${requests.map(u => renderUserCard(u, true)).join("")}
-                    </div>
-
-                </div>
-            `
-            : ""
-        }
-
-        <div class="card">
-
-            <h3 style="margin-top:0;">
-                Мои друзья · ${friends.length}
-            </h3>
-
-            ${
-                friends.length
-                ? `<div class="user-list">${friends.map(u => renderUserCard(u)).join("")}</div>`
-                : emptyState("👥", "Пока нет друзей", "Найди кого-нибудь через поиск.")
-            }
-
-        </div>
-
-        <div class="card">
-
-            <h3 style="margin-top:0;">
-                Люди в bubbles
-            </h3>
-
-            ${
-                others.length
-                ? `<div class="user-list">${others.map(u => renderUserCard(u)).join("")}</div>`
-                : emptyState("🫧", "Пока никого нет", "")
-            }
-
-        </div>
-
-    `;
-}
-
-
-function renderUserCard(user, request = false) {
-
-    const me = getCurrentUser();
-
-    const isFriend = me?.friends?.includes(user.id);
 
     return `
-        <div class="user-card">
 
-            <img
-                src="${user.avatar || defaultAvatar(user.displayName)}"
-                onclick="renderProfile('${user.id}')"
-            >
-
-            <div class="user-card-info">
-
-                <div
-                    class="user-card-name"
-                    onclick="renderProfile('${user.id}')"
-                    style="cursor:pointer;"
-                >
-                    ${escapeHtml(user.displayName)}
-                </div>
-
-                <div class="user-card-username">
-                    @${escapeHtml(user.username)}
-                </div>
-
-                <div style="margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;">
-
-                    ${
-                        request
-                        ? `<button class="green" onclick="acceptFriend('${user.id}')">Принять</button>`
-                        : isFriend
-                        ? `<button onclick="removeFriend('${user.id}')">Удалить</button>`
-                        : `<button onclick="sendFriendRequest('${user.id}')">＋ Дружба</button>`
-                    }
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-}
-
-
-/* ============================================================
-   MUSIC
-   ============================================================ */
-
-function renderMusic() {
-
-    const music = [...db.music]
-        .sort((a,b) => b.createdAt - a.createdAt);
-
-    document.getElementById("page").innerHTML = `
-
-        <h1 class="section-title">🎵 Вся музыка</h1>
-
-        <div class="card">
-
-            <h3 style="margin-top:0;">Добавить музыку</h3>
-
-            <input
-                id="musicTitle"
-                placeholder="Название трека"
-                maxlength="70"
-            >
-
-            <input
-                id="musicCover"
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-            >
-
-            <input
-                id="musicFile"
-                type="file"
-                accept=".mp3,audio/mpeg"
-            >
-
-            <button class="primary" style="width:auto;" onclick="uploadMusic()">
-                🎵 Опубликовать MP3
-            </button>
-
-            <p style="font-size:12px;color:#7899a7;margin-bottom:0;">
-                Поддерживается именно MP3. Видео и другие файлы не принимаются.
-            </p>
-
-        </div>
-
-        <div id="musicList">
-
-            ${
-                music.length
-                ? music.map(renderMusicCard).join("")
-                : emptyState("🎵", "Музыки пока нет", "Загрузи первый трек в bubbles.")
-            }
-
-        </div>
-
-    `;
-}
-
-
-function uploadMusic() {
-
-    const title = document.getElementById("musicTitle").value.trim();
-    const audioFile = document.getElementById("musicFile").files[0];
-    const coverFile = document.getElementById("musicCover").files[0];
-
-    if (!title) {
-        toast("Укажи название трека.");
-        return;
-    }
-
-    if (!audioFile) {
-        toast("Выбери MP3-файл.");
-        return;
-    }
-
-    const isMP3 =
-        audioFile.type === "audio/mpeg" ||
-        audioFile.name.toLowerCase().endsWith(".mp3");
-
-    if (!isMP3) {
-        toast("Можно загружать только MP3.");
-        return;
-    }
-
-    const readFile = (file) => {
-
-        return new Promise((resolve, reject) => {
-
-            if (!file) {
-                resolve("");
-                return;
-            }
-
-            const reader = new FileReader();
-
-            reader.onload = e => resolve(e.target.result);
-            reader.onerror = reject;
-
-            reader.readAsDataURL(file);
-        });
-    };
-
-
-    Promise.all([
-        readFile(audioFile),
-        readFile(coverFile)
-    ])
-    .then(([audio, cover]) => {
-
-        db.music.push({
-            id: uid("music"),
-            authorId: currentUserId,
-            title,
-            audio,
-            cover: cover || "",
-            createdAt: Date.now()
-        });
-
-        saveDB();
-
-        openPage("music");
-
-        toast("Трек опубликован 🎵");
-    })
-    .catch(() => {
-        toast("Не удалось прочитать файл.");
-    });
-}
-
-
-function renderMusicCard(music) {
-
-    const author = getUser(music.authorId);
-
-    return `
         <div class="music-card">
 
             <div class="music-row">
@@ -2069,7 +2772,6 @@ function renderMusicCard(music) {
                 <img
                     class="music-cover"
                     src="${music.cover || defaultMusicCover()}"
-                    alt=""
                 >
 
                 <div class="music-info">
@@ -2079,295 +2781,442 @@ function renderMusicCard(music) {
                     </div>
 
                     <div class="music-artist">
-                        ${escapeHtml(author?.displayName || "Unknown")}
-                        · @${escapeHtml(author?.username || "unknown")}
+                        @${escapeHtml(
+                            author?.username || "unknown"
+                        )}
                     </div>
 
                 </div>
 
-                ${
-                    music.authorId === currentUserId
-                    ? `<button onclick="deleteMusic('${music.id}')">🗑️</button>`
-                    : ""
-                }
+
+                <button
+                    onclick="playMusic('${music.id}')"
+                >
+                    ▶️
+                </button>
 
             </div>
 
-            <audio controls preload="metadata" src="${music.audio}"></audio>
-
         </div>
+
     `;
-}
 
-
-function defaultMusicCover() {
-
-    const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
-        <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                <stop stop-color="#69d9f8"/>
-                <stop offset=".5" stop-color="#b5f1df"/>
-                <stop offset="1" stop-color="#f2a9d2"/>
-            </linearGradient>
-        </defs>
-        <rect width="400" height="400" rx="40" fill="url(#g)"/>
-        <circle cx="130" cy="120" r="60" fill="white" opacity=".35"/>
-        <text x="200" y="245"
-              text-anchor="middle"
-              font-size="130">♪</text>
-    </svg>`;
-
-    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
-}
-
-
-function deleteMusic(id) {
-
-    if (!confirm("Удалить этот трек?")) return;
-
-    db.music = db.music.filter(m => m.id !== id);
-
-    saveDB();
-
-    openPage("music");
-
-    toast("Трек удалён.");
 }
 
 
 /* ============================================================
-   EDIT PROFILE
+   PROFILE EDIT
    ============================================================ */
 
-function renderEditProfile() {
+function renderEditProfile(){
 
-    const user = getCurrentUser();
+    const user =
+        getCurrentUser();
+
 
     document.getElementById("page").innerHTML = `
 
-        <h1 class="section-title">⚙️ Настройки профиля</h1>
-
-        <div class="card">
-
-            <h3 style="margin-top:0;">Основная информация</h3>
-
-            <label>Username</label>
-            <input
-                id="editUsername"
-                value="${escapeAttr(user.username)}"
-                maxlength="25"
-            >
-
-            <label>Имя</label>
-            <input
-                id="editDisplayName"
-                value="${escapeAttr(user.displayName)}"
-                maxlength="35"
-            >
-
-            <label>Описание</label>
-            <textarea
-                id="editBio"
-                maxlength="160"
-                placeholder="Расскажи о себе..."
-            >${escapeHtml(user.bio || "")}</textarea>
-
-            <label>Пол</label>
-            <select id="editGender">
-                <option value="male" ${user.gender === "male" ? "selected" : ""}>Мужской</option>
-                <option value="female" ${user.gender === "female" ? "selected" : ""}>Женский</option>
-            </select>
-
-        </div>
+        <h1 class="section-title">
+            ⚙️ Настройки профиля
+        </h1>
 
 
         <div class="card">
 
-            <h3 style="margin-top:0;">🖼️ Аватар</h3>
+            <div class="edit-preview">
 
-            <img
-                id="avatarPreview"
-                class="file-preview"
-                style="
-                    width:140px;
-                    height:140px;
-                    border-radius:50%;
-                    margin:auto;
-                    object-fit:cover;
-                "
-                src="${user.avatar}"
+                <img
+                    id="editAvatarPreview"
+                    src="${user.avatar || defaultAvatar()}"
+                >
+
+                <div>
+
+                    <strong>
+                        Фото профиля
+                    </strong>
+
+                    <div style="
+                        color:#7b9ca9;
+                        font-size:12px;
+                        margin-top:4px;
+                    ">
+                        PNG, JPG или WEBP
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Аватар</label>
+
+                <input
+                    id="editAvatar"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onchange="previewAvatar(this)"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Обложка профиля</label>
+
+                <input
+                    id="editCover"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Юзернейм</label>
+
+                <input
+                    id="editUsername"
+                    maxlength="25"
+                    value="${escapeHtml(user.username)}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Имя</label>
+
+                <input
+                    id="editName"
+                    maxlength="40"
+                    value="${escapeHtml(user.displayName)}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Описание</label>
+
+                <textarea
+                    id="editBio"
+                    maxlength="500"
+                    placeholder="Расскажи немного о себе..."
+                >${escapeHtml(user.bio || "")}</textarea>
+
+            </div>
+
+
+            <button
+                class="primary"
+                onclick="saveProfile()"
             >
-
-            <input
-                id="avatarFile"
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-            >
-
-            <p style="font-size:12px;color:#7899a7;">
-                PNG, JPG или WebP.
-            </p>
+                💾 Сохранить изменения
+            </button>
 
         </div>
-
-
-        <div class="card">
-
-            <h3 style="margin-top:0;">🌅 Обложка профиля</h3>
-
-            <img
-                id="coverPreview"
-                class="file-preview"
-                src="${user.cover || ""}"
-                style="${user.cover ? "display:block;" : ""}"
-            >
-
-            <input
-                id="coverFile"
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-            >
-
-        </div>
-
-
-        <button
-            class="primary"
-            style="width:auto;"
-            onclick="saveProfileChanges()"
-        >
-            💾 Сохранить изменения
-        </button>
 
     `;
 
-
-    document.getElementById("avatarFile").addEventListener("change", function() {
-
-        const file = this.files[0];
-
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            toast("Выбери изображение.");
-            this.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = e => {
-            document.getElementById("avatarPreview").src = e.target.result;
-            document.getElementById("avatarPreview").style.display = "block";
-        };
-
-        reader.readAsDataURL(file);
-    });
-
-
-    document.getElementById("coverFile").addEventListener("change", function() {
-
-        const file = this.files[0];
-
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-            toast("Выбери изображение.");
-            this.value = "";
-            return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = e => {
-            document.getElementById("coverPreview").src = e.target.result;
-            document.getElementById("coverPreview").style.display = "block";
-        };
-
-        reader.readAsDataURL(file);
-    });
 }
 
 
-function saveProfileChanges() {
+function previewAvatar(input){
 
-    const user = getCurrentUser();
+    const file =
+        input.files[0];
 
-    const username = document
+    if(!file) return;
+
+
+    if(!file.type.startsWith("image/")){
+
+        toast("Выбери изображение.");
+
+        input.value = "";
+
+        return;
+
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload = e => {
+
+        document
+            .getElementById("editAvatarPreview")
+            .src = e.target.result;
+
+    };
+
+
+    reader.readAsDataURL(file);
+
+}
+
+
+async function saveProfile(){
+
+    const user =
+        getCurrentUser();
+
+
+    const username =
+        document
         .getElementById("editUsername")
         .value
         .trim()
         .toLowerCase();
 
-    const displayName = document
-        .getElementById("editDisplayName")
+
+    const displayName =
+        document
+        .getElementById("editName")
         .value
         .trim();
 
-    const bio = document
+
+    const bio =
+        document
         .getElementById("editBio")
         .value
         .trim();
 
-    const gender = document
-        .getElementById("editGender")
-        .value;
 
-    if (!/^[a-zA-Z0-9_.-]{3,25}$/.test(username)) {
-        toast("Некорректный username.");
+    if(!username || !displayName){
+
+        toast("Заполни имя и юзернейм.");
+
         return;
+
     }
 
-    const duplicate = db.users.find(
-        u => u.username === username && u.id !== user.id
-    );
 
-    if (duplicate) {
-        toast("Такой username уже занят.");
+    const taken =
+        db.users.some(
+            u =>
+                u.id !== user.id &&
+                u.username === username
+        );
+
+
+    if(taken){
+
+        toast("Этот юзернейм уже занят.");
+
         return;
+
     }
 
-    user.username = username;
-    user.displayName = displayName || username;
-    user.bio = bio;
-    user.gender = gender;
 
-    const avatarFile = document.getElementById("avatarFile").files[0];
-    const coverFile = document.getElementById("coverFile").files[0];
+    const avatarFile =
+        document
+        .getElementById("editAvatar")
+        .files[0];
 
-    const read = file => new Promise((resolve, reject) => {
 
-        if (!file) {
-            resolve(null);
+    const coverFile =
+        document
+        .getElementById("editCover")
+        .files[0];
+
+
+    if(avatarFile){
+
+        if(avatarFile.size > 5 * 1024 * 1024){
+
+            toast("Аватар слишком большой. Максимум 5 МБ.");
+
             return;
+
         }
 
-        const reader = new FileReader();
+        user.avatar =
+            await fileToDataURL(avatarFile);
 
-        reader.onload = e => resolve(e.target.result);
-        reader.onerror = reject;
-
-        reader.readAsDataURL(file);
-    });
+    }
 
 
-    Promise.all([
-        read(avatarFile),
-        read(coverFile)
-    ])
-    .then(([avatar, cover]) => {
+    if(coverFile){
 
-        if (avatar) user.avatar = avatar;
-        if (cover) user.cover = cover;
+        if(coverFile.size > 8 * 1024 * 1024){
 
-        saveDB();
-        updateTopbar();
+            toast("Обложка слишком большая. Максимум 8 МБ.");
 
-        renderProfile(user.id);
+            return;
 
-        toast("Профиль сохранён 🫧");
-    });
+        }
+
+        user.cover =
+            await fileToDataURL(coverFile);
+
+    }
+
+
+    user.username =
+        username;
+
+    user.displayName =
+        displayName;
+
+    user.bio =
+        bio;
+
+
+    saveDB();
+
+    toast("Профиль обновлён.");
+
+    renderApp();
+
+}
+
+
+/* ============================================================
+   FRIENDS
+   ============================================================ */
+
+function renderFriends(){
+
+    const friends =
+        db.friends
+        .filter(
+            f =>
+                f.user1 === currentUserId ||
+                f.user2 === currentUserId
+        );
+
+
+    const users =
+        friends
+        .map(f =>
+            getUser(
+                f.user1 === currentUserId
+                ? f.user2
+                : f.user1
+            )
+        )
+        .filter(Boolean);
+
+
+    document.getElementById("page").innerHTML = `
+
+        <h1 class="section-title">
+            🫂 Друзья
+        </h1>
+
+
+        ${
+            users.length
+            ? `
+                <div class="friend-grid">
+
+                    ${users.map(friendCard).join("")}
+
+                </div>
+            `
+            : emptyState(
+                "🌱",
+                "Пока нет друзей",
+                "Найди пользователей и добавь их в друзья."
+            )
+        }
+
+    `;
+
+}
+
+
+function friendCard(user){
+
+    return `
+
+        <div class="friend-card">
+
+            <img
+                src="${user.avatar || defaultAvatar()}"
+                onclick="navigate('profile','${user.id}')"
+                style="cursor:pointer"
+            >
+
+            <h4>
+                ${escapeHtml(user.displayName)}
+            </h4>
+
+            <p>
+                @${escapeHtml(user.username)}
+            </p>
+
+
+            <button
+                class="primary"
+                style="width:100%;"
+                onclick="navigate('profile','${user.id}')"
+            >
+                Открыть
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+function toggleFriend(userId){
+
+    if(userId === currentUserId)
+        return;
+
+
+    const index =
+        db.friends.findIndex(
+            f =>
+                (f.user1 === currentUserId && f.user2 === userId) ||
+                (f.user2 === currentUserId && f.user1 === userId)
+        );
+
+
+    if(index >= 0){
+
+        db.friends.splice(index,1);
+
+        toast("Пользователь удалён из друзей.");
+
+    }else{
+
+        db.friends.push({
+
+            id:uid("friend"),
+
+            user1:currentUserId,
+
+            user2:userId,
+
+            createdAt:Date.now()
+
+        });
+
+        toast("Пользователь добавлен в друзья.");
+
+    }
+
+
+    saveDB();
+
+    renderProfile(userId);
+
 }
 
 
@@ -2375,56 +3224,90 @@ function saveProfileChanges() {
    MESSAGES
    ============================================================ */
 
-function openChat(userId) {
+function openChat(userId){
 
-    selectedChatUser = userId;
+    selectedChatId =
+        userId;
 
-    openPage("messages");
+    currentPage =
+        "messages";
+
+    renderMessages();
+
 }
 
 
-function renderMessages() {
+function renderMessages(){
 
-    const me = getCurrentUser();
-
-    const otherUsers = db.users
-        .filter(u => u.id !== currentUserId)
-        .filter(u =>
-            db.messages.some(m =>
-                (m.from === currentUserId && m.to === u.id) ||
-                (m.from === u.id && m.to === currentUserId)
-            )
+    const friends =
+        db.friends
+        .filter(
+            f =>
+                f.user1 === currentUserId ||
+                f.user2 === currentUserId
         );
 
-    if (!selectedChatUser && otherUsers.length) {
-        selectedChatUser = otherUsers[0].id;
+
+    const users =
+        friends
+        .map(
+            f =>
+                getUser(
+                    f.user1 === currentUserId
+                    ? f.user2
+                    : f.user1
+                )
+        )
+        .filter(Boolean);
+
+
+    if(
+        !selectedChatId &&
+        users.length
+    ){
+
+        selectedChatId =
+            users[0].id;
+
     }
+
 
     document.getElementById("page").innerHTML = `
 
-        <h1 class="section-title">💌 Сообщения</h1>
+        <h1 class="section-title">
+            💬 Сообщения
+        </h1>
 
-        <div class="messages-layout card" style="padding:0;">
 
-            <div class="conversations">
+        <div class="card messages-layout">
+
+            <div class="conversation-list">
 
                 ${
-                    otherUsers.length
-                    ? otherUsers.map(renderConversation).join("")
-                    : emptyState("💌", "Пока нет сообщений", "Открой профиль пользователя и нажми «Написать».")
+                    users.length
+                    ? users.map(renderConversation).join("")
+                    : `
+                        <div class="empty">
+                            Нет друзей для переписки.
+                        </div>
+                    `
                 }
 
             </div>
 
+
             <div class="chat">
 
                 ${
-                    selectedChatUser
-                    ? renderChat(selectedChatUser)
+                    selectedChatId
+                    ? renderChat(selectedChatId)
                     : `
-                        <div class="empty" style="margin:auto;">
-                            <div class="empty-icon">🫧</div>
-                            Выбери собеседника
+                        <div class="empty">
+                            <div class="empty-icon">
+                                💬
+                            </div>
+
+                            Выбери друга.
                         </div>
                     `
                 }
@@ -2435,129 +3318,858 @@ function renderMessages() {
 
     `;
 
-    const chatMessages = document.getElementById("chatMessages");
-
-    if (chatMessages) {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
 }
 
 
-function renderConversation(user) {
+function renderConversation(user){
+
+    const messages =
+        db.messages
+        .filter(
+            m =>
+                (m.from === currentUserId &&
+                 m.to === user.id) ||
+                (m.from === user.id &&
+                 m.to === currentUserId)
+        )
+        .sort(
+            (a,b) =>
+                b.createdAt-a.createdAt
+        );
+
+
+    const last =
+        messages[0];
+
 
     return `
+
         <div
-            class="conversation ${selectedChatUser === user.id ? "active" : ""}"
+            class="conversation ${selectedChatId === user.id ? "active" : ""}"
             onclick="openChat('${user.id}')"
         >
 
-            <img src="${user.avatar || defaultAvatar(user.displayName)}">
+            <img
+                class="mini-avatar"
+                src="${user.avatar || defaultAvatar()}"
+            >
 
-            <div style="min-width:0;">
+            <div class="conversation-info">
 
-                <b style="overflow-wrap:anywhere;">
+                <strong>
                     ${escapeHtml(user.displayName)}
-                </b>
+                </strong>
 
-                <div
-                    style="
-                        font-size:12px;
-                        color:#759aaa;
-                        overflow:hidden;
-                        text-overflow:ellipsis;
-                    "
-                >
-                    @${escapeHtml(user.username)}
-                </div>
+                <small>
+                    ${
+                        last
+                        ? escapeHtml(last.text)
+                        : "Нет сообщений"
+                    }
+                </small>
 
             </div>
 
         </div>
+
     `;
+
 }
 
 
-function renderChat(userId) {
+function renderChat(userId){
 
-    const user = getUser(userId);
+    const user =
+        getUser(userId);
 
-    if (!user) return "";
 
-    const messages = db.messages
-        .filter(m =>
-            (m.from === currentUserId && m.to === userId) ||
-            (m.from === userId && m.to === currentUserId)
+    const messages =
+        db.messages
+        .filter(
+            m =>
+                (m.from === currentUserId &&
+                 m.to === userId) ||
+                (m.from === userId &&
+                 m.to === currentUserId)
         )
-        .sort((a,b) => a.createdAt - b.createdAt);
+        .sort(
+            (a,b) =>
+                a.createdAt-b.createdAt
+        );
+
 
     return `
 
         <div class="chat-header">
-            💬 ${escapeHtml(user.displayName)}
+
+            <img
+                class="mini-avatar"
+                src="${user.avatar || defaultAvatar()}"
+                style="width:30px;height:30px;vertical-align:middle;"
+            >
+
+            ${escapeHtml(user.displayName)}
+
         </div>
 
-        <div class="chat-messages" id="chatMessages">
+
+        <div
+            class="chat-messages"
+            id="chatMessages"
+        >
 
             ${
                 messages.length
-                ? messages.map(m => `
-                    <div class="message ${m.from === currentUserId ? "mine" : ""}">
-                        ${escapeHtml(m.text)}
-                    </div>
-                `).join("")
+                ? messages.map(messageBubble).join("")
                 : `
                     <div class="empty">
-                        <div class="empty-icon">🫧</div>
-                        Напиши первое сообщение
+                        Начни переписку.
                     </div>
                 `
             }
 
         </div>
 
-        <form class="chat-form" onsubmit="sendMessage(event, '${userId}')">
+
+        <form
+            class="chat-input"
+            onsubmit="sendMessage(event,'${userId}')"
+        >
 
             <input
                 id="messageInput"
                 maxlength="1000"
-                placeholder="Написать сообщение..."
                 autocomplete="off"
+                placeholder="Написать сообщение..."
                 required
             >
 
-            <button class="primary" style="width:auto;">
-                ➤
+            <button class="primary">
+                Отправить
             </button>
 
         </form>
 
     `;
+
 }
 
 
-function sendMessage(event, userId) {
+function messageBubble(message){
+
+    return `
+
+        <div class="message ${
+            message.from === currentUserId
+            ? "me"
+            : "them"
+        }">
+
+            ${escapeHtml(message.text)}
+
+            <small>
+                ${new Date(message.createdAt)
+                    .toLocaleTimeString(
+                        "ru-RU",
+                        {
+                            hour:"2-digit",
+                            minute:"2-digit"
+                        }
+                    )}
+            </small>
+
+        </div>
+
+    `;
+
+}
+
+
+function sendMessage(event,userId){
 
     event.preventDefault();
 
-    const input = document.getElementById("messageInput");
 
-    const text = input.value.trim();
+    const input =
+        document.getElementById(
+            "messageInput"
+        );
 
-    if (!text) return;
+
+    const text =
+        input.value.trim();
+
+
+    if(!text) return;
+
 
     db.messages.push({
-        id: uid("message"),
-        from: currentUserId,
-        to: userId,
+
+        id:uid("message"),
+
+        from:currentUserId,
+
+        to:userId,
+
         text,
-        createdAt: Date.now()
+
+        createdAt:Date.now()
+
     });
+
 
     saveDB();
 
-    selectedChatUser = userId;
-
     renderMessages();
+
+    setTimeout(()=>{
+
+        const box =
+            document.getElementById(
+                "chatMessages"
+            );
+
+        if(box){
+
+            box.scrollTop =
+                box.scrollHeight;
+
+        }
+
+    },20);
+
+}
+
+
+/* ============================================================
+   MUSIC
+   ============================================================ */
+
+function renderMusic(){
+
+    const music =
+        [...db.music]
+        .sort(
+            (a,b) =>
+                b.createdAt-a.createdAt
+        );
+
+
+    document.getElementById("page").innerHTML = `
+
+        <h1 class="section-title">
+            🎵 Вся музыка
+        </h1>
+
+
+        <div class="card">
+
+            <h3>
+                Опубликовать музыку
+            </h3>
+
+
+            <div class="form-group">
+
+                <label>
+                    Название трека
+                </label>
+
+                <input
+                    id="musicTitle"
+                    maxlength="80"
+                    placeholder="Название"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Обложка
+                </label>
+
+                <input
+                    id="musicCover"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    MP3-файл — максимум 15 МБ
+                </label>
+
+                <input
+                    id="musicFile"
+                    type="file"
+                    accept=".mp3,audio/mpeg"
+                >
+
+            </div>
+
+
+            <button
+                class="primary"
+                onclick="uploadMusic()"
+            >
+                🎵 Опубликовать MP3
+            </button>
+
+            <p style="
+                color:#7899a7;
+                font-size:12px;
+                margin-bottom:0;
+            ">
+                Поддерживается только MP3.
+                Загруженный файл не показывается
+                как количество загрузок.
+            </p>
+
+        </div>
+
+
+        ${
+            music.length
+            ? music.map(renderMusicCard).join("")
+            : emptyState(
+                "🎵",
+                "Музыки пока нет",
+                "Загрузи первый трек."
+            )
+        }
+
+    `;
+
+}
+
+
+function renderMusicCard(music){
+
+    const author =
+        getUser(music.authorId);
+
+
+    return `
+
+        <div
+            class="music-card"
+            id="music-${music.id}"
+        >
+
+            <div class="music-row">
+
+                <img
+                    class="music-cover"
+                    src="${music.cover || defaultMusicCover()}"
+                >
+
+
+                <div class="music-info">
+
+                    <div class="music-title">
+                        ${escapeHtml(music.title)}
+                    </div>
+
+                    <div class="music-artist">
+
+                        @${escapeHtml(
+                            author?.username || "unknown"
+                        )}
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    onclick="playMusic('${music.id}')"
+                    title="Слушать"
+                >
+                    ▶️
+                </button>
+
+
+                ${
+                    music.authorId === currentUserId
+                    ? `
+                        <button
+                            onclick="deleteMusic('${music.id}')"
+                            title="Удалить"
+                        >
+                            🗑️
+                        </button>
+                    `
+                    : ""
+                }
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+async function uploadMusic(){
+
+    const title =
+        document
+        .getElementById("musicTitle")
+        .value
+        .trim();
+
+
+    const audioFile =
+        document
+        .getElementById("musicFile")
+        .files[0];
+
+
+    const coverFile =
+        document
+        .getElementById("musicCover")
+        .files[0];
+
+
+    if(!title){
+
+        toast("Укажи название трека.");
+
+        return;
+
+    }
+
+
+    if(!audioFile){
+
+        toast("Выбери MP3-файл.");
+
+        return;
+
+    }
+
+
+    if(audioFile.size > MAX_MUSIC_SIZE){
+
+        toast("MP3 слишком большой. Максимум — 15 МБ.");
+
+        return;
+
+    }
+
+
+    const isMP3 =
+        audioFile.type === "audio/mpeg" ||
+        audioFile.name
+        .toLowerCase()
+        .endsWith(".mp3");
+
+
+    if(!isMP3){
+
+        toast("Можно загружать только MP3.");
+
+        return;
+
+    }
+
+
+    if(!musicDB){
+
+        try{
+
+            await openMusicDB();
+
+        }catch{
+
+            toast("IndexedDB недоступна.");
+
+            return;
+
+        }
+
+    }
+
+
+    if(coverFile){
+
+        if(!coverFile.type.startsWith("image/")){
+
+            toast("Обложка должна быть изображением.");
+
+            return;
+
+        }
+
+        if(coverFile.size > 5 * 1024 * 1024){
+
+            toast("Обложка слишком большая. Максимум 5 МБ.");
+
+            return;
+
+        }
+
+    }
+
+
+    const musicId =
+        uid("music");
+
+
+    try{
+
+        await saveAudioFile(
+            musicId,
+            audioFile
+        );
+
+
+        let cover = "";
+
+        if(coverFile){
+
+            cover =
+                await fileToDataURL(
+                    coverFile
+                );
+
+        }
+
+
+        db.music.push({
+
+            id:musicId,
+
+            authorId:currentUserId,
+
+            title,
+
+            cover,
+
+            audioId:musicId,
+
+            createdAt:Date.now()
+
+        });
+
+
+        saveDB();
+
+
+        document
+            .getElementById("musicTitle")
+            .value = "";
+
+        document
+            .getElementById("musicFile")
+            .value = "";
+
+        document
+            .getElementById("musicCover")
+            .value = "";
+
+
+        toast("Трек опубликован 🎵");
+
+        renderMusic();
+
+    }catch(error){
+
+        console.error(error);
+
+        try{
+
+            await deleteAudioFile(
+                musicId
+            );
+
+        }catch{}
+
+        toast("Не удалось сохранить MP3.");
+
+    }
+
+}
+
+
+async function playMusic(musicId){
+
+    const music =
+        db.music.find(
+            m => m.id === musicId
+        );
+
+
+    if(!music){
+
+        toast("Трек не найден.");
+
+        return;
+
+    }
+
+
+    const audio =
+        document.getElementById(
+            "globalAudio"
+        );
+
+
+    if(
+        currentlyPlayingMusicId === musicId &&
+        !audio.paused
+    ){
+
+        return;
+
+    }
+
+
+    let url = "";
+
+
+    if(music.audioId){
+
+        try{
+
+            const blob =
+                await getAudioFile(
+                    music.audioId
+                );
+
+
+            if(!blob){
+
+                toast("Файл трека не найден.");
+
+                return;
+
+            }
+
+
+            if(globalAudioURL){
+
+                URL.revokeObjectURL(
+                    globalAudioURL
+                );
+
+            }
+
+
+            globalAudioURL =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            url =
+                globalAudioURL;
+
+        }catch(error){
+
+            console.error(error);
+
+            toast("Не удалось открыть MP3.");
+
+            return;
+
+        }
+
+    }else if(music.audio){
+
+        url =
+            music.audio;
+
+    }
+
+
+    if(!url){
+
+        toast("Аудиофайл отсутствует.");
+
+        return;
+
+    }
+
+
+    currentlyPlayingMusicId =
+        musicId;
+
+
+    audio.src =
+        url;
+
+
+    document
+        .getElementById(
+            "globalPlayerCover"
+        )
+        .src =
+        music.cover ||
+        defaultMusicCover();
+
+
+    const author =
+        getUser(music.authorId);
+
+
+    document
+        .getElementById(
+            "globalPlayerTitle"
+        )
+        .textContent =
+        music.title;
+
+
+    document
+        .getElementById(
+            "globalPlayerArtist"
+        )
+        .textContent =
+        author
+        ? "@" + author.username
+        : "Unknown";
+
+
+    document
+        .getElementById(
+            "globalPlayer"
+        )
+        .classList
+        .remove("hidden");
+
+
+    try{
+
+        await audio.play();
+
+    }catch(error){
+
+        console.log(
+            "Браузер ожидает действие пользователя.",
+            error
+        );
+
+    }
+
+}
+
+
+function closeMusicPlayer(){
+
+    const audio =
+        document.getElementById(
+            "globalAudio"
+        );
+
+
+    audio.pause();
+
+    audio.removeAttribute(
+        "src"
+    );
+
+    audio.load();
+
+
+    currentlyPlayingMusicId =
+        null;
+
+
+    document
+        .getElementById(
+            "globalPlayer"
+        )
+        .classList
+        .add("hidden");
+
+
+    if(globalAudioURL){
+
+        URL.revokeObjectURL(
+            globalAudioURL
+        );
+
+        globalAudioURL =
+            null;
+
+    }
+
+}
+
+
+async function deleteMusic(id){
+
+    const music =
+        db.music.find(
+            m => m.id === id
+        );
+
+
+    if(!music)
+        return;
+
+
+    if(music.authorId !== currentUserId)
+        return;
+
+
+    if(
+        !confirm(
+            "Удалить этот трек?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    if(
+        currentlyPlayingMusicId === id
+    ){
+
+        closeMusicPlayer();
+
+    }
+
+
+    if(music.audioId){
+
+        try{
+
+            await deleteAudioFile(
+                music.audioId
+            );
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    db.music =
+        db.music.filter(
+            m => m.id !== id
+        );
+
+
+    saveDB();
+
+    toast("Трек удалён.");
+
+    renderMusic();
+
 }
 
 
@@ -2565,23 +4177,51 @@ function sendMessage(event, userId) {
    SEARCH
    ============================================================ */
 
-function searchEverything(query) {
+function searchUsers(value){
 
-    query = query.trim().toLowerCase();
+    const query =
+        value
+        .trim()
+        .toLowerCase();
 
-    if (!query) {
-        if (currentPage === "feed") renderFeed();
+
+    if(!query){
+
+        if(currentPage === "search")
+            navigate("feed");
+
         return;
+
     }
 
-    const users = db.users.filter(u =>
-        u.username.includes(query) ||
-        u.displayName.toLowerCase().includes(query)
+
+    currentPage =
+        "search";
+
+
+    renderSearchResults(
+        query
     );
 
-    const posts = db.posts.filter(p =>
-        p.text.toLowerCase().includes(query)
-    );
+}
+
+
+function renderSearchResults(query){
+
+    const users =
+        db.users.filter(
+            user =>
+                user.id !== currentUserId &&
+                (
+                    user.username
+                    .toLowerCase()
+                    .includes(query) ||
+                    user.displayName
+                    .toLowerCase()
+                    .includes(query)
+                )
+        );
+
 
     document.getElementById("page").innerHTML = `
 
@@ -2589,170 +4229,65 @@ function searchEverything(query) {
             🔎 Результаты поиска
         </h1>
 
-        <div class="card">
-
-            <h3>Люди</h3>
-
-            ${
-                users.length
-                ? `<div class="user-list">${users.map(u => renderUserCard(u)).join("")}</div>`
-                : `<p style="color:#7899a7;">Никого не найдено.</p>`
-            }
-
-        </div>
-
-        <h2 class="section-title">Посты</h2>
 
         ${
-            posts.length
-            ? posts.map(renderPost).join("")
-            : emptyState("🔎", "Постов не найдено", "")
+            users.length
+            ? `
+                <div class="friend-grid">
+
+                    ${users.map(friendCard).join("")}
+
+                </div>
+            `
+            : emptyState(
+                "🔎",
+                "Ничего не найдено",
+                "Попробуй другой юзернейм или имя."
+            )
         }
 
     `;
+
 }
 
 
 /* ============================================================
-   WIDGET
+   INIT
    ============================================================ */
 
-function updateOnlineWidget() {
+(async function(){
 
-    const count = Math.max(1, Math.min(
-        db.users.length,
-        3 + Math.floor(Math.random() * 7)
-    ));
-
-    document.getElementById("onlineWidget").innerHTML = `
-
-        <div style="
-            background:rgba(255,255,255,.5);
-            border-radius:17px;
-            padding:12px;
-        ">
-
-            <div style="font-weight:800;">
-                🟢 Сейчас в bubbles
-            </div>
-
-            <div style="font-size:28px;font-weight:900;margin-top:4px;">
-                ${count}
-            </div>
-
-            <div style="font-size:12px;color:#7899a7;">
-                пользователей гуляют по интернету
-            </div>
-
-        </div>
-
-    `;
-}
+    loadDB();
 
 
-/* ============================================================
-   HELPERS
-   ============================================================ */
+    try{
 
-function emptyState(icon, title, text) {
+        await openMusicDB();
 
-    return `
-        <div class="empty">
+    }catch(error){
 
-            <div class="empty-icon">${icon}</div>
+        console.error(
+            "IndexedDB недоступна:",
+            error
+        );
 
-            <b style="font-size:18px;">
-                ${escapeHtml(title)}
-            </b>
-
-            ${
-                text
-                ? `<div style="margin-top:6px;">${escapeHtml(text)}</div>`
-                : ""
-            }
-
-        </div>
-    `;
-}
-
-
-function formatDate(timestamp) {
-
-    const date = new Date(timestamp);
-
-    const diff = Date.now() - timestamp;
-
-    if (diff < 60000) return "только что";
-
-    if (diff < 3600000) {
-        return Math.floor(diff / 60000) + " мин назад";
     }
 
-    if (diff < 86400000) {
-        return Math.floor(diff / 3600000) + " ч назад";
+
+    if(
+        currentUserId &&
+        getCurrentUser()
+    ){
+
+        startApp();
+
+    }else{
+
+        showAuth("login");
+
     }
 
-    return date.toLocaleDateString("ru-RU", {
-        day: "numeric",
-        month: "short",
-        year: date.getFullYear() !== new Date().getFullYear()
-            ? "numeric"
-            : undefined
-    });
-}
-
-
-function toast(text) {
-
-    const el = document.getElementById("toast");
-
-    el.textContent = text;
-    el.classList.add("show");
-
-    clearTimeout(window.toastTimer);
-
-    window.toastTimer = setTimeout(() => {
-        el.classList.remove("show");
-    }, 2600);
-}
-
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-
-function escapeAttr(value) {
-    return escapeHtml(value);
-}
-
-
-function escapeSvg(value) {
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&apos;");
-}
-
-
-/* ============================================================
-   START
-   ============================================================ */
-
-showAuth("login");
-
-if (currentUserId && getCurrentUser()) {
-    startApp();
-}
-
+})();
 </script>
 
 </body>
