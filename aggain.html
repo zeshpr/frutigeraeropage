@@ -3,1408 +3,853 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#69dff5">
 <title>Bubbles — social network</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+* {
+    box-sizing: border-box;
 }
 
-:root{
-    --sky:#68dff8;
-    --sky-dark:#168bc4;
-    --blue:#0b74aa;
-    --text:#245d78;
-    --muted:#7095a7;
-    --white:rgba(255,255,255,.78);
-    --white2:rgba(255,255,255,.58);
-    --line:rgba(255,255,255,.82);
-    --shadow:0 12px 35px rgba(0,93,145,.18);
-    --shadow-small:0 5px 15px rgba(0,93,145,.12);
-    --radius:24px;
+:root {
+    --blue: #54c8f5;
+    --blue-dark: #218fc5;
+    --cyan: #bdf5ff;
+    --white: rgba(255,255,255,.88);
+    --glass: rgba(255,255,255,.72);
+    --glass-strong: rgba(255,255,255,.9);
+    --text: #22566d;
+    --muted: #6691a4;
+    --green: #63d6a1;
+    --pink: #f39dcc;
+    --shadow: 0 10px 30px rgba(24,122,163,.18);
 }
 
-html{
-    scroll-behavior:smooth;
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
 }
 
-body{
-    min-height:100vh;
-    overflow-x:hidden;
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-    color:var(--text);
-
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
     background:
-        radial-gradient(circle at 10% 5%,rgba(255,255,255,.95),transparent 17%),
-        radial-gradient(circle at 88% 12%,rgba(255,255,255,.8),transparent 15%),
-        radial-gradient(circle at 45% 100%,rgba(255,255,255,.5),transparent 22%),
-        linear-gradient(135deg,#55d9f5,#c6f9ff 48%,#65d8ec);
-    background-attachment:fixed;
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,.95), transparent 25%),
+        radial-gradient(circle at 90% 15%, rgba(255,255,255,.8), transparent 22%),
+        linear-gradient(180deg, #8ee8ff 0%, #d9faff 45%, #b7f2e8 100%);
 }
 
-button,
+/* decorative bubbles */
+
+.sky-bubble {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(circle at 30% 25%,
+        rgba(255,255,255,.95),
+        rgba(255,255,255,.3) 35%,
+        rgba(255,255,255,.08) 65%);
+    border: 1px solid rgba(255,255,255,.7);
+    box-shadow:
+        inset -10px -12px 20px rgba(65,180,220,.08),
+        0 8px 25px rgba(255,255,255,.2);
+    animation: float 8s ease-in-out infinite;
+}
+
+.b1 { width: 110px; height: 110px; left: 4%; top: 18%; }
+.b2 { width: 55px; height: 55px; right: 10%; top: 25%; animation-delay: -2s; }
+.b3 { width: 150px; height: 150px; right: -30px; bottom: 8%; animation-delay: -4s; }
+.b4 { width: 70px; height: 70px; left: 15%; bottom: 7%; animation-delay: -1s; }
+
+@keyframes float {
+    0%,100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-22px) rotate(5deg); }
+}
+
+/* AUTH */
+
+#authScreen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.auth-card {
+    width: min(460px, 100%);
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255,255,255,.75);
+    border-radius: 35px;
+    box-shadow: var(--shadow);
+    padding: 35px;
+}
+
+.logo {
+    text-align: center;
+    font-size: 55px;
+    font-weight: 900;
+    letter-spacing: -4px;
+    color: #fff;
+    text-shadow:
+        0 3px 0 #35a8d7,
+        0 6px 15px rgba(28,120,160,.25);
+}
+
+.logo span {
+    color: #f7ffff;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin: 4px 0 28px;
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 18px;
+    background: rgba(80,190,225,.12);
+    margin-bottom: 20px;
+}
+
+.auth-tabs button {
+    flex: 1;
+}
+
 input,
 textarea,
-select{
-    font:inherit;
+select {
+    width: 100%;
+    border: 1px solid rgba(71,171,207,.25);
+    background: rgba(255,255,255,.8);
+    color: var(--text);
+    border-radius: 15px;
+    padding: 13px 15px;
+    outline: none;
+    font: inherit;
+    margin-bottom: 11px;
 }
 
-button{
-    border:0;
-    cursor:pointer;
+textarea {
+    min-height: 100px;
+    resize: vertical;
 }
 
-button:active{
-    transform:scale(.97);
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #55c8ee;
+    box-shadow: 0 0 0 4px rgba(85,200,238,.12);
 }
 
-img{
-    max-width:100%;
+button {
+    border: 0;
+    border-radius: 15px;
+    padding: 12px 17px;
+    cursor: pointer;
+    color: #226078;
+    background: rgba(255,255,255,.82);
+    box-shadow: 0 4px 12px rgba(35,130,165,.12);
+    font-weight: 700;
+    transition: .18s;
 }
 
-.hidden{
-    display:none!important;
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 17px rgba(35,130,165,.18);
 }
 
-/* ========================================
-   DECORATION
-======================================== */
-
-.bubble{
-    position:fixed;
-    border-radius:50%;
-    pointer-events:none;
-    z-index:-1;
-    background:
-        radial-gradient(
-            circle at 28% 22%,
-            rgba(255,255,255,.95),
-            rgba(255,255,255,.32) 35%,
-            rgba(255,255,255,.08) 65%,
-            transparent 72%
-        );
-    border:1px solid rgba(255,255,255,.6);
-    opacity:.42;
+button:active {
+    transform: translateY(0) scale(.98);
 }
 
-.b1{
-    width:110px;
-    height:110px;
-    left:2%;
-    bottom:12%;
+.primary {
+    width: 100%;
+    color: white;
+    background: linear-gradient(180deg, #70dafb, #39addd);
 }
 
-.b2{
-    width:38px;
-    height:38px;
-    left:17%;
-    top:15%;
+.green {
+    background: linear-gradient(180deg, #8ae6bd, #54c995);
+    color: white;
 }
 
-.b3{
-    width:150px;
-    height:150px;
-    right:-20px;
-    bottom:10%;
+.pink {
+    background: linear-gradient(180deg, #f7b5d9, #e986bd);
+    color: white;
 }
 
-.b4{
-    width:55px;
-    height:55px;
-    right:20%;
-    top:8%;
+.hidden {
+    display: none !important;
 }
 
-/* ========================================
-   AUTH
-======================================== */
-
-.auth{
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
+.error {
+    background: rgba(255,100,130,.13);
+    color: #c95478;
+    padding: 10px 13px;
+    border-radius: 13px;
+    margin-bottom: 12px;
+    display: none;
 }
 
-.auth-box{
-    width:min(500px,100%);
-    padding:35px;
-    border-radius:32px;
-    background:rgba(255,255,255,.78);
-    border:1px solid white;
-    box-shadow:var(--shadow);
-    backdrop-filter:blur(22px);
-    -webkit-backdrop-filter:blur(22px);
+/* APP */
+
+#app {
+    display: none;
 }
 
-.auth-logo{
-    text-align:center;
-    margin-bottom:28px;
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: 72px;
+    background: rgba(255,255,255,.74);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255,255,255,.8);
+    box-shadow: 0 5px 20px rgba(28,120,160,.08);
 }
 
-.auth-orb{
-    width:92px;
-    height:92px;
-    margin:auto;
-    border-radius:50%;
-    background:
-        radial-gradient(circle at 28% 20%,white 0 13%,transparent 14%),
-        radial-gradient(circle at 35% 30%,#d9ffff,#76e5fa 35%,#25b9e5 70%,#0878b5);
-    box-shadow:
-        inset -11px -13px 22px rgba(0,76,130,.2),
-        0 10px 25px rgba(0,100,170,.2);
+.topbar-inner {
+    max-width: 1250px;
+    height: 100%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 18px;
 }
 
-.auth-logo h1{
-    color:#0876b4;
-    font-size:42px;
-    margin-top:10px;
-    text-shadow:0 2px white;
+.mini-logo {
+    font-size: 30px;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 2px 0 #31a6d3;
+    margin-right: 10px;
 }
 
-.auth-logo p{
-    color:var(--muted);
-    margin-top:3px;
+.search {
+    flex: 1;
+    max-width: 430px;
+    position: relative;
 }
 
-.auth-box h2{
-    color:#175f7d;
-    text-align:center;
-    margin-bottom:7px;
+.search input {
+    margin: 0;
+    padding-left: 42px;
+    border-radius: 25px;
 }
 
-.auth-box>p{
-    color:var(--muted);
-    text-align:center;
-    margin-bottom:22px;
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 11px;
 }
 
-.field{
-    margin-bottom:14px;
+.top-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
 }
 
-.field label{
-    display:block;
-    margin-bottom:6px;
-    color:#4e7b8f;
-    font-weight:bold;
-    font-size:13px;
+.icon-btn {
+    min-width: 43px;
+    padding: 10px;
 }
 
-.field input,
-.field textarea,
-.field select{
-    width:100%;
-    min-width:0;
-    padding:12px 14px;
-    border-radius:14px;
-    border:1px solid rgba(55,145,180,.2);
-    outline:none;
-    background:rgba(255,255,255,.68);
-    color:#245d78;
-    transition:.2s;
+.avatar-small {
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(30,120,160,.15);
+    cursor: pointer;
 }
 
-.field input:focus,
-.field textarea:focus,
-.field select:focus{
-    border-color:#65cce9;
-    box-shadow:0 0 0 3px rgba(74,207,239,.12);
-}
-
-.field textarea{
-    min-height:100px;
-    resize:vertical;
-}
-
-.gender{
-    display:flex;
-    gap:8px;
-}
-
-.gender label{
-    flex:1;
-}
-
-.gender input{
-    display:none;
-}
-
-.gender span{
-    display:block;
-    padding:12px;
-    text-align:center;
-    border-radius:13px;
-    background:rgba(255,255,255,.55);
-    border:1px solid transparent;
-    cursor:pointer;
-}
-
-.gender input:checked+span{
-    background:#baf3ff;
-    border-color:#69cce7;
-    color:#0872a8;
-}
-
-.primary{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    color:white;
-    background:linear-gradient(#48d9fa,#087ebc);
-    padding:11px 17px;
-    border-radius:14px;
-    box-shadow:
-        0 5px 12px rgba(0,100,160,.2),
-        inset 0 1px rgba(255,255,255,.7);
-}
-
-.primary:hover{
-    filter:brightness(1.04);
-}
-
-.secondary{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    color:#176e94;
-    background:rgba(255,255,255,.7);
-    padding:10px 14px;
-    border-radius:13px;
-    box-shadow:inset 0 1px white;
-}
-
-.secondary:hover{
-    background:rgba(255,255,255,.9);
-}
-
-.auth-switch{
-    text-align:center;
-    color:var(--muted);
-    font-size:13px;
-    margin-top:16px;
-}
-
-.link{
-    color:#0878b2;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-/* ========================================
-   APP
-======================================== */
-
-.app{
-    width:min(1450px,96%);
-    min-height:100vh;
-    margin:auto;
-    display:grid;
-    grid-template-columns:240px minmax(0,1fr);
-    gap:20px;
-    padding:18px 0;
+.layout {
+    width: min(1250px, calc(100% - 30px));
+    margin: 25px auto 60px;
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr) 250px;
+    gap: 20px;
 }
 
 .sidebar,
-.topbar,
-.card{
-    background:var(--white);
-    border:1px solid var(--line);
-    box-shadow:var(--shadow);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
+.rightbar,
+.card,
+.post,
+.profile-card,
+.music-card,
+.message-box {
+    background: var(--glass);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,.78);
+    box-shadow: var(--shadow);
 }
 
-/* ========================================
-   SIDEBAR
-======================================== */
-
-.sidebar{
-    height:calc(100vh - 36px);
-    position:sticky;
-    top:18px;
-    border-radius:30px;
-    padding:18px 13px;
-    display:flex;
-    flex-direction:column;
+.sidebar {
+    border-radius: 25px;
+    padding: 12px;
+    height: max-content;
+    position: sticky;
+    top: 95px;
 }
 
-.logo{
-    text-align:center;
-    padding:7px 0 23px;
+.nav-btn {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    box-shadow: none;
+    margin-bottom: 4px;
 }
 
-.logo-orb{
-    width:70px;
-    height:70px;
-    margin:auto;
-    border-radius:50%;
+.nav-btn:hover,
+.nav-btn.active {
+    background: rgba(76,190,229,.16);
+}
+
+.nav-icon {
+    display: inline-block;
+    width: 28px;
+}
+
+.rightbar {
+    border-radius: 25px;
+    padding: 18px;
+    height: max-content;
+    position: sticky;
+    top: 95px;
+}
+
+.page {
+    min-width: 0;
+}
+
+.section-title {
+    font-size: 27px;
+    margin: 0 0 15px;
+}
+
+.card,
+.post,
+.music-card,
+.message-box {
+    border-radius: 25px;
+    padding: 18px;
+    margin-bottom: 17px;
+}
+
+/* FEED */
+
+.create-post textarea {
+    min-height: 80px;
+}
+
+.create-tools {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.create-tools button {
+    white-space: nowrap;
+}
+
+.post-image {
+    display: block;
+    width: 100%;
+    max-height: 600px;
+    object-fit: cover;
+    border-radius: 20px;
+    margin-top: 13px;
+}
+
+.post-head {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.post-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+.post-author {
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.post-time {
+    font-size: 12px;
+    color: #8aa9b7;
+}
+
+.post-text {
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    margin: 15px 0;
+}
+
+.post-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    border-top: 1px solid rgba(50,150,180,.12);
+    padding-top: 12px;
+}
+
+.like.active {
+    color: #e85e9f;
+    background: rgba(240,130,185,.15);
+}
+
+.comments {
+    margin-top: 12px;
+}
+
+.comment {
+    padding: 8px 12px;
+    background: rgba(255,255,255,.48);
+    border-radius: 14px;
+    margin-top: 6px;
+    overflow-wrap: anywhere;
+}
+
+.comment-form {
+    display: flex;
+    gap: 6px;
+    margin-top: 9px;
+}
+
+.comment-form input {
+    margin: 0;
+}
+
+.comment-form button {
+    flex-shrink: 0;
+}
+
+/* PROFILE */
+
+.profile-cover {
+    height: 220px;
+    border-radius: 25px 25px 0 0;
     background:
-        radial-gradient(circle at 28% 20%,white 0 12%,transparent 13%),
-        linear-gradient(145deg,#d8ffff,#68e1f6 50%,#1595cc);
-    box-shadow:
-        inset -8px -9px 15px rgba(0,90,150,.2),
-        0 7px 16px rgba(0,90,150,.18);
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.9), transparent 16%),
+        linear-gradient(135deg, #75dbfa, #b0f4ec 55%, #83dfc4);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
 }
 
-.logo h1{
-    color:#0879b6;
-    font-size:30px;
-    margin-top:7px;
-}
-
-.logo small{
-    color:#7195a7;
-    font-size:11px;
-}
-
-.nav{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-}
-
-.nav button{
-    width:100%;
-    display:flex;
-    align-items:center;
-    gap:11px;
-    padding:12px 13px;
-    border-radius:16px;
-    background:transparent;
-    color:#32677f;
-    text-align:left;
-    font-weight:bold;
-    transition:.2s;
-}
-
-.nav button:hover{
-    background:rgba(255,255,255,.62);
-    transform:translateX(3px);
-}
-
-.nav button.active{
-    background:linear-gradient(#e7fdff,#a9efff);
-    color:#0874ad;
-    box-shadow:
-        0 5px 13px rgba(0,130,180,.13),
-        inset 0 1px white;
-}
-
-.nav-icon{
-    width:24px;
-    text-align:center;
-    font-size:18px;
-}
-
-.side-user{
-    margin-top:auto;
-    padding:12px;
-    border-radius:18px;
-    background:rgba(255,255,255,.45);
-    display:flex;
-    align-items:center;
-    gap:9px;
-    min-width:0;
-}
-
-.side-user div{
-    min-width:0;
-}
-
-.side-user strong{
-    display:block;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    font-size:13px;
-}
-
-.side-user small{
-    color:#7194a5;
-}
-
-/* ========================================
-   AVATARS
-======================================== */
-
-.avatar{
-    width:44px;
-    height:44px;
-    flex:0 0 44px;
-    border-radius:50%;
-    object-fit:cover;
-    background:#a6efff;
-    border:2px solid white;
-    box-shadow:0 3px 10px rgba(0,90,150,.14);
-}
-
-/* ========================================
-   MAIN / TOPBAR
-======================================== */
-
-.main{
-    min-width:0;
-}
-
-.topbar{
-    min-width:0;
-    border-radius:22px;
-    padding:11px;
-    margin-bottom:18px;
-    display:flex;
-    align-items:center;
-    gap:9px;
-}
-
-.search{
-    flex:1;
-    min-width:0;
-    position:relative;
-}
-
-.search input{
-    width:100%;
-    min-width:0;
-    padding:12px 14px 12px 40px;
-    border:1px solid rgba(255,255,255,.8);
-    border-radius:16px;
-    outline:none;
-    background:rgba(255,255,255,.65);
-    color:#205e78;
-}
-
-.search-icon{
-    position:absolute;
-    left:14px;
-    top:10px;
-}
-
-.top-actions{
-    display:flex;
-    gap:6px;
-}
-
-.icon-btn{
-    width:43px;
-    height:43px;
-    flex:0 0 43px;
-    border-radius:14px;
-    background:rgba(255,255,255,.7);
-    color:#1478af;
-    box-shadow:var(--shadow-small);
-    font-size:18px;
-}
-
-.icon-btn:hover{
-    background:white;
-}
-
-/* ========================================
-   CONTENT
-======================================== */
-
-.content{
-    width:100%;
-    max-width:1000px;
-    margin:auto;
-    padding-bottom:60px;
-}
-
-.page{
-    display:none;
-    min-width:0;
-}
-
-.page.active{
-    display:block;
-}
-
-.hero{
-    position:relative;
-    overflow:hidden;
-    min-height:190px;
-    padding:30px;
-    border-radius:30px;
+.profile-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
     background:
-        radial-gradient(circle at 85% 20%,rgba(255,255,255,.9),transparent 17%),
-        linear-gradient(125deg,#e0ffff,#9cefff 55%,#57c8eb);
-    border:1px solid white;
-    box-shadow:var(--shadow);
-}
-
-.hero:after{
-    content:"";
-    position:absolute;
-    width:260px;
-    height:260px;
-    border-radius:50%;
-    right:-75px;
-    bottom:-140px;
-    background:rgba(255,255,255,.22);
-}
-
-.hero h2{
-    position:relative;
-    z-index:1;
-    color:#086fa8;
-    font-size:32px;
-    margin-bottom:8px;
-    overflow-wrap:anywhere;
-}
-
-.hero p{
-    position:relative;
-    z-index:1;
-    max-width:680px;
-    color:#39728d;
-    line-height:1.55;
-    overflow-wrap:anywhere;
-}
-
-.pill{
-    position:relative;
-    z-index:1;
-    display:inline-block;
-    margin-top:17px;
-    padding:8px 13px;
-    border-radius:20px;
-    background:rgba(255,255,255,.68);
-    color:#0873ad;
-    font-size:12px;
-    font-weight:bold;
-}
-
-/* ========================================
-   CARDS
-======================================== */
-
-.card{
-    width:100%;
-    min-width:0;
-    margin-top:18px;
-    padding:20px;
-    border-radius:var(--radius);
-    overflow:hidden;
-}
-
-.card-title{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:14px;
-    min-width:0;
-}
-
-.card-title h3{
-    min-width:0;
-    overflow-wrap:anywhere;
-    color:#12648b;
-}
-
-/* ========================================
-   COMPOSER
-======================================== */
-
-.composer textarea{
-    width:100%;
-    min-height:85px;
-    max-width:100%;
-    resize:vertical;
-    border:1px solid rgba(70,160,190,.22);
-    border-radius:16px;
-    background:rgba(255,255,255,.7);
-    padding:13px;
-    outline:none;
-    color:#225e7a;
-    overflow-wrap:anywhere;
-}
-
-.composer-bottom{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    margin-top:10px;
-    flex-wrap:wrap;
+        radial-gradient(circle at 75% 30%, rgba(255,255,255,.45) 0 35px, transparent 36px),
+        radial-gradient(circle at 85% 65%, rgba(255,255,255,.25) 0 55px, transparent 56px);
 }
 
-.photo-label{
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-    padding:9px 13px;
-    border-radius:12px;
-    background:rgba(255,255,255,.65);
-    color:#28718f;
-    font-size:13px;
-    cursor:pointer;
+.profile-info {
+    padding: 0 22px 22px;
+    position: relative;
 }
 
-.photo-label input{
-    display:none;
+.profile-big-avatar {
+    width: 125px;
+    height: 125px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 6px solid rgba(255,255,255,.95);
+    margin-top: -65px;
+    position: relative;
+    z-index: 2;
+    background: #d9faff;
 }
 
-/* ========================================
-   POSTS
-======================================== */
-
-.post{
-    width:100%;
-    min-width:0;
-    margin-top:13px;
-    padding:17px;
-    border-radius:21px;
-    background:rgba(255,255,255,.53);
-    border:1px solid rgba(255,255,255,.72);
-    overflow:hidden;
-}
-
-.post-head{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    min-width:0;
-}
-
-.post-author{
-    flex:1;
-    min-width:0;
-}
-
-.post-author strong{
-    display:block;
-    color:#145e7e;
-    cursor:pointer;
-    overflow-wrap:anywhere;
-}
-
-.post-author small{
-    color:#7193a5;
-}
-
-.post-text{
-    width:100%;
-    max-width:100%;
-    margin:14px 0;
-    line-height:1.55;
-    white-space:pre-wrap;
-    overflow-wrap:anywhere;
-    word-break:break-word;
-}
-
-.post-image{
-    display:block;
-    width:100%;
-    max-width:100%;
-    max-height:550px;
-    object-fit:cover;
-    border-radius:17px;
-    border:1px solid white;
-}
-
-.post-actions{
-    display:flex;
-    align-items:center;
-    gap:7px;
-    flex-wrap:wrap;
-    margin-top:12px;
-}
-
-.post-actions button{
-    padding:8px 11px;
-    border-radius:12px;
-    background:rgba(255,255,255,.72);
-    color:#39738d;
-}
-
-.post-actions button:hover{
-    background:white;
-}
-
-.post-actions button.liked{
-    color:#e74778;
-    background:#ffe5ee;
-}
-
-.comments{
-    width:100%;
-    margin-top:12px;
-    border-top:1px solid rgba(100,150,170,.15);
-    padding-top:10px;
-}
-
-.comment{
-    width:100%;
-    padding:7px 0;
-    font-size:13px;
-    overflow-wrap:anywhere;
-    word-break:break-word;
-}
-
-.comment strong{
-    color:#146b91;
-}
-
-.comment-form{
-    display:flex;
-    width:100%;
-    gap:7px;
-    margin-top:7px;
-}
-
-.comment-form input{
-    flex:1;
-    min-width:0;
-    border:1px solid rgba(100,170,200,.25);
-    border-radius:12px;
-    padding:9px;
-    background:rgba(255,255,255,.7);
-    outline:none;
-}
-
-/* ========================================
-   PROFILE
-======================================== */
-
-.profile-card{
-    padding:0;
-    overflow:hidden;
-}
-
-.profile-cover{
-    position:relative;
-    width:100%;
-    height:235px;
-    overflow:hidden;
-    background:
-        radial-gradient(circle at 15% 30%,rgba(255,255,255,.9),transparent 15%),
-        linear-gradient(130deg,#9ff5ff,#55c9ed,#85eaff);
-}
-
-.profile-cover:before,
-.profile-cover:after{
-    content:"";
-    position:absolute;
-    border-radius:50%;
-    background:rgba(255,255,255,.2);
+.profile-name {
+    font-size: 28px;
+    font-weight: 900;
+    margin-top: 10px;
+    overflow-wrap: anywhere;
 }
 
-.profile-cover:before{
-    width:280px;
-    height:280px;
-    right:-60px;
-    top:-100px;
+.profile-username {
+    color: #6b98aa;
 }
 
-.profile-cover:after{
-    width:130px;
-    height:130px;
-    left:20%;
-    bottom:-70px;
+.profile-bio {
+    margin: 10px 0;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
-.profile-info{
-    position:relative;
-    display:flex;
-    align-items:flex-end;
-    gap:17px;
-    padding:0 25px 20px;
-    margin-top:-55px;
+.profile-stats {
+    display: flex;
+    gap: 25px;
+    margin-top: 14px;
+    flex-wrap: wrap;
 }
 
-.profile-big-avatar{
-    width:120px;
-    height:120px;
-    flex:0 0 120px;
-    object-fit:cover;
-    border-radius:34px;
-    border:5px solid white;
-    background:#a9f4ff;
-    box-shadow:0 8px 20px rgba(0,100,160,.2);
+.stat b {
+    display: block;
+    font-size: 20px;
 }
 
-.profile-main{
-    flex:1;
-    min-width:0;
-    padding-bottom:4px;
+.stat span {
+    color: #759aaa;
+    font-size: 13px;
 }
 
-.profile-main h2{
-    color:#12638a;
-    overflow-wrap:anywhere;
+.profile-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 15px;
 }
 
-.profile-main p{
-    margin-top:5px;
-    color:#64869a;
-    line-height:1.45;
-    overflow-wrap:anywhere;
-    word-break:break-word;
-}
-
-.profile-actions{
-    display:flex;
-    gap:7px;
-    flex-wrap:wrap;
-}
-
-.profile-tabs{
-    display:flex;
-    gap:7px;
-    padding:0 20px 18px;
-    overflow-x:auto;
-}
-
-.profile-tabs button{
-    white-space:nowrap;
-    padding:9px 14px;
-    border-radius:12px;
-    background:rgba(255,255,255,.5);
-    color:#38728d;
-}
-
-.profile-tabs button.active{
-    background:#b5f2ff;
-    color:#0d72a7;
-}
-
-/* ========================================
-   FRIENDS
-======================================== */
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:12px;
-}
-
-.person{
-    min-width:0;
-    padding:14px;
-    border-radius:18px;
-    background:rgba(255,255,255,.56);
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-.person-info{
-    flex:1;
-    min-width:0;
-}
-
-.person-info strong,
-.person-info small{
-    display:block;
-    min-width:0;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-.person-info strong{
-    color:#185e7b;
-}
-
-.person-info small{
-    margin-top:2px;
-    color:#7193a5;
-}
-
-.person button{
-    flex-shrink:0;
-    padding:8px 10px;
-    font-size:12px;
-}
-
-/* ========================================
-   MUSIC
-======================================== */
-
-.music-item{
-    min-width:0;
-    display:flex;
-    align-items:center;
-    gap:13px;
-    padding:13px;
-    margin-top:10px;
-    border-radius:18px;
-    background:rgba(255,255,255,.56);
-}
-
-.cover{
-    width:62px;
-    height:62px;
-    flex:0 0 62px;
-    object-fit:cover;
-    border-radius:16px;
-    background:linear-gradient(135deg,#8ff2ff,#0d87c5);
-    border:2px solid white;
-}
+/* FRIENDS */
 
-.music-info{
-    flex:1;
-    min-width:0;
+.user-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 13px;
 }
 
-.music-info strong,
-.music-info small{
-    display:block;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+.user-card {
+    background: rgba(255,255,255,.6);
+    border-radius: 20px;
+    padding: 14px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    min-width: 0;
 }
 
-.music-info strong{
-    color:#146383;
+.user-card img {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
-.music-info small{
-    margin-top:3px;
-    color:#7192a4;
+.user-card-info {
+    min-width: 0;
+    flex: 1;
 }
 
-.music-item audio{
-    width:220px;
-    max-width:35%;
-    min-width:120px;
+.user-card-name {
+    font-weight: 800;
+    overflow-wrap: anywhere;
 }
 
-.music-item button{
-    flex-shrink:0;
+.user-card-username {
+    color: #759aaa;
+    font-size: 13px;
+    overflow-wrap: anywhere;
 }
-
-/* ========================================
-   MESSAGES
-======================================== */
 
-.message-layout{
-    display:grid;
-    grid-template-columns:280px minmax(0,1fr);
-    min-height:600px;
-    overflow:hidden;
-    padding:0;
-}
+/* MUSIC */
 
-.chat-list{
-    min-width:0;
-    border-right:1px solid rgba(60,130,160,.15);
-    padding:15px;
-    overflow:auto;
+.music-cover {
+    width: 75px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 17px;
+    background: linear-gradient(135deg, #7bdff9, #f5b4db);
+    flex-shrink: 0;
 }
 
-.chat{
-    min-width:0;
-    padding:11px;
-    border-radius:15px;
-    display:flex;
-    gap:9px;
-    align-items:center;
-    cursor:pointer;
+.music-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
 }
 
-.chat:hover,
-.chat.selected{
-    background:rgba(180,240,255,.6);
+.music-info {
+    min-width: 0;
+    flex: 1;
 }
 
-.chat-info{
-    min-width:0;
+.music-title {
+    font-weight: 900;
+    font-size: 17px;
+    overflow-wrap: anywhere;
 }
 
-.chat-info strong,
-.chat-info small{
-    display:block;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+.music-artist {
+    color: #759aaa;
+    font-size: 13px;
+    overflow-wrap: anywhere;
 }
 
-.chat-info small{
-    color:#7b98a6;
-    margin-top:2px;
+audio {
+    width: 100%;
+    margin-top: 12px;
 }
 
-.chat-window{
-    min-width:0;
-    display:flex;
-    flex-direction:column;
-}
+/* MESSAGES */
 
-.chat-header{
-    min-width:0;
-    padding:15px;
-    border-bottom:1px solid rgba(60,130,160,.15);
-    font-weight:bold;
+.messages-layout {
+    display: grid;
+    grid-template-columns: 260px minmax(0,1fr);
+    min-height: 600px;
+    overflow: hidden;
+    border-radius: 25px;
 }
 
-.messages{
-    flex:1;
-    min-width:0;
-    min-height:350px;
-    padding:18px;
-    overflow:auto;
+.conversations {
+    background: rgba(255,255,255,.45);
+    padding: 10px;
+    border-right: 1px solid rgba(40,150,180,.1);
+    overflow-y: auto;
 }
 
-.msg{
-    width:max-content;
-    max-width:min(75%,600px);
-    padding:10px 13px;
-    margin-bottom:8px;
-    line-height:1.4;
-    overflow-wrap:anywhere;
-    word-break:break-word;
+.conversation {
+    padding: 11px;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    margin-bottom: 5px;
 }
 
-.msg.me{
-    margin-left:auto;
-    background:#73dcf8;
-    color:#145d79;
-    border-bottom-right-radius:4px;
+.conversation:hover,
+.conversation.active {
+    background: rgba(75,190,225,.15);
 }
 
-.msg.them{
-    background:white;
-    color:#376a80;
-    border-bottom-left-radius:4px;
+.conversation img {
+    width: 43px;
+    height: 43px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
-.message-input{
-    display:flex;
-    gap:8px;
-    padding:14px;
-    border-top:1px solid rgba(60,130,160,.15);
+.chat {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
-.message-input input{
-    flex:1;
-    min-width:0;
-    padding:12px;
-    border:1px solid rgba(70,150,180,.2);
-    border-radius:14px;
-    background:rgba(255,255,255,.7);
-    outline:none;
+.chat-header {
+    padding: 15px;
+    border-bottom: 1px solid rgba(40,150,180,.1);
+    font-weight: 800;
 }
-
-/* ========================================
-   EMPTY
-======================================== */
 
-.empty{
-    width:100%;
-    text-align:center;
-    padding:35px 15px;
-    color:#7394a2;
-    overflow-wrap:anywhere;
+.chat-messages {
+    flex: 1;
+    padding: 17px;
+    overflow-y: auto;
+    max-height: 450px;
 }
 
-.empty .bubble-icon{
-    font-size:43px;
-    margin-bottom:8px;
+.message {
+    max-width: 75%;
+    width: fit-content;
+    background: rgba(255,255,255,.7);
+    padding: 10px 14px;
+    border-radius: 18px 18px 18px 5px;
+    margin-bottom: 9px;
+    overflow-wrap: anywhere;
 }
 
-/* ========================================
-   MODAL
-======================================== */
-
-.modal{
-    position:fixed;
-    inset:0;
-    z-index:100;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:rgba(0,80,120,.25);
-    backdrop-filter:blur(6px);
+.message.mine {
+    margin-left: auto;
+    background: rgba(92,207,245,.35);
+    border-radius: 18px 18px 5px 18px;
 }
 
-.modal-box{
-    width:min(620px,100%);
-    max-height:90vh;
-    overflow:auto;
-    padding:25px;
-    border-radius:26px;
-    background:rgba(246,255,255,.96);
-    box-shadow:0 25px 70px rgba(0,70,120,.3);
+.chat-form {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid rgba(40,150,180,.1);
 }
 
-.modal-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    margin-bottom:18px;
+.chat-form input {
+    margin: 0;
 }
 
-.modal-head h3{
-    overflow-wrap:anywhere;
-}
+/* EDIT PROFILE */
 
-.close{
-    width:36px;
-    height:36px;
-    flex:0 0 36px;
-    border-radius:12px;
-    background:#e5faff;
-    color:#176a88;
+.file-preview {
+    width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+    border-radius: 18px;
+    margin: 5px 0 13px;
+    display: none;
 }
 
-/* ========================================
-   TOAST
-======================================== */
+/* EMPTY */
 
-.toast{
-    position:fixed;
-    right:20px;
-    bottom:20px;
-    z-index:200;
-    max-width:min(360px,calc(100vw - 40px));
-    padding:13px 17px;
-    border-radius:15px;
-    background:white;
-    color:#126384;
-    box-shadow:var(--shadow);
-    transform:translateY(130px);
-    transition:.3s;
-    overflow-wrap:anywhere;
+.empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #759aaa;
 }
 
-.toast.show{
-    transform:translateY(0);
+.empty-icon {
+    font-size: 45px;
+    margin-bottom: 8px;
 }
 
-/* ========================================
-   DESKTOP HOME BUTTON
-======================================== */
+/* TOAST */
 
-.return-home{
-    margin-top:auto;
-    margin-bottom:10px;
+.toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: rgba(255,255,255,.94);
+    border: 1px solid white;
+    box-shadow: var(--shadow);
+    border-radius: 17px;
+    padding: 13px 17px;
+    z-index: 100;
+    transform: translateY(120px);
+    opacity: 0;
+    transition: .25s;
 }
 
-.return-home button{
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:7px;
-    padding:11px;
-    border-radius:15px;
-    color:#13729d;
-    background:linear-gradient(
-        rgba(255,255,255,.8),
-        rgba(190,244,255,.72)
-    );
-    border:1px solid rgba(255,255,255,.8);
-    box-shadow:inset 0 1px white;
-    font-weight:bold;
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
 }
-
-.return-home button:hover{
-    background:white;
-}
-
-/* ========================================
-   RESPONSIVE
-======================================== */
 
-@media(max-width:950px){
+/* MOBILE */
 
-    .app{
-        grid-template-columns:1fr;
-        width:96%;
+@media (max-width: 1050px) {
+    .layout {
+        grid-template-columns: 185px minmax(0,1fr);
     }
 
-    .sidebar{
-        position:fixed;
-        z-index:80;
-        left:10px;
-        right:10px;
-        bottom:9px;
-        top:auto;
-        width:auto;
-        height:64px;
-        padding:6px;
-        border-radius:22px;
-    }
-
-    .logo,
-    .side-user,
-    .return-home{
-        display:none;
-    }
-
-    .nav{
-        height:100%;
-        flex-direction:row;
-        align-items:stretch;
-        justify-content:space-around;
-        gap:2px;
-    }
-
-    .nav button{
-        flex:1;
-        min-width:0;
-        justify-content:center;
-        flex-direction:column;
-        gap:1px;
-        padding:5px 2px;
-        text-align:center;
-        font-size:10px;
-        border-radius:14px;
-    }
-
-    .nav button:hover{
-        transform:none;
-    }
-
-    .nav-icon{
-        width:auto;
-        font-size:19px;
-    }
-
-    .content{
-        padding-bottom:75px;
+    .rightbar {
+        display: none;
     }
 }
 
-@media(max-width:700px){
-
-    .app{
-        width:100%;
-        padding:8px;
+@media (max-width: 720px) {
+    .topbar {
+        height: auto;
     }
 
-    .topbar{
-        margin-bottom:10px;
+    .topbar-inner {
+        flex-wrap: wrap;
+        padding: 9px 12px;
     }
 
-    .top-actions .icon-btn:nth-child(1){
-        display:none;
+    .mini-logo {
+        font-size: 26px;
     }
 
-    .hero{
-        min-height:165px;
-        padding:23px;
-        border-radius:24px;
+    .search {
+        order: 3;
+        flex-basis: 100%;
+        max-width: none;
     }
 
-    .hero h2{
-        font-size:26px;
+    .top-actions {
+        margin-left: auto;
     }
 
-    .card{
-        margin-top:12px;
-        padding:15px;
-        border-radius:20px;
+    .layout {
+        width: calc(100% - 14px);
+        margin-top: 10px;
+        display: block;
     }
 
-    .grid{
-        grid-template-columns:1fr;
+    .sidebar {
+        position: static;
+        display: flex;
+        overflow-x: auto;
+        padding: 7px;
+        border-radius: 18px;
+        margin-bottom: 12px;
+        gap: 4px;
     }
 
-    .profile-cover{
-        height:175px;
+    .nav-btn {
+        width: auto;
+        white-space: nowrap;
+        margin: 0;
     }
 
-    .profile-info{
-        flex-direction:column;
-        align-items:center;
-        text-align:center;
-        margin-top:-50px;
+    .nav-btn span:not(.nav-icon) {
+        display: none;
     }
 
-    .profile-big-avatar{
-        width:105px;
-        height:105px;
-        flex-basis:105px;
+    .card,
+    .post,
+    .music-card {
+        border-radius: 20px;
+        padding: 14px;
     }
 
-    .profile-main{
-        width:100%;
+    .profile-cover {
+        height: 160px;
     }
 
-    .profile-actions{
-        justify-content:center;
+    .profile-big-avatar {
+        width: 100px;
+        height: 100px;
+        margin-top: -50px;
     }
 
-    .music-item{
-        flex-wrap:wrap;
+    .profile-info {
+        padding: 0 15px 18px;
     }
 
-    .music-item audio{
-        order:5;
-        width:100%;
-        max-width:100%;
+    .messages-layout {
+        grid-template-columns: 1fr;
     }
 
-    .message-layout{
-        grid-template-columns:1fr;
-        min-height:570px;
+    .conversations {
+        max-height: 160px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(40,150,180,.1);
     }
 
-    .chat-list{
-        display:none;
-    }
-
-    .msg{
-        max-width:84%;
-    }
-
-    .auth-box{
-        padding:25px 18px;
+    .chat-messages {
+        max-height: 400px;
     }
 }
 
-@media(max-width:430px){
-
-    .topbar{
-        padding:7px;
+@media (max-width: 450px) {
+    .logo {
+        font-size: 45px;
     }
 
-    .search input{
-        font-size:13px;
+    .auth-card {
+        padding: 22px;
+        border-radius: 27px;
     }
 
-    .icon-btn{
-        width:40px;
-        flex-basis:40px;
+    .top-actions .icon-btn:nth-child(2) {
+        display: none;
     }
 
-    .composer-bottom{
-        align-items:stretch;
-        flex-direction:column;
-    }
-
-    .photo-label,
-    .composer-bottom .primary{
-        width:100%;
-    }
-
-    .profile-info{
-        padding-left:15px;
-        padding-right:15px;
-    }
-
-    .post{
-        padding:13px;
-    }
-
-    .post-actions button{
-        flex:1;
-        min-width:70px;
+    .profile-stats {
+        gap: 15px;
     }
 }
 </style>
@@ -1412,1540 +857,638 @@ img{
 
 <body>
 
-<div class="bubble b1"></div>
-<div class="bubble b2"></div>
-<div class="bubble b3"></div>
-<div class="bubble b4"></div>
+<div class="sky-bubble b1"></div>
+<div class="sky-bubble b2"></div>
+<div class="sky-bubble b3"></div>
+<div class="sky-bubble b4"></div>
 
-<!-- =========================================
-     AUTH
-========================================= -->
+<!-- AUTH -->
 
-<div id="authScreen" class="auth">
+<section id="authScreen">
 
-    <div class="auth-box">
+    <div class="auth-card">
 
-        <div class="auth-logo">
-            <div class="auth-orb"></div>
-            <h1>Bubbles</h1>
-            <p>your little social world</p>
+        <div class="logo">bubbles</div>
+        <div class="subtitle">a little place on the internet</div>
+
+        <div class="auth-tabs">
+            <button id="loginTab" onclick="showAuth('login')">Войти</button>
+            <button id="registerTab" onclick="showAuth('register')">Создать аккаунт</button>
         </div>
 
-        <!-- LOGIN -->
+        <div id="authError" class="error"></div>
 
-        <div id="loginForm">
+        <form id="loginForm">
+            <input id="loginUsername" placeholder="Username" autocomplete="username" required>
+            <input id="loginPassword" type="password" placeholder="Пароль" autocomplete="current-password" required>
+            <button class="primary" type="submit">Войти в bubbles</button>
+        </form>
 
-            <h2>С возвращением!</h2>
-            <p>Загляни обратно в свой пузырёк.</p>
+        <form id="registerForm" class="hidden">
 
-            <div class="field">
-                <label>Юзернейм</label>
-                <input
-                    id="loginUsername"
-                    autocomplete="username"
-                    placeholder="например, bubblegirl"
-                >
-            </div>
+            <input id="regUsername" placeholder="Username" maxlength="25" required>
 
-            <div class="field">
-                <label>Пароль</label>
-                <input
-                    id="loginPassword"
-                    type="password"
-                    autocomplete="current-password"
-                    placeholder="••••••••"
-                >
-            </div>
+            <input id="regDisplayName" placeholder="Имя, которое увидят другие" maxlength="35" required>
 
-            <button
-                class="primary"
-                style="width:100%"
-                onclick="login()"
+            <select id="regGender" required>
+                <option value="">Пол</option>
+                <option value="male">Мужской</option>
+                <option value="female">Женский</option>
+            </select>
+
+            <textarea
+                id="regBio"
+                maxlength="160"
+                placeholder="Немного о себе..."
+            ></textarea>
+
+            <input
+                id="regPassword"
+                type="password"
+                placeholder="Пароль"
+                minlength="4"
+                required
             >
-                🫧 Войти в Bubbles
-            </button>
 
-            <div class="auth-switch">
-                Нет аккаунта?
-                <span class="link" onclick="showRegister()">
-                    Создать его
-                </span>
-            </div>
+            <button class="primary" type="submit">Создать bubbles</button>
 
-        </div>
-
-        <!-- REGISTER -->
-
-        <div id="registerForm" class="hidden">
-
-            <h2>Создай свой пузырёк</h2>
-            <p>Добро пожаловать в Bubbles.</p>
-
-            <div class="field">
-                <label>Юзернейм</label>
-                <input
-                    id="regUsername"
-                    autocomplete="username"
-                    placeholder="твой уникальный ник"
-                >
-            </div>
-
-            <div class="field">
-                <label>Пароль</label>
-                <input
-                    id="regPassword"
-                    type="password"
-                    autocomplete="new-password"
-                    placeholder="минимум 6 символов"
-                >
-            </div>
-
-            <div class="field">
-
-                <label>Пол</label>
-
-                <div class="gender">
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="gender"
-                            value="male"
-                        >
-                        <span>♂ Мужской</span>
-                    </label>
-
-                    <label>
-                        <input
-                            type="radio"
-                            name="gender"
-                            value="female"
-                        >
-                        <span>♀ Женский</span>
-                    </label>
-
-                </div>
-
-            </div>
-
-            <button
-                class="primary"
-                style="width:100%"
-                onclick="register()"
-            >
-                ✨ Создать профиль
-            </button>
-
-            <div class="auth-switch">
-                Уже есть аккаунт?
-                <span class="link" onclick="showLogin()">
-                    Войти
-                </span>
-            </div>
-
-        </div>
+        </form>
 
     </div>
 
-</div>
+</section>
 
-<!-- =========================================
-     APP
-========================================= -->
 
-<div id="app" class="app hidden">
+<!-- APP -->
 
-    <!-- SIDEBAR -->
+<div id="app">
 
-    <aside class="sidebar">
+    <header class="topbar">
 
-        <div class="logo">
+        <div class="topbar-inner">
 
-            <div class="logo-orb"></div>
-
-            <h1>Bubbles</h1>
-
-            <small>
-                your little social world
-            </small>
-
-        </div>
-
-        <nav class="nav">
-
-            <button
-                class="active"
-                data-page="home"
-                onclick="go('home')"
-            >
-                <span class="nav-icon">🏠</span>
-                <span>Главная</span>
-            </button>
-
-            <button
-                data-page="profile"
-                onclick="go('profile')"
-            >
-                <span class="nav-icon">👤</span>
-                <span>Профиль</span>
-            </button>
-
-            <button
-                data-page="friends"
-                onclick="go('friends')"
-            >
-                <span class="nav-icon">👥</span>
-                <span>Друзья</span>
-            </button>
-
-            <button
-                data-page="messages"
-                onclick="go('messages')"
-            >
-                <span class="nav-icon">💬</span>
-                <span>Сообщения</span>
-            </button>
-
-            <button
-                data-page="music"
-                onclick="go('music')"
-            >
-                <span class="nav-icon">🎵</span>
-                <span>Музыка</span>
-            </button>
-
-            <button
-                data-page="notifications"
-                onclick="go('notifications')"
-            >
-                <span class="nav-icon">🔔</span>
-                <span>Уведомления</span>
-            </button>
-
-            <button
-                data-page="settings"
-                onclick="go('settings')"
-            >
-                <span class="nav-icon">⚙️</span>
-                <span>Настройки</span>
-            </button>
-
-        </nav>
-
-        <!-- ВОТ ЭТА КНОПКА ВЕДЁТ НА BUBBLING.HTML -->
-
-        <div class="return-home">
-
-            <button
-                onclick="window.location.href='https://zeshpr.github.io/frutigeraeropage/bubbling.html'"
-            >
-                🌐 Вернуться на сайт
-            </button>
-
-        </div>
-
-        <div class="side-user">
-
-            <img
-                id="sideAvatar"
-                class="avatar"
-                src=""
-                alt=""
-            >
-
-            <div>
-                <strong id="sideUsername"></strong>
-                <small>мой профиль</small>
-            </div>
-
-        </div>
-
-    </aside>
-
-    <!-- MAIN -->
-
-    <main class="main">
-
-        <!-- TOP BAR -->
-
-        <header class="topbar">
+            <div class="mini-logo">bubbles</div>
 
             <div class="search">
-
                 <span class="search-icon">🔎</span>
-
                 <input
                     id="searchInput"
-                    placeholder="Найти людей или музыку..."
+                    placeholder="Найти людей, посты..."
                     oninput="searchEverything(this.value)"
                 >
-
             </div>
 
             <div class="top-actions">
+                <button class="icon-btn" onclick="openPage('messages')">💌</button>
+                <button class="icon-btn" onclick="openPage('friends')">👥</button>
+                <button class="icon-btn" onclick="openPage('music')">🎵</button>
 
-                <button
-                    class="icon-btn"
-                    onclick="go('home')"
-                    title="Главная"
+                <img
+                    id="topAvatar"
+                    class="avatar-small"
+                    onclick="openOwnProfile()"
+                    alt="avatar"
                 >
-                    🏠
-                </button>
-
-                <button
-                    class="icon-btn"
-                    onclick="go('notifications')"
-                    title="Уведомления"
-                >
-                    🔔
-                </button>
-
-                <button
-                    class="icon-btn"
-                    onclick="go('messages')"
-                    title="Сообщения"
-                >
-                    💬
-                </button>
-
-                <button
-                    class="icon-btn"
-                    onclick="go('profile')"
-                    title="Профиль"
-                >
-                    👤
-                </button>
-
             </div>
 
-        </header>
-
-        <div class="content">
-
-            <!-- =====================================
-                 HOME
-            ====================================== -->
-
-            <section
-                id="page-home"
-                class="page active"
-            >
-
-                <div class="hero">
-
-                    <h2>
-                        Добро пожаловать в Bubbles 🫧
-                    </h2>
-
-                    <p>
-                        Маленькое место в интернете, где можно
-                        делиться фотографиями, музыкой, мыслями
-                        и находить людей со своими интересами.
-                    </p>
-
-                    <span class="pill">
-                        everything feels a little softer here
-                    </span>
-
-                </div>
-
-                <div class="card composer">
-
-                    <div class="card-title">
-                        <h3>
-                            Что у тебя нового?
-                        </h3>
-                    </div>
-
-                    <textarea
-                        id="postText"
-                        placeholder="Напиши что-нибудь..."
-                    ></textarea>
-
-                    <div class="composer-bottom">
-
-                        <label class="photo-label">
-
-                            📷 Добавить фотографию
-
-                            <input
-                                id="postImage"
-                                type="file"
-                                accept="image/*"
-                            >
-
-                        </label>
-
-                        <button
-                            class="primary"
-                            onclick="createPost()"
-                        >
-                            🫧 Опубликовать
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div id="feed"></div>
-
-            </section>
-
-            <!-- =====================================
-                 PROFILE
-            ====================================== -->
-
-            <section
-                id="page-profile"
-                class="page"
-            >
-
-                <div class="card profile-card">
-
-                    <div
-                        id="profileCover"
-                        class="profile-cover"
-                    ></div>
-
-                    <div class="profile-info">
-
-                        <img
-                            id="profileAvatar"
-                            class="profile-big-avatar"
-                            src=""
-                            alt=""
-                        >
-
-                        <div class="profile-main">
-
-                            <h2 id="profileName"></h2>
-
-                            <p id="profileBio"></p>
-
-                        </div>
-
-                        <div class="profile-actions">
-
-                            <button
-                                class="secondary"
-                                onclick="go('messages')"
-                            >
-                                💬 Сообщения
-                            </button>
-
-                            <button
-                                class="primary"
-                                onclick="openEditProfile()"
-                            >
-                                ✏️ Изменить
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                    <div class="profile-tabs">
-
-                        <button
-                            class="active"
-                            onclick="renderProfile()"
-                        >
-                            📝 Посты
-                        </button>
-
-                        <button
-                            onclick="showProfileFriends()"
-                        >
-                            👥 Друзья
-                        </button>
-
-                        <button
-                            onclick="showProfileMusic()"
-                        >
-                            🎵 Музыка
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div id="profileContent"></div>
-
-            </section>
-
-            <!-- =====================================
-                 FRIENDS
-            ====================================== -->
-
-            <section
-                id="page-friends"
-                class="page"
-            >
-
-                <div class="hero">
-
-                    <h2>
-                        Друзья 👥
-                    </h2>
-
-                    <p>
-                        Добавляй людей, находи знакомых
-                        и собирай свой маленький круг Bubbles.
-                    </p>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="card-title">
-
-                        <h3>
-                            Заявки в друзья
-                        </h3>
-
-                    </div>
-
-                    <div id="friendRequests"></div>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="card-title">
-
-                        <h3>
-                            Мои друзья
-                        </h3>
-
-                        <button
-                            class="secondary"
-                            onclick="document.getElementById('searchInput').focus()"
-                        >
-                            🔎 Найти
-                        </button>
-
-                    </div>
-
-                    <div
-                        id="friendsList"
-                        class="grid"
-                    ></div>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="card-title">
-
-                        <h3>
-                            Пользователи Bubbles
-                        </h3>
-
-                    </div>
-
-                    <div
-                        id="peopleList"
-                        class="grid"
-                    ></div>
-
-                </div>
-
-            </section>
-
-            <!-- =====================================
-                 MESSAGES
-            ====================================== -->
-
-            <section
-                id="page-messages"
-                class="page"
-            >
-
-                <div class="card message-layout">
-
-                    <div
-                        class="chat-list"
-                        id="chatList"
-                    ></div>
-
-                    <div class="chat-window">
-
-                        <div
-                            class="chat-header"
-                            id="chatHeader"
-                        >
-                            Выбери друга
-                        </div>
-
-                        <div
-                            class="messages"
-                            id="messages"
-                        ></div>
-
-                        <div class="message-input">
-
-                            <input
-                                id="messageInput"
-                                placeholder="Написать сообщение..."
-                                onkeydown="if(event.key==='Enter')sendMessage()"
-                            >
-
-                            <button
-                                class="primary"
-                                onclick="sendMessage()"
-                            >
-                                ➤
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!-- =====================================
-                 MUSIC
-            ====================================== -->
-
-            <section
-                id="page-music"
-                class="page"
-            >
-
-                <div class="hero">
-
-                    <h2>
-                        Музыка 🎵
-                    </h2>
-
-                    <p>
-                        Публикуй свои треки, слушай других
-                        пользователей и делись музыкой в ленте.
-                    </p>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="card-title">
-
-                        <h3>
-                            Вся музыка
-                        </h3>
-
-                        <button
-                            class="primary"
-                            onclick="openMusicModal()"
-                        >
-                            ＋ Добавить трек
-                        </button>
-
-                    </div>
-
-                    <div id="musicList"></div>
-
-                </div>
-
-            </section>
-
-            <!-- =====================================
-                 NOTIFICATIONS
-            ====================================== -->
-
-            <section
-                id="page-notifications"
-                class="page"
-            >
-
-                <div class="hero">
-
-                    <h2>
-                        Уведомления 🔔
-                    </h2>
-
-                    <p>
-                        Лайки, комментарии, заявки в друзья
-                        и новые сообщения будут появляться здесь.
-                    </p>
-
-                </div>
-
-                <div class="card">
-
-                    <div id="notificationsList"></div>
-
-                </div>
-
-            </section>
-
-            <!-- =====================================
-                 SETTINGS
-            ====================================== -->
-
-            <section
-                id="page-settings"
-                class="page"
-            >
-
-                <div class="hero">
-
-                    <h2>
-                        Настройки ⚙️
-                    </h2>
-
-                    <p>
-                        Управляй своим профилем и настройками Bubbles.
-                    </p>
-
-                </div>
-
-                <div class="card">
-
-                    <div class="form">
-
-                        <div class="card-title">
-
-                            <h3>
-                                Аккаунт
-                            </h3>
-
-                        </div>
-
-                        <div class="field">
-
-                            <label>
-                                Юзернейм
-                            </label>
-
-                            <input
-                                id="settingsUsername"
-                            >
-
-                        </div>
-
-                        <div class="field">
-
-                            <label>
-                                О себе
-                            </label>
-
-                            <textarea
-                                id="settingsBio"
-                            ></textarea>
-
-                        </div>
-
-                        <button
-                            class="primary"
-                            onclick="saveSettings()"
-                        >
-                            💾 Сохранить
-                        </button>
-
-                        <button
-                            class="secondary"
-                            style="margin-left:7px"
-                            onclick="logout()"
-                        >
-                            🚪 Выйти
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </section>
-
         </div>
 
-    </main>
+    </header>
 
-</div>
 
-<!-- =========================================
-     MODAL
-========================================= -->
+    <div class="layout">
 
-<div
-    id="modal"
-    class="modal hidden"
->
+        <!-- NAV -->
 
-    <div class="modal-box">
+        <aside class="sidebar">
 
-        <div class="modal-head">
-
-            <h3 id="modalTitle">
-                Редактирование
-            </h3>
-
-            <button
-                class="close"
-                onclick="closeModal()"
-            >
-                ✕
+            <button class="nav-btn active" data-page="feed" onclick="openPage('feed')">
+                <span class="nav-icon">🏠</span><span>Лента</span>
             </button>
 
-        </div>
+            <button class="nav-btn" data-page="profile" onclick="openOwnProfile()">
+                <span class="nav-icon">👤</span><span>Профиль</span>
+            </button>
 
-        <div id="modalContent"></div>
+            <button class="nav-btn" data-page="friends" onclick="openPage('friends')">
+                <span class="nav-icon">👥</span><span>Друзья</span>
+            </button>
+
+            <button class="nav-btn" data-page="messages" onclick="openPage('messages')">
+                <span class="nav-icon">💌</span><span>Сообщения</span>
+            </button>
+
+            <button class="nav-btn" data-page="music" onclick="openPage('music')">
+                <span class="nav-icon">🎵</span><span>Музыка</span>
+            </button>
+
+            <button class="nav-btn" data-page="edit" onclick="openPage('edit')">
+                <span class="nav-icon">⚙️</span><span>Настройки</span>
+            </button>
+
+            <button
+                class="nav-btn"
+                onclick="window.location.href='https://zeshpr.github.io/frutigeraeropage/bubbling.html'"
+            >
+                <span class="nav-icon">🌐</span><span>На главную</span>
+            </button>
+
+            <button class="nav-btn" onclick="logout()">
+                <span class="nav-icon">🚪</span><span>Выйти</span>
+            </button>
+
+        </aside>
+
+
+        <!-- MAIN -->
+
+        <main id="page" class="page"></main>
+
+
+        <!-- RIGHT -->
+
+        <aside class="rightbar">
+
+            <h3 style="margin-top:0;">🌊 bubbles</h3>
+
+            <p style="line-height:1.5;color:#7098a8;">
+                Маленькая социальная сеть,
+                которая выглядит так, будто интернет
+                никогда не перестал быть добрым.
+            </p>
+
+            <hr style="border:0;border-top:1px solid rgba(50,150,180,.12);">
+
+            <div id="onlineWidget"></div>
+
+        </aside>
 
     </div>
 
 </div>
 
-<div
-    id="toast"
-    class="toast"
-></div>
+
+<div id="toast" class="toast"></div>
+
 
 <script>
+/* ============================================================
+   BUBBLES — LOCAL PROTOTYPE
+   ============================================================ */
 
-/* ==========================================================
-   BUBBLES
-   Сейчас это полностью браузерный прототип.
+const DB_KEY = "bubbles_social_database_v4";
+const SESSION_KEY = "bubbles_current_user_v4";
 
-   Данные:
-   - пользователи
-   - посты
-   - друзья
-   - сообщения
-   - музыка
-   - уведомления
+let db = loadDB();
+let currentUserId = localStorage.getItem(SESSION_KEY);
+let currentPage = "feed";
+let selectedChatUser = null;
 
-   сохраняются в localStorage.
 
-   Позже этот слой можно заменить настоящим backend/API.
-========================================================== */
+/* ============================================================
+   DATABASE
+   ============================================================ */
 
-const STORAGE_KEY="bubbles_social_v2";
+function loadDB() {
 
-let db=JSON.parse(localStorage.getItem(STORAGE_KEY))||{
-    users:[],
-    posts:[],
-    friendships:[],
-    messages:[],
-    music:[],
-    notifications:[]
-};
+    try {
+        const saved = localStorage.getItem(DB_KEY);
 
-let currentUser=null;
-let selectedChat=null;
+        if (saved) {
+            const parsed = JSON.parse(saved);
 
-/* ==========================================
-   HELPERS
-========================================== */
+            return {
+                users: parsed.users || [],
+                posts: parsed.posts || [],
+                music: parsed.music || [],
+                messages: parsed.messages || []
+            };
+        }
 
-function saveDB(){
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(db)
-    );
+    } catch(e) {
+        console.error(e);
+    }
+
+    return {
+        users: [],
+        posts: [],
+        music: [],
+        messages: []
+    };
 }
 
-function uid(prefix="id"){
-    return prefix+
-        "_"+
-        Math.random()
-            .toString(36)
-            .slice(2,10)+
-        Date.now()
-            .toString(36);
+
+function saveDB() {
+    localStorage.setItem(DB_KEY, JSON.stringify(db));
 }
 
-function esc(value=""){
-    return String(value).replace(
-        /[&<>"']/g,
-        m=>({
-            "&":"&amp;",
-            "<":"&lt;",
-            ">":"&gt;",
-            '"':"&quot;",
-            "'":"&#039;"
-        }[m])
-    );
+
+function saveSession() {
+    if (currentUserId) {
+        localStorage.setItem(SESSION_KEY, currentUserId);
+    } else {
+        localStorage.removeItem(SESSION_KEY);
+    }
 }
 
-function getUser(id){
-    return db.users.find(
-        u=>u.id===id
-    );
+
+function uid(prefix = "id") {
+    return prefix + "_" + Date.now() + "_" + Math.random().toString(36).slice(2,9);
 }
 
-function getUserByName(name){
-    return db.users.find(
-        u=>
-            u.username.toLowerCase()===
-            name.toLowerCase()
-    );
+
+function getUser(id) {
+    return db.users.find(u => u.id === id);
 }
 
-function toast(text){
 
-    const el=
-        document.getElementById("toast");
-
-    el.textContent=text;
-
-    el.classList.add("show");
-
-    setTimeout(
-        ()=>el.classList.remove("show"),
-        2500
-    );
+function getCurrentUser() {
+    return getUser(currentUserId);
 }
 
-function timeAgo(time){
 
-    const diff=
-        Math.floor(
-            (Date.now()-time)/1000
-        );
+function defaultAvatar(name = "B") {
 
-    if(diff<60)
-        return "только что";
+    const letter = (name || "B").trim().charAt(0).toUpperCase();
 
-    if(diff<3600)
-        return Math.floor(diff/60)+" мин. назад";
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
+        <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop stop-color="#73dcfa"/>
+                <stop offset="1" stop-color="#91e5c5"/>
+            </linearGradient>
+        </defs>
+        <rect width="400" height="400" rx="200" fill="url(#g)"/>
+        <circle cx="120" cy="100" r="55" fill="white" opacity=".35"/>
+        <text x="200" y="245"
+              text-anchor="middle"
+              font-family="Arial"
+              font-size="150"
+              font-weight="bold"
+              fill="white">${escapeSvg(letter)}</text>
+    </svg>`;
 
-    if(diff<86400)
-        return Math.floor(diff/3600)+" ч. назад";
-
-    if(diff<604800)
-        return Math.floor(diff/86400)+" дн. назад";
-
-    return new Date(time)
-        .toLocaleDateString("ru-RU");
+    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
 }
 
-/* ==========================================
-   AVATAR
-========================================== */
 
-function defaultAvatar(
-    username,
-    gender
-){
-
-    const color=
-        gender==="female"
-        ?"#ffb8e7"
-        :"#91e9ff";
-
-    const letter=
-        (username||"?")[0]
-            .toUpperCase();
-
-    return "data:image/svg+xml;charset=UTF-8,"+
-        encodeURIComponent(`
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="300"
-            height="300"
-        >
-
-            <defs>
-
-                <linearGradient
-                    id="g"
-                    x1="0"
-                    y1="0"
-                    x2="1"
-                    y2="1"
-                >
-
-                    <stop
-                        stop-color="${color}"
-                    />
-
-                    <stop
-                        offset="1"
-                        stop-color="#37bde8"
-                    />
-
-                </linearGradient>
-
-            </defs>
-
-            <circle
-                cx="150"
-                cy="150"
-                r="150"
-                fill="url(#g)"
-            />
-
-            <circle
-                cx="95"
-                cy="75"
-                r="40"
-                fill="white"
-                opacity=".45"
-            />
-
-            <text
-                x="150"
-                y="190"
-                text-anchor="middle"
-                font-family="Arial"
-                font-size="110"
-                font-weight="bold"
-                fill="white"
-            >
-                ${letter}
-            </text>
-
-        </svg>
-        `);
+function defaultCover() {
+    return "";
 }
 
-/* ==========================================
+
+/* ============================================================
    AUTH
-========================================== */
+   ============================================================ */
 
-function showLogin(){
+function showAuth(type) {
 
-    document
-        .getElementById("loginForm")
-        .classList.remove("hidden");
+    document.getElementById("loginForm").classList.toggle("hidden", type !== "login");
+    document.getElementById("registerForm").classList.toggle("hidden", type !== "register");
 
-    document
-        .getElementById("registerForm")
-        .classList.add("hidden");
+    document.getElementById("loginTab").classList.toggle("primary", type === "login");
+    document.getElementById("registerTab").classList.toggle("primary", type === "register");
+
+    hideError();
 }
 
-function showRegister(){
 
-    document
-        .getElementById("loginForm")
-        .classList.add("hidden");
-
-    document
-        .getElementById("registerForm")
-        .classList.remove("hidden");
+function showError(text) {
+    const el = document.getElementById("authError");
+    el.textContent = text;
+    el.style.display = "block";
 }
 
-function register(){
 
-    const username=
-        document
-            .getElementById("regUsername")
-            .value
-            .trim();
+function hideError() {
+    const el = document.getElementById("authError");
+    el.textContent = "";
+    el.style.display = "none";
+}
 
-    const password=
-        document
-            .getElementById("regPassword")
-            .value;
 
-    const gender=
-        document
-            .querySelector(
-                'input[name="gender"]:checked'
-            )?.value;
+document.getElementById("registerForm").addEventListener("submit", function(e) {
 
-    if(username.length<3)
-        return toast(
-            "Юзернейм должен быть длиннее 2 символов"
-        );
+    e.preventDefault();
 
-    if(
-        !/^[a-zA-Z0-9_а-яА-ЯёЁ.-]+$/
-            .test(username)
-    )
-        return toast(
-            "В юзернейме есть недопустимые символы"
-        );
+    const username = document.getElementById("regUsername").value.trim().toLowerCase();
+    const displayName = document.getElementById("regDisplayName").value.trim();
+    const gender = document.getElementById("regGender").value;
+    const bio = document.getElementById("regBio").value.trim();
+    const password = document.getElementById("regPassword").value;
 
-    if(password.length<6)
-        return toast(
-            "Пароль должен содержать минимум 6 символов"
-        );
+    if (!/^[a-zA-Z0-9_.-]{3,25}$/.test(username)) {
+        showError("Username: только латиница, цифры, _ . - и минимум 3 символа.");
+        return;
+    }
 
-    if(!gender)
-        return toast(
-            "Выбери пол"
-        );
+    if (db.users.some(u => u.username === username)) {
+        showError("Такой username уже занят.");
+        return;
+    }
 
-    if(getUserByName(username))
-        return toast(
-            "Такой юзернейм уже занят"
-        );
-
-    const user={
-        id:uid("u"),
+    const user = {
+        id: uid("user"),
         username,
-        password,
+        displayName,
         gender,
-        bio:"",
-        avatar:defaultAvatar(
-            username,
-            gender
-        ),
-        cover:"",
-        createdAt:Date.now()
+        bio,
+        password,
+        avatar: defaultAvatar(displayName),
+        cover: defaultCover(),
+        friends: [],
+        friendRequests: [],
+        createdAt: Date.now()
     };
 
     db.users.push(user);
-
     saveDB();
 
-    currentUser=user.id;
+    currentUserId = user.id;
+    saveSession();
 
-    localStorage.setItem(
-        "bubbles_session",
-        currentUser
-    );
+    document.getElementById("registerForm").reset();
 
     startApp();
 
-    toast(
-        "Добро пожаловать в Bubbles 🫧"
-    );
-}
+    toast("Добро пожаловать в bubbles 🫧");
+});
 
-function login(){
 
-    const username=
-        document
-            .getElementById("loginUsername")
-            .value
-            .trim();
+document.getElementById("loginForm").addEventListener("submit", function(e) {
 
-    const password=
-        document
-            .getElementById("loginPassword")
-            .value;
+    e.preventDefault();
 
-    const user=
-        getUserByName(username);
+    const username = document.getElementById("loginUsername").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
 
-    if(
-        !user ||
-        user.password!==password
-    ){
-        return toast(
-            "Неверный юзернейм или пароль"
-        );
-    }
-
-    currentUser=user.id;
-
-    localStorage.setItem(
-        "bubbles_session",
-        currentUser
+    const user = db.users.find(
+        u => u.username === username && u.password === password
     );
 
-    startApp();
-}
-
-function logout(){
-
-    localStorage.removeItem(
-        "bubbles_session"
-    );
-
-    currentUser=null;
-
-    document
-        .getElementById("app")
-        .classList.add("hidden");
-
-    document
-        .getElementById("authScreen")
-        .classList.remove("hidden");
-
-    showLogin();
-}
-
-/* ==========================================
-   APP
-========================================== */
-
-function startApp(){
-
-    const id=
-        localStorage.getItem(
-            "bubbles_session"
-        );
-
-    const user=getUser(id);
-
-    if(!user){
-
-        document
-            .getElementById("authScreen")
-            .classList.remove("hidden");
-
-        document
-            .getElementById("app")
-            .classList.add("hidden");
-
+    if (!user) {
+        showError("Неверный username или пароль.");
         return;
     }
 
-    currentUser=id;
+    currentUserId = user.id;
+    saveSession();
 
-    document
-        .getElementById("authScreen")
-        .classList.add("hidden");
+    document.getElementById("loginForm").reset();
 
-    document
-        .getElementById("app")
-        .classList.remove("hidden");
+    startApp();
 
-    refreshUserUI();
+    toast("С возвращением, " + user.displayName + " 🫧");
+});
 
-    renderAll();
+
+function logout() {
+
+    currentUserId = null;
+    saveSession();
+
+    document.getElementById("app").style.display = "none";
+    document.getElementById("authScreen").style.display = "flex";
+
+    showAuth("login");
 }
 
-function refreshUserUI(){
 
-    const user=
-        getUser(currentUser);
+/* ============================================================
+   APP START
+   ============================================================ */
 
-    if(!user)return;
+function startApp() {
 
-    document
-        .getElementById("sideUsername")
-        .textContent="@"+user.username;
+    const user = getCurrentUser();
 
-    document
-        .getElementById("sideAvatar")
-        .src=user.avatar;
-
-    document
-        .getElementById("profileName")
-        .textContent="@"+user.username;
-
-    document
-        .getElementById("profileBio")
-        .textContent=
-            user.bio ||
-            "Пока ничего не написал(а) о себе.";
-
-    document
-        .getElementById("profileAvatar")
-        .src=user.avatar;
-
-    const cover=
-        document.getElementById(
-            "profileCover"
-        );
-
-    if(user.cover){
-
-        cover.style.backgroundImage=
-            `url("${user.cover}")`;
-
-        cover.style.backgroundSize=
-            "cover";
-
-        cover.style.backgroundPosition=
-            "center";
-
-    }else{
-
-        cover.style.backgroundImage="";
-
+    if (!user) {
+        logout();
+        return;
     }
 
-    document
-        .getElementById("settingsUsername")
-        .value=user.username;
+    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("app").style.display = "block";
 
-    document
-        .getElementById("settingsBio")
-        .value=user.bio;
+    updateTopbar();
+
+    openPage("feed");
+
+    updateOnlineWidget();
 }
 
-/* ==========================================
-   NAVIGATION
-========================================== */
 
-function go(page){
+function updateTopbar() {
 
-    document
-        .querySelectorAll(".page")
-        .forEach(
-            p=>p.classList.remove("active")
-        );
+    const user = getCurrentUser();
 
-    const target=
-        document.getElementById(
-            "page-"+page
-        );
+    if (!user) return;
 
-    if(target)
-        target.classList.add("active");
-
-    document
-        .querySelectorAll(".nav button")
-        .forEach(button=>{
-            button.classList.toggle(
-                "active",
-                button.dataset.page===page
-            );
-        });
-
-    if(page==="home")
-        renderFeed();
-
-    if(page==="profile")
-        renderProfile();
-
-    if(page==="friends")
-        renderFriends();
-
-    if(page==="messages")
-        renderChats();
-
-    if(page==="music")
-        renderMusic();
-
-    if(page==="notifications")
-        renderNotifications();
+    document.getElementById("topAvatar").src = user.avatar || defaultAvatar(user.displayName);
 }
 
-function renderAll(){
 
-    renderFeed();
-    renderProfile();
-    renderFriends();
-    renderChats();
-    renderMusic();
-    renderNotifications();
+function openPage(page) {
+
+    currentPage = page;
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.page === page);
+    });
+
+    if (page === "feed") renderFeed();
+    if (page === "profile") renderProfile(currentUserId);
+    if (page === "friends") renderFriends();
+    if (page === "messages") renderMessages();
+    if (page === "music") renderMusic();
+    if (page === "edit") renderEditProfile();
 }
 
-/* ==========================================
-   POSTS
-========================================== */
 
-function createPost(){
+function openOwnProfile() {
+    openPage("profile");
+}
 
-    const text=
-        document
-            .getElementById("postText")
-            .value
-            .trim();
 
-    const file=
-        document
-            .getElementById("postImage")
-            .files[0];
+/* ============================================================
+   FEED
+   ============================================================ */
 
-    if(!text&&!file)
-        return toast(
-            "Добавь текст или фотографию"
-        );
+function renderFeed() {
 
-    const finish=(image="")=>{
+    const page = document.getElementById("page");
 
-        db.posts.unshift({
+    const posts = [...db.posts].sort((a,b) => b.createdAt - a.createdAt);
 
-            id:uid("post"),
+    page.innerHTML = `
+        <h1 class="section-title">Лента 🌊</h1>
 
-            authorId:currentUser,
+        <div class="card create-post">
 
+            <textarea
+                id="newPostText"
+                maxlength="1000"
+                placeholder="Что нового в твоём маленьком интернете?"
+            ></textarea>
+
+            <input
+                type="file"
+                id="postImageInput"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                hidden
+            >
+
+            <div class="create-tools">
+
+                <button onclick="document.getElementById('postImageInput').click()">
+                    📷 Фотография
+                </button>
+
+                <span id="postImageName" style="color:#7899a7;font-size:13px;"></span>
+
+                <button class="primary" style="width:auto;margin-left:auto;" onclick="createPost()">
+                    Опубликовать
+                </button>
+
+            </div>
+
+        </div>
+
+        <div id="feedPosts">
+            ${
+                posts.length
+                ? posts.map(renderPost).join("")
+                : emptyState("🫧", "Здесь пока тихо", "Создай первый пост в bubbles.")
+            }
+        </div>
+    `;
+
+    document.getElementById("postImageInput").addEventListener("change", function() {
+        const file = this.files[0];
+        document.getElementById("postImageName").textContent =
+            file ? file.name : "";
+    });
+}
+
+
+function createPost() {
+
+    const text = document.getElementById("newPostText").value.trim();
+    const input = document.getElementById("postImageInput");
+    const file = input.files[0];
+
+    if (!text && !file) {
+        toast("Напиши что-нибудь или добавь фотографию.");
+        return;
+    }
+
+    if (file && !file.type.startsWith("image/")) {
+        toast("Можно загружать только изображения.");
+        return;
+    }
+
+    const finish = image => {
+
+        db.posts.push({
+            id: uid("post"),
+            authorId: currentUserId,
             text,
-
-            image,
-
-            likes:[],
-
-            comments:[],
-
-            createdAt:Date.now()
-
+            image: image || "",
+            likes: [],
+            comments: [],
+            createdAt: Date.now()
         });
 
         saveDB();
-
-        document
-            .getElementById("postText")
-            .value="";
-
-        document
-            .getElementById("postImage")
-            .value="";
-
         renderFeed();
-
-        toast(
-            "Пост опубликован 🫧"
-        );
+        toast("Пост опубликован 🫧");
     };
 
-    if(file){
+    if (file) {
 
-        if(
-            file.size>
-            8*1024*1024
-        )
-            return toast(
-                "Фотография слишком большая"
-            );
+        const reader = new FileReader();
 
-        const reader=
-            new FileReader();
-
-        reader.onload=()=>{
-            finish(reader.result);
-        };
+        reader.onload = e => finish(e.target.result);
 
         reader.readAsDataURL(file);
 
-    }else{
-
-        finish();
-
+    } else {
+        finish("");
     }
 }
 
-function renderFeed(){
 
-    const box=
-        document.getElementById(
-            "feed"
-        );
+function renderPost(post) {
 
-    const posts=
-        [...db.posts]
-            .sort(
-                (a,b)=>
-                    b.createdAt-a.createdAt
-            );
+    const author = getUser(post.authorId);
 
-    if(!posts.length){
+    if (!author) return "";
 
-        box.innerHTML=`
-            <div class="card empty">
+    const liked = post.likes.includes(currentUserId);
 
-                <div class="bubble-icon">
-                    🫧
-                </div>
-
-                <h3>
-                    Пока здесь тихо
-                </h3>
-
-                <p>
-                    Будь первым, кто что-нибудь
-                    опубликует.
-                </p>
-
-            </div>
-        `;
-
-        return;
-    }
-
-    box.innerHTML=
-        posts
-            .map(renderPost)
-            .join("");
-}
-
-function renderPost(post){
-
-    const author=
-        getUser(post.authorId);
-
-    if(!author)return "";
-
-    const liked=
-        post.likes.includes(
-            currentUser
-        );
+    const comments = post.comments || [];
 
     return `
-
         <article class="post">
 
             <div class="post-head">
 
                 <img
-                    class="avatar"
-                    src="${author.avatar}"
+                    class="post-avatar"
+                    src="${author.avatar || defaultAvatar(author.displayName)}"
+                    onclick="renderProfile('${author.id}')"
                     alt=""
                 >
 
-                <div class="post-author">
-
-                    <strong
-                        onclick="openUser('${author.id}')"
+                <div style="min-width:0;">
+                    <div
+                        class="post-author"
+                        onclick="renderProfile('${author.id}')"
                     >
-                        @${esc(author.username)}
-                    </strong>
+                        ${escapeHtml(author.displayName)}
+                    </div>
 
-                    <small>
-                        ${timeAgo(post.createdAt)}
-                    </small>
-
+                    <div class="post-time">
+                        @${escapeHtml(author.username)} · ${formatDate(post.createdAt)}
+                    </div>
                 </div>
 
             </div>
 
             ${
                 post.text
-                ?
-                `
-                <div class="post-text">
-                    ${esc(post.text)}
-                </div>
-                `
-                :
-                ""
+                ? `<div class="post-text">${escapeHtml(post.text)}</div>`
+                : ""
             }
 
             ${
                 post.image
-                ?
-                `
-                <img
-                    class="post-image"
-                    src="${post.image}"
-                    alt="Фото"
-                >
-                `
-                :
-                ""
+                ? `<img class="post-image" src="${post.image}" alt="post image">`
+                : ""
             }
 
             <div class="post-actions">
 
                 <button
-                    class="${liked?"liked":""}"
+                    class="like ${liked ? "active" : ""}"
                     onclick="toggleLike('${post.id}')"
                 >
-                    ❤️ ${post.likes.length}
+                    ${liked ? "💗" : "♡"} ${post.likes.length}
                 </button>
 
-                <button
-                    onclick="focusComment('${post.id}')"
-                >
-                    💬 ${post.comments.length}
+                <button onclick="focusComment('${post.id}')">
+                    💬 ${comments.length}
                 </button>
 
-                <button
-                    onclick="sharePost('${post.id}')"
-                >
-                    ↗ Поделиться
+                <button onclick="openProfileFromPost('${post.authorId}')">
+                    👤 Профиль
                 </button>
 
                 ${
-                    post.authorId===currentUser
-                    ?
-                    `
-                    <button
-                        onclick="deletePost('${post.id}')"
-                    >
-                        🗑 Удалить
-                    </button>
-                    `
-                    :
-                    ""
+                    post.authorId === currentUserId
+                    ? `<button onclick="deletePost('${post.id}')">🗑️</button>`
+                    : ""
                 }
 
             </div>
@@ -2953,33 +1496,18 @@ function renderPost(post){
             <div class="comments">
 
                 ${
-                    post.comments
-                        .map(comment=>{
+                    comments.map(c => {
 
-                            const u=
-                                getUser(
-                                    comment.userId
-                                );
+                        const user = getUser(c.userId);
 
-                            return `
-                                <div class="comment">
+                        return `
+                            <div class="comment">
+                                <b>@${escapeHtml(user?.username || "user")}</b>
+                                ${escapeHtml(c.text)}
+                            </div>
+                        `;
 
-                                    <strong>
-                                        @${esc(
-                                            u?.username ||
-                                            "unknown"
-                                        )}
-                                    </strong>
-
-                                    ${esc(
-                                        comment.text
-                                    )}
-
-                                </div>
-                            `;
-
-                        })
-                        .join("")
+                    }).join("")
                 }
 
                 <div class="comment-form">
@@ -2987,18 +1515,11 @@ function renderPost(post){
                     <input
                         id="comment-${post.id}"
                         placeholder="Написать комментарий..."
-                        onkeydown="
-                            if(event.key==='Enter')
-                            addComment('${post.id}')
-                        "
+                        maxlength="300"
+                        onkeydown="if(event.key==='Enter') addComment('${post.id}')"
                     >
 
-                    <button
-                        class="secondary"
-                        onclick="addComment('${post.id}')"
-                    >
-                        ➤
-                    </button>
+                    <button onclick="addComment('${post.id}')">➤</button>
 
                 </div>
 
@@ -3008,2004 +1529,1229 @@ function renderPost(post){
     `;
 }
 
-function toggleLike(id){
 
-    const post=
-        db.posts.find(
-            p=>p.id===id
-        );
+function toggleLike(postId) {
 
-    if(!post)return;
+    const post = db.posts.find(p => p.id === postId);
 
-    if(
-        post.likes.includes(
-            currentUser
-        )
-    ){
+    if (!post) return;
 
-        post.likes=
-            post.likes.filter(
-                id=>id!==currentUser
-            );
-
-    }else{
-
-        post.likes.push(
-            currentUser
-        );
-
-        if(
-            post.authorId!==currentUser
-        ){
-
-            db.notifications.unshift({
-
-                id:uid("n"),
-
-                userId:post.authorId,
-
-                text:
-                    "@"+
-                    getUser(currentUser).username+
-                    " поставил(а) лайк вашему посту ❤️",
-
-                createdAt:Date.now(),
-
-                read:false
-
-            });
-
-        }
-
+    if (post.likes.includes(currentUserId)) {
+        post.likes = post.likes.filter(id => id !== currentUserId);
+    } else {
+        post.likes.push(currentUserId);
     }
 
     saveDB();
-
     renderFeed();
 }
 
-function addComment(id){
 
-    const input=
-        document.getElementById(
-            "comment-"+id
-        );
+function addComment(postId) {
 
-    const text=
-        input.value.trim();
+    const input = document.getElementById("comment-" + postId);
 
-    if(!text)return;
+    if (!input) return;
 
-    const post=
-        db.posts.find(
-            p=>p.id===id
-        );
+    const text = input.value.trim();
 
-    if(!post)return;
+    if (!text) return;
+
+    const post = db.posts.find(p => p.id === postId);
+
+    if (!post) return;
 
     post.comments.push({
-
-        id:uid("c"),
-
-        userId:currentUser,
-
+        id: uid("comment"),
+        userId: currentUserId,
         text,
-
-        createdAt:Date.now()
-
+        createdAt: Date.now()
     });
 
-    if(
-        post.authorId!==currentUser
-    ){
-
-        db.notifications.unshift({
-
-            id:uid("n"),
-
-            userId:post.authorId,
-
-            text:
-                "@"+
-                getUser(currentUser).username+
-                " прокомментировал(а) ваш пост 💬",
-
-            createdAt:Date.now(),
-
-            read:false
-
-        });
-
-    }
-
     saveDB();
-
     renderFeed();
 }
 
-function focusComment(id){
 
-    const input=
-        document.getElementById(
-            "comment-"+id
-        );
+function focusComment(postId) {
 
-    if(input){
+    const input = document.getElementById("comment-" + postId);
 
+    if (input) {
         input.focus();
-
         input.scrollIntoView({
-            behavior:"smooth",
-            block:"center"
+            behavior: "smooth",
+            block: "center"
         });
-
     }
 }
 
-function deletePost(id){
 
-    if(
-        !confirm(
-            "Удалить этот пост?"
-        )
-    )
-        return;
+function deletePost(id) {
 
-    db.posts=
-        db.posts.filter(
-            p=>p.id!==id
-        );
+    if (!confirm("Удалить этот пост?")) return;
+
+    db.posts = db.posts.filter(p => p.id !== id);
 
     saveDB();
-
     renderFeed();
 
-    toast(
-        "Пост удалён"
-    );
+    toast("Пост удалён.");
 }
 
-function sharePost(id){
 
-    const post=
-        db.posts.find(
-            p=>p.id===id
-        );
-
-    if(!post)return;
-
-    db.posts.unshift({
-
-        id:uid("post"),
-
-        authorId:currentUser,
-
-        text:
-            "↗ Поделился(ась) постом @"+
-            getUser(post.authorId).username+
-            (
-                post.text
-                ?
-                "\n\n"+post.text
-                :
-                ""
-            ),
-
-        image:post.image||"",
-
-        likes:[],
-
-        comments:[],
-
-        createdAt:Date.now()
-
-    });
-
-    saveDB();
-
-    renderFeed();
-
-    toast(
-        "Пост появился в твоей ленте"
-    );
+function openProfileFromPost(id) {
+    renderProfile(id);
 }
 
-/* ==========================================
+
+/* ============================================================
    PROFILE
-========================================== */
+   ============================================================ */
 
-function renderProfile(){
+function renderProfile(userId) {
 
-    refreshUserUI();
+    currentPage = "profile";
 
-    const posts=
-        db.posts
-            .filter(
-                p=>p.authorId===currentUser
-            )
-            .sort(
-                (a,b)=>
-                    b.createdAt-a.createdAt
-            );
+    const user = getUser(userId);
 
-    const box=
-        document.getElementById(
-            "profileContent"
-        );
+    if (!user) return;
 
-    if(!posts.length){
+    const own = user.id === currentUserId;
 
-        box.innerHTML=`
-            <div class="card empty">
+    const posts = db.posts
+        .filter(p => p.authorId === user.id)
+        .sort((a,b) => b.createdAt - a.createdAt);
 
-                <div class="bubble-icon">
-                    🌊
+    const userMusic = db.music
+        .filter(m => m.authorId === user.id)
+        .sort((a,b) => b.createdAt - a.createdAt);
+
+    const friend = getCurrentUser()?.friends?.includes(user.id);
+
+    const incoming = user.friendRequests?.includes(currentUserId);
+
+    const coverStyle = user.cover
+        ? `background-image:url("${user.cover}")`
+        : "";
+
+    document.getElementById("page").innerHTML = `
+
+        <div class="profile-card">
+
+            <div class="profile-cover" style="${coverStyle}"></div>
+
+            <div class="profile-info">
+
+                <img
+                    class="profile-big-avatar"
+                    src="${user.avatar || defaultAvatar(user.displayName)}"
+                    alt=""
+                >
+
+                <div class="profile-name">
+                    ${escapeHtml(user.displayName)}
                 </div>
 
-                <h3>
-                    Тут пока ничего нет
-                </h3>
-
-                <p>
-                    Твои публикации появятся здесь.
-                </p>
-
-            </div>
-        `;
-
-    }else{
-
-        box.innerHTML=
-            posts
-                .map(renderPost)
-                .join("");
-
-    }
-}
-
-function showProfileFriends(){
-
-    const ids=
-        getFriends(currentUser);
-
-    document
-        .getElementById(
-            "profileContent"
-        )
-        .innerHTML=`
-
-            <div class="card">
-
-                <div class="card-title">
-
-                    <h3>
-                        Друзья · ${ids.length}
-                    </h3>
-
+                <div class="profile-username">
+                    @${escapeHtml(user.username)}
                 </div>
 
-                <div class="grid">
-
-                    ${
-                        ids
-                            .map(
-                                id=>
-                                    personHTML(
-                                        getUser(id)
-                                    )
-                            )
-                            .join("")
-                        ||
-                        `
-                        <div class="empty">
-                            Пока нет друзей.
-                        </div>
-                        `
-                    }
-
+                <div class="profile-bio">
+                    ${escapeHtml(user.bio || "Этот пользователь пока ничего о себе не написал.")}
                 </div>
 
-            </div>
-        `;
-}
+                <div class="profile-stats">
 
-function showProfileMusic(){
-
-    const tracks=
-        db.music.filter(
-            m=>m.authorId===currentUser
-        );
-
-    document
-        .getElementById(
-            "profileContent"
-        )
-        .innerHTML=`
-
-            <div class="card">
-
-                <div class="card-title">
-
-                    <h3>
-                        Моя музыка
-                    </h3>
-
-                </div>
-
-                ${
-                    tracks
-                        .map(musicHTML)
-                        .join("")
-                    ||
-                    `
-                    <div class="empty">
-                        Ты ещё ничего не опубликовал(а).
+                    <div class="stat">
+                        <b>${user.friends?.length || 0}</b>
+                        <span>друзей</span>
                     </div>
-                    `
-                }
 
-            </div>
-        `;
-}
+                    <div class="stat">
+                        <b>${posts.length}</b>
+                        <span>постов</span>
+                    </div>
 
-function openEditProfile(){
+                    <div class="stat">
+                        <b>${userMusic.length}</b>
+                        <span>музыки</span>
+                    </div>
 
-    const user=
-        getUser(currentUser);
+                </div>
 
-    openModal(
-        "Редактирование профиля",
-        `
+                <div class="profile-buttons">
 
-        <div class="form">
-
-            <div class="field">
-
-                <label>
-                    Юзернейм
-                </label>
-
-                <input
-                    id="editUsername"
-                    value="${esc(user.username)}"
-                >
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    О себе
-                </label>
-
-                <textarea
-                    id="editBio"
-                    placeholder="Расскажи немного о себе..."
-                >${esc(user.bio)}</textarea>
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Фотография профиля
-                </label>
-
-                <input
-                    id="editAvatar"
-                    type="file"
-                    accept="image/*"
-                >
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Обложка профиля
-                </label>
-
-                <input
-                    id="editCover"
-                    type="file"
-                    accept="image/*"
-                >
-
-            </div>
-
-            <button
-                class="primary"
-                onclick="saveProfile()"
-            >
-                💾 Сохранить
-            </button>
-
-        </div>
-
-        `
-    );
-}
-
-function saveProfile(){
-
-    const user=
-        getUser(currentUser);
-
-    const username=
-        document
-            .getElementById(
-                "editUsername"
-            )
-            .value
-            .trim();
-
-    const bio=
-        document
-            .getElementById(
-                "editBio"
-            )
-            .value
-            .trim();
-
-    const avatar=
-        document
-            .getElementById(
-                "editAvatar"
-            )
-            .files[0];
-
-    const cover=
-        document
-            .getElementById(
-                "editCover"
-            )
-            .files[0];
-
-    if(username.length<3)
-        return toast(
-            "Слишком короткий юзернейм"
-        );
-
-    const existing=
-        db.users.find(
-            u=>
-                u.username.toLowerCase()===
-                username.toLowerCase() &&
-                u.id!==currentUser
-        );
-
-    if(existing)
-        return toast(
-            "Этот юзернейм уже занят"
-        );
-
-    user.username=username;
-    user.bio=bio;
-
-    const readFile=(
-        file,
-        callback
-    )=>{
-
-        if(!file)
-            return callback();
-
-        if(file.size>8*1024*1024)
-            return toast(
-                "Файл слишком большой"
-            );
-
-        const reader=
-            new FileReader();
-
-        reader.onload=()=>{
-            callback(
-                reader.result
-            );
-        };
-
-        reader.readAsDataURL(file);
-    };
-
-    readFile(
-        avatar,
-        img=>{
-
-            if(img)
-                user.avatar=img;
-
-            readFile(
-                cover,
-                cov=>{
-
-                    if(cov)
-                        user.cover=cov;
-
-                    saveDB();
-
-                    refreshUserUI();
-
-                    closeModal();
-
-                    toast(
-                        "Профиль обновлён ✨"
-                    );
-
-                }
-            );
-
-        }
-    );
-}
-
-/* ==========================================
-   FRIENDS
-========================================== */
-
-function getFriends(id){
-
-    return db.friendships
-        .filter(
-            f=>
-                f.status==="accepted" &&
-                (
-                    f.from===id ||
-                    f.to===id
-                )
-        )
-        .map(
-            f=>
-                f.from===id
-                ?f.to
-                :f.from
-        );
-}
-
-function friendshipState(other){
-
-    const f=
-        db.friendships.find(
-            f=>
-                (
-                    f.from===currentUser &&
-                    f.to===other
-                ) ||
-                (
-                    f.from===other &&
-                    f.to===currentUser
-                )
-        );
-
-    if(!f)
-        return "none";
-
-    if(f.status==="accepted")
-        return "friends";
-
-    if(f.from===currentUser)
-        return "sent";
-
-    return "incoming";
-}
-
-function sendFriendRequest(id){
-
-    if(id===currentUser)
-        return;
-
-    if(
-        friendshipState(id)!=="none"
-    )
-        return;
-
-    db.friendships.push({
-
-        id:uid("friend"),
-
-        from:currentUser,
-
-        to:id,
-
-        status:"pending",
-
-        createdAt:Date.now()
-
-    });
-
-    db.notifications.unshift({
-
-        id:uid("n"),
-
-        userId:id,
-
-        text:
-            "@"+
-            getUser(currentUser).username+
-            " хочет добавить вас в друзья 👥",
-
-        createdAt:Date.now(),
-
-        read:false,
-
-        friendRequest:true,
-
-        fromId:currentUser
-
-    });
-
-    saveDB();
-
-    renderFriends();
-
-    toast(
-        "Заявка отправлена"
-    );
-}
-
-function acceptFriend(id){
-
-    const f=
-        db.friendships.find(
-            f=>
-                f.from===id &&
-                f.to===currentUser &&
-                f.status==="pending"
-        );
-
-    if(!f)return;
-
-    f.status="accepted";
-
-    saveDB();
-
-    renderFriends();
-
-    toast(
-        "Теперь вы друзья 🫧"
-    );
-}
-
-function rejectFriend(id){
-
-    db.friendships=
-        db.friendships.filter(
-            f=>
-                !(
-                    f.from===id &&
-                    f.to===currentUser &&
-                    f.status==="pending"
-                )
-        );
-
-    saveDB();
-
-    renderFriends();
-}
-
-function removeFriend(id){
-
-    db.friendships=
-        db.friendships.filter(
-            f=>
-                !(
-                    (
-                        f.from===currentUser &&
-                        f.to===id
-                    ) ||
-                    (
-                        f.from===id &&
-                        f.to===currentUser
-                    )
-                )
-        );
-
-    saveDB();
-
-    renderFriends();
-
-    toast(
-        "Пользователь удалён из друзей"
-    );
-}
-
-function personHTML(user){
-
-    if(!user)return "";
-
-    const state=
-        friendshipState(
-            user.id
-        );
-
-    let button="";
-
-    if(state==="none"){
-
-        button=`
-            <button
-                class="secondary"
-                onclick="sendFriendRequest('${user.id}')"
-            >
-                ＋ Дружить
-            </button>
-        `;
-
-    }
-
-    if(state==="sent"){
-
-        button=`
-            <button
-                class="secondary"
-                disabled
-            >
-                Заявка
-            </button>
-        `;
-
-    }
-
-    if(state==="friends"){
-
-        button=`
-            <button
-                class="secondary"
-                onclick="removeFriend('${user.id}')"
-            >
-                ✓ Друзья
-            </button>
-        `;
-
-    }
-
-    if(state==="incoming"){
-
-        button=`
-            <button
-                class="secondary"
-                onclick="acceptFriend('${user.id}')"
-            >
-                Принять
-            </button>
-        `;
-
-    }
-
-    return `
-
-        <div class="person">
-
-            <img
-                class="avatar"
-                src="${user.avatar}"
-                alt=""
-            >
-
-            <div
-                class="person-info"
-                onclick="openUser('${user.id}')"
-            >
-
-                <strong>
-                    @${esc(user.username)}
-                </strong>
-
-                <small>
                     ${
-                        user.bio
-                        ?
-                        esc(user.bio)
-                        :
-                        "Пользователь Bubbles"
+                        own
+                        ? `
+                            <button onclick="openPage('edit')">
+                                ✏️ Редактировать
+                            </button>
+                        `
+                        : `
+                            ${
+                                friend
+                                ? `<button class="green" onclick="removeFriend('${user.id}')">✓ В друзьях</button>`
+                                : incoming
+                                ? `<button class="green" onclick="acceptFriend('${user.id}')">✓ Принять заявку</button>`
+                                : `<button class="primary" style="width:auto" onclick="sendFriendRequest('${user.id}')">＋ Добавить в друзья</button>`
+                            }
+
+                            <button onclick="openChat('${user.id}')">
+                                💌 Написать
+                            </button>
+                        `
                     }
-                </small>
+
+                </div>
 
             </div>
 
-            ${button}
-
         </div>
+
+
+        ${
+            userMusic.length
+            ? `
+                <h2 class="section-title" style="margin-top:25px;">
+                    🎵 Музыка
+                </h2>
+
+                ${userMusic.map(renderMusicCard).join("")}
+            `
+            : ""
+        }
+
+
+        <h2 class="section-title" style="margin-top:25px;">
+            📰 Посты
+        </h2>
+
+        ${
+            posts.length
+            ? posts.map(renderPost).join("")
+            : emptyState("🌊", "Пока нет постов", "Здесь появятся публикации пользователя.")
+        }
 
     `;
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.page === "profile");
+    });
 }
 
-function renderFriends(){
 
-    const friends=
-        getFriends(currentUser);
+/* ============================================================
+   FRIENDS
+   ============================================================ */
 
-    document
-        .getElementById(
-            "friendsList"
-        )
-        .innerHTML=
-            friends
-                .map(
-                    id=>
-                        personHTML(
-                            getUser(id)
-                        )
-                )
-                .join("")
-            ||
-            `
-            <div class="empty">
-                У тебя пока нет друзей.
-            </div>
-            `;
+function sendFriendRequest(userId) {
 
-    const requests=
-        db.friendships.filter(
-            f=>
-                f.to===currentUser &&
-                f.status==="pending"
-        );
+    const target = getUser(userId);
+    const me = getCurrentUser();
 
-    document
-        .getElementById(
-            "friendRequests"
-        )
-        .innerHTML=
-            requests
-                .map(
-                    f=>{
+    if (!target || !me || userId === currentUserId) return;
 
-                        const u=
-                            getUser(f.from);
+    if (!target.friendRequests) target.friendRequests = [];
 
-                        return `
+    if (!target.friendRequests.includes(currentUserId)) {
+        target.friendRequests.push(currentUserId);
+    }
 
-                        <div
-                            class="person"
-                            style="margin-bottom:8px"
-                        >
+    saveDB();
 
-                            <img
-                                class="avatar"
-                                src="${u.avatar}"
-                                alt=""
-                            >
+    renderProfile(userId);
 
-                            <div class="person-info">
-
-                                <strong>
-                                    @${esc(u.username)}
-                                </strong>
-
-                                <small>
-                                    Хочет добавить тебя
-                                    в друзья
-                                </small>
-
-                            </div>
-
-                            <button
-                                class="primary"
-                                onclick="acceptFriend('${u.id}')"
-                            >
-                                ✓
-                            </button>
-
-                            <button
-                                class="secondary"
-                                onclick="rejectFriend('${u.id}')"
-                            >
-                                ✕
-                            </button>
-
-                        </div>
-
-                        `;
-
-                    }
-                )
-                .join("")
-            ||
-            `
-            <div class="empty">
-                Новых заявок нет.
-            </div>
-            `;
-
-    document
-        .getElementById(
-            "peopleList"
-        )
-        .innerHTML=
-            db.users
-                .filter(
-                    u=>u.id!==currentUser
-                )
-                .map(personHTML)
-                .join("");
+    toast("Заявка отправлена 👥");
 }
 
-function openUser(id){
 
-    const user=
-        getUser(id);
+function acceptFriend(userId) {
 
-    if(!user)return;
+    const me = getCurrentUser();
+    const other = getUser(userId);
 
-    openModal(
-        "@"+user.username,
-        `
+    if (!me || !other) return;
 
-        <div style="text-align:center">
+    if (!me.friends) me.friends = [];
+    if (!other.friends) other.friends = [];
 
-            <img
-                class="profile-big-avatar"
-                src="${user.avatar}"
-                alt=""
-            >
+    if (!me.friends.includes(userId)) me.friends.push(userId);
+    if (!other.friends.includes(currentUserId)) other.friends.push(currentUserId);
 
-            <h2
-                style="
-                    margin-top:10px;
-                    color:#145f7d;
-                    overflow-wrap:anywhere;
-                "
-            >
-                @${esc(user.username)}
-            </h2>
+    me.friendRequests = (me.friendRequests || [])
+        .filter(id => id !== userId);
 
-            <p
-                style="
-                    margin:8px 0;
-                    color:#718f9d;
-                    overflow-wrap:anywhere;
-                "
-            >
-                ${
-                    esc(
-                        user.bio ||
-                        "Пока ничего о себе не написал(а)."
-                    )
-                }
-            </p>
+    saveDB();
 
-            <div
-                style="
-                    display:flex;
-                    justify-content:center;
-                    flex-wrap:wrap;
-                    gap:7px;
-                    margin-top:15px;
-                "
-            >
+    renderProfile(userId);
 
-                ${personActionHTML(user.id)}
+    toast("Теперь вы друзья 🫧");
+}
 
-                ${
-                    getFriends(currentUser)
-                        .includes(user.id)
-                    ?
-                    `
-                    <button
-                        class="secondary"
-                        onclick="
-                            openChat('${user.id}');
-                            closeModal();
-                        "
-                    >
-                        💬 Написать
-                    </button>
-                    `
-                    :
-                    ""
-                }
 
-            </div>
+function removeFriend(userId) {
+
+    const me = getCurrentUser();
+    const other = getUser(userId);
+
+    if (!me || !other) return;
+
+    me.friends = (me.friends || []).filter(id => id !== userId);
+    other.friends = (other.friends || []).filter(id => id !== currentUserId);
+
+    saveDB();
+
+    renderProfile(userId);
+
+    toast("Пользователь удалён из друзей.");
+}
+
+
+function renderFriends() {
+
+    const me = getCurrentUser();
+
+    const friends = (me.friends || [])
+        .map(getUser)
+        .filter(Boolean);
+
+    const requests = (me.friendRequests || [])
+        .map(getUser)
+        .filter(Boolean);
+
+    const others = db.users
+        .filter(u => u.id !== currentUserId)
+        .filter(u => !friends.some(f => f.id === u.id))
+        .slice(0, 12);
+
+    document.getElementById("page").innerHTML = `
+
+        <h1 class="section-title">👥 Друзья</h1>
+
+        ${
+            requests.length
+            ? `
+                <div class="card">
+
+                    <h3 style="margin-top:0;">
+                        Новые заявки
+                    </h3>
+
+                    <div class="user-list">
+                        ${requests.map(u => renderUserCard(u, true)).join("")}
+                    </div>
+
+                </div>
+            `
+            : ""
+        }
+
+        <div class="card">
+
+            <h3 style="margin-top:0;">
+                Мои друзья · ${friends.length}
+            </h3>
+
+            ${
+                friends.length
+                ? `<div class="user-list">${friends.map(u => renderUserCard(u)).join("")}</div>`
+                : emptyState("👥", "Пока нет друзей", "Найди кого-нибудь через поиск.")
+            }
 
         </div>
 
         <div class="card">
 
-            <h3
-                style="
-                    margin-bottom:10px;
-                    color:#146383;
-                "
-            >
-                Посты
+            <h3 style="margin-top:0;">
+                Люди в bubbles
             </h3>
 
             ${
-                db.posts
-                    .filter(
-                        p=>p.authorId===id
-                    )
-                    .map(renderPost)
-                    .join("")
-                ||
-                `
-                <div class="empty">
-                    Постов пока нет.
-                </div>
-                `
+                others.length
+                ? `<div class="user-list">${others.map(u => renderUserCard(u)).join("")}</div>`
+                : emptyState("🫧", "Пока никого нет", "")
             }
 
         </div>
 
-        `
-    );
-}
-
-function personActionHTML(id){
-
-    const state=
-        friendshipState(id);
-
-    if(state==="none"){
-
-        return `
-            <button
-                class="primary"
-                onclick="
-                    sendFriendRequest('${id}');
-                    closeModal();
-                "
-            >
-                ＋ Добавить в друзья
-            </button>
-        `;
-
-    }
-
-    if(state==="sent"){
-
-        return `
-            <button
-                class="secondary"
-                disabled
-            >
-                Заявка отправлена
-            </button>
-        `;
-
-    }
-
-    if(state==="incoming"){
-
-        return `
-            <button
-                class="primary"
-                onclick="
-                    acceptFriend('${id}');
-                    closeModal();
-                "
-            >
-                Принять заявку
-            </button>
-        `;
-
-    }
-
-    return `
-        <button
-            class="secondary"
-            onclick="
-                removeFriend('${id}');
-                closeModal();
-            "
-        >
-            ✓ Уже друзья
-        </button>
     `;
 }
 
-/* ==========================================
-   MESSAGES
-========================================== */
 
-function renderChats(){
+function renderUserCard(user, request = false) {
 
-    const friends=
-        getFriends(currentUser);
+    const me = getCurrentUser();
 
-    const list=
-        document.getElementById(
-            "chatList"
-        );
-
-    if(!friends.length){
-
-        list.innerHTML=`
-
-            <div class="empty">
-                Добавь друзей,
-                чтобы начать общаться.
-            </div>
-
-        `;
-
-        document
-            .getElementById(
-                "chatHeader"
-            )
-            .textContent=
-                "Нет выбранного диалога";
-
-        document
-            .getElementById(
-                "messages"
-            )
-            .innerHTML=`
-
-                <div class="empty">
-                    Здесь появятся сообщения.
-                </div>
-
-            `;
-
-        return;
-    }
-
-    list.innerHTML=
-        friends
-            .map(id=>{
-
-                const u=
-                    getUser(id);
-
-                const msgs=
-                    db.messages
-                        .filter(
-                            m=>
-                                (
-                                    m.from===currentUser &&
-                                    m.to===id
-                                ) ||
-                                (
-                                    m.from===id &&
-                                    m.to===currentUser
-                                )
-                        )
-                        .sort(
-                            (a,b)=>
-                                b.createdAt-a.createdAt
-                        );
-
-                const last=
-                    msgs[0];
-
-                return `
-
-                    <div
-                        class="
-                            chat
-                            ${
-                                selectedChat===id
-                                ?
-                                "selected"
-                                :
-                                ""
-                            }
-                        "
-                        onclick="
-                            openChat('${id}')
-                        "
-                    >
-
-                        <img
-                            class="avatar"
-                            src="${u.avatar}"
-                            alt=""
-                        >
-
-                        <div class="chat-info">
-
-                            <strong>
-                                @${esc(u.username)}
-                            </strong>
-
-                            <small>
-                                ${
-                                    last
-                                    ?
-                                    esc(last.text)
-                                    :
-                                    "Начать разговор..."
-                                }
-                            </small>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            })
-            .join("");
-
-    if(
-        selectedChat &&
-        friends.includes(selectedChat)
-    ){
-
-        renderMessages();
-
-    }else{
-
-        openChat(
-            friends[0]
-        );
-
-    }
-}
-
-function openChat(id){
-
-    selectedChat=id;
-
-    renderChats();
-}
-
-function renderMessages(){
-
-    const user=
-        getUser(selectedChat);
-
-    if(!user)return;
-
-    document
-        .getElementById(
-            "chatHeader"
-        )
-        .innerHTML=`
-
-            <span
-                style="
-                    display:flex;
-                    align-items:center;
-                    gap:9px;
-                    min-width:0;
-                "
-            >
-
-                <img
-                    class="avatar"
-                    style="
-                        width:35px;
-                        height:35px;
-                        flex-basis:35px;
-                    "
-                    src="${user.avatar}"
-                    alt=""
-                >
-
-                <span
-                    style="
-                        overflow:hidden;
-                        text-overflow:ellipsis;
-                        white-space:nowrap;
-                    "
-                >
-                    @${esc(user.username)}
-                </span>
-
-            </span>
-
-        `;
-
-    const msgs=
-        db.messages
-            .filter(
-                m=>
-                    (
-                        m.from===currentUser &&
-                        m.to===selectedChat
-                    ) ||
-                    (
-                        m.from===selectedChat &&
-                        m.to===currentUser
-                    )
-            )
-            .sort(
-                (a,b)=>
-                    a.createdAt-b.createdAt
-            );
-
-    document
-        .getElementById(
-            "messages"
-        )
-        .innerHTML=
-            msgs
-                .map(
-                    m=>
-                        `
-                        <div
-                            class="
-                                msg
-                                ${
-                                    m.from===currentUser
-                                    ?
-                                    "me"
-                                    :
-                                    "them"
-                                }
-                            "
-                        >
-                            ${esc(m.text)}
-                        </div>
-                        `
-                )
-                .join("")
-            ||
-            `
-            <div class="empty">
-                Начни разговор 🫧
-            </div>
-            `;
-
-    const box=
-        document.getElementById(
-            "messages"
-        );
-
-    box.scrollTop=
-        box.scrollHeight;
-}
-
-function sendMessage(){
-
-    if(!selectedChat)
-        return toast(
-            "Сначала выбери друга"
-        );
-
-    const input=
-        document.getElementById(
-            "messageInput"
-        );
-
-    const text=
-        input.value.trim();
-
-    if(!text)return;
-
-    db.messages.push({
-
-        id:uid("msg"),
-
-        from:currentUser,
-
-        to:selectedChat,
-
-        text,
-
-        createdAt:Date.now()
-
-    });
-
-    db.notifications.unshift({
-
-        id:uid("n"),
-
-        userId:selectedChat,
-
-        text:
-            "Новое сообщение от @"+
-            getUser(currentUser).username+
-            " 💬",
-
-        createdAt:Date.now(),
-
-        read:false
-
-    });
-
-    saveDB();
-
-    input.value="";
-
-    renderMessages();
-
-    renderChats();
-}
-
-/* ==========================================
-   MUSIC
-========================================== */
-
-function openMusicModal(){
-
-    openModal(
-        "Опубликовать трек",
-        `
-
-        <div class="form">
-
-            <div class="field">
-
-                <label>
-                    Название
-                </label>
-
-                <input
-                    id="musicTitle"
-                    placeholder="Название трека"
-                >
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Обложка
-                </label>
-
-                <input
-                    id="musicCover"
-                    type="file"
-                    accept="image/*"
-                >
-
-            </div>
-
-            <div class="field">
-
-                <label>
-                    Аудиофайл
-                </label>
-
-                <input
-                    id="musicFile"
-                    type="file"
-                    accept="audio/*"
-                >
-
-            </div>
-
-            <button
-                class="primary"
-                onclick="publishMusic()"
-            >
-                🎵 Опубликовать
-            </button>
-
-        </div>
-
-        `
-    );
-}
-
-function publishMusic(){
-
-    const title=
-        document
-            .getElementById(
-                "musicTitle"
-            )
-            .value
-            .trim();
-
-    const audio=
-        document
-            .getElementById(
-                "musicFile"
-            )
-            .files[0];
-
-    const cover=
-        document
-            .getElementById(
-                "musicCover"
-            )
-            .files[0];
-
-    if(!title)
-        return toast(
-            "Напиши название"
-        );
-
-    if(!audio)
-        return toast(
-            "Выбери аудиофайл"
-        );
-
-    if(
-        audio.size>
-        15*1024*1024
-    )
-        return toast(
-            "Аудио слишком большое"
-        );
-
-    const read=(
-        file,
-        callback
-    )=>{
-
-        if(!file)
-            return callback("");
-
-        const reader=
-            new FileReader();
-
-        reader.onload=()=>{
-            callback(
-                reader.result
-            );
-        };
-
-        reader.readAsDataURL(file);
-    };
-
-    read(
-        cover,
-        coverData=>{
-
-            read(
-                audio,
-                audioData=>{
-
-                    db.music.unshift({
-
-                        id:uid("music"),
-
-                        authorId:currentUser,
-
-                        title,
-
-                        cover:
-                            coverData||"",
-
-                        audio:audioData,
-
-                        createdAt:Date.now()
-
-                    });
-
-                    saveDB();
-
-                    closeModal();
-
-                    renderMusic();
-
-                    toast(
-                        "Трек опубликован 🎵"
-                    );
-
-                }
-            );
-
-        }
-    );
-}
-
-function musicHTML(m){
-
-    const user=
-        getUser(m.authorId);
+    const isFriend = me?.friends?.includes(user.id);
 
     return `
-
-        <div class="music-item">
+        <div class="user-card">
 
             <img
-                class="cover"
-                src="${
-                    m.cover ||
-                    defaultAvatar(
-                        m.title,
-                        "female"
-                    )
-                }"
-                alt=""
+                src="${user.avatar || defaultAvatar(user.displayName)}"
+                onclick="renderProfile('${user.id}')"
             >
 
-            <div class="music-info">
+            <div class="user-card-info">
 
-                <strong>
-                    ${esc(m.title)}
-                </strong>
+                <div
+                    class="user-card-name"
+                    onclick="renderProfile('${user.id}')"
+                    style="cursor:pointer;"
+                >
+                    ${escapeHtml(user.displayName)}
+                </div>
 
-                <small>
-                    @${esc(
-                        user?.username ||
-                        "unknown"
-                    )}
-                </small>
+                <div class="user-card-username">
+                    @${escapeHtml(user.username)}
+                </div>
+
+                <div style="margin-top:7px;display:flex;gap:5px;flex-wrap:wrap;">
+
+                    ${
+                        request
+                        ? `<button class="green" onclick="acceptFriend('${user.id}')">Принять</button>`
+                        : isFriend
+                        ? `<button onclick="removeFriend('${user.id}')">Удалить</button>`
+                        : `<button onclick="sendFriendRequest('${user.id}')">＋ Дружба</button>`
+                    }
+
+                </div>
 
             </div>
 
-            <audio
-                controls
-                src="${m.audio}"
-            ></audio>
-
-            <button
-                class="secondary"
-                onclick="
-                    shareMusic('${m.id}')
-                "
-            >
-                ↗
-            </button>
-
-            ${
-                m.authorId===currentUser
-                ?
-                `
-                <button
-                    class="secondary"
-                    onclick="
-                        deleteMusic('${m.id}')
-                    "
-                >
-                    🗑
-                </button>
-                `
-                :
-                ""
-            }
-
         </div>
-
     `;
 }
 
-function renderMusic(){
 
-    const list=
-        document.getElementById(
-            "musicList"
-        );
+/* ============================================================
+   MUSIC
+   ============================================================ */
 
-    const music=
-        [...db.music]
-            .sort(
-                (a,b)=>
-                    b.createdAt-a.createdAt
-            );
+function renderMusic() {
 
-    list.innerHTML=
-        music
-            .map(musicHTML)
-            .join("")
-        ||
-        `
-        <div class="empty">
+    const music = [...db.music]
+        .sort((a,b) => b.createdAt - a.createdAt);
 
-            <div class="bubble-icon">
-                🎵
-            </div>
+    document.getElementById("page").innerHTML = `
 
-            <h3>
-                Музыки пока нет
-            </h3>
+        <h1 class="section-title">🎵 Вся музыка</h1>
 
-            <p>
-                Стань первым исполнителем Bubbles.
+        <div class="card">
+
+            <h3 style="margin-top:0;">Добавить музыку</h3>
+
+            <input
+                id="musicTitle"
+                placeholder="Название трека"
+                maxlength="70"
+            >
+
+            <input
+                id="musicCover"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+            >
+
+            <input
+                id="musicFile"
+                type="file"
+                accept=".mp3,audio/mpeg"
+            >
+
+            <button class="primary" style="width:auto;" onclick="uploadMusic()">
+                🎵 Опубликовать MP3
+            </button>
+
+            <p style="font-size:12px;color:#7899a7;margin-bottom:0;">
+                Поддерживается именно MP3. Видео и другие файлы не принимаются.
             </p>
 
         </div>
-        `;
+
+        <div id="musicList">
+
+            ${
+                music.length
+                ? music.map(renderMusicCard).join("")
+                : emptyState("🎵", "Музыки пока нет", "Загрузи первый трек в bubbles.")
+            }
+
+        </div>
+
+    `;
 }
 
-function shareMusic(id){
 
-    const m=
-        db.music.find(
-            x=>x.id===id
+function uploadMusic() {
+
+    const title = document.getElementById("musicTitle").value.trim();
+    const audioFile = document.getElementById("musicFile").files[0];
+    const coverFile = document.getElementById("musicCover").files[0];
+
+    if (!title) {
+        toast("Укажи название трека.");
+        return;
+    }
+
+    if (!audioFile) {
+        toast("Выбери MP3-файл.");
+        return;
+    }
+
+    const isMP3 =
+        audioFile.type === "audio/mpeg" ||
+        audioFile.name.toLowerCase().endsWith(".mp3");
+
+    if (!isMP3) {
+        toast("Можно загружать только MP3.");
+        return;
+    }
+
+    const readFile = (file) => {
+
+        return new Promise((resolve, reject) => {
+
+            if (!file) {
+                resolve("");
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = e => resolve(e.target.result);
+            reader.onerror = reject;
+
+            reader.readAsDataURL(file);
+        });
+    };
+
+
+    Promise.all([
+        readFile(audioFile),
+        readFile(coverFile)
+    ])
+    .then(([audio, cover]) => {
+
+        db.music.push({
+            id: uid("music"),
+            authorId: currentUserId,
+            title,
+            audio,
+            cover: cover || "",
+            createdAt: Date.now()
+        });
+
+        saveDB();
+
+        openPage("music");
+
+        toast("Трек опубликован 🎵");
+    })
+    .catch(() => {
+        toast("Не удалось прочитать файл.");
+    });
+}
+
+
+function renderMusicCard(music) {
+
+    const author = getUser(music.authorId);
+
+    return `
+        <div class="music-card">
+
+            <div class="music-row">
+
+                <img
+                    class="music-cover"
+                    src="${music.cover || defaultMusicCover()}"
+                    alt=""
+                >
+
+                <div class="music-info">
+
+                    <div class="music-title">
+                        ${escapeHtml(music.title)}
+                    </div>
+
+                    <div class="music-artist">
+                        ${escapeHtml(author?.displayName || "Unknown")}
+                        · @${escapeHtml(author?.username || "unknown")}
+                    </div>
+
+                </div>
+
+                ${
+                    music.authorId === currentUserId
+                    ? `<button onclick="deleteMusic('${music.id}')">🗑️</button>`
+                    : ""
+                }
+
+            </div>
+
+            <audio controls preload="metadata" src="${music.audio}"></audio>
+
+        </div>
+    `;
+}
+
+
+function defaultMusicCover() {
+
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400">
+        <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                <stop stop-color="#69d9f8"/>
+                <stop offset=".5" stop-color="#b5f1df"/>
+                <stop offset="1" stop-color="#f2a9d2"/>
+            </linearGradient>
+        </defs>
+        <rect width="400" height="400" rx="40" fill="url(#g)"/>
+        <circle cx="130" cy="120" r="60" fill="white" opacity=".35"/>
+        <text x="200" y="245"
+              text-anchor="middle"
+              font-size="130">♪</text>
+    </svg>`;
+
+    return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+}
+
+
+function deleteMusic(id) {
+
+    if (!confirm("Удалить этот трек?")) return;
+
+    db.music = db.music.filter(m => m.id !== id);
+
+    saveDB();
+
+    openPage("music");
+
+    toast("Трек удалён.");
+}
+
+
+/* ============================================================
+   EDIT PROFILE
+   ============================================================ */
+
+function renderEditProfile() {
+
+    const user = getCurrentUser();
+
+    document.getElementById("page").innerHTML = `
+
+        <h1 class="section-title">⚙️ Настройки профиля</h1>
+
+        <div class="card">
+
+            <h3 style="margin-top:0;">Основная информация</h3>
+
+            <label>Username</label>
+            <input
+                id="editUsername"
+                value="${escapeAttr(user.username)}"
+                maxlength="25"
+            >
+
+            <label>Имя</label>
+            <input
+                id="editDisplayName"
+                value="${escapeAttr(user.displayName)}"
+                maxlength="35"
+            >
+
+            <label>Описание</label>
+            <textarea
+                id="editBio"
+                maxlength="160"
+                placeholder="Расскажи о себе..."
+            >${escapeHtml(user.bio || "")}</textarea>
+
+            <label>Пол</label>
+            <select id="editGender">
+                <option value="male" ${user.gender === "male" ? "selected" : ""}>Мужской</option>
+                <option value="female" ${user.gender === "female" ? "selected" : ""}>Женский</option>
+            </select>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3 style="margin-top:0;">🖼️ Аватар</h3>
+
+            <img
+                id="avatarPreview"
+                class="file-preview"
+                style="
+                    width:140px;
+                    height:140px;
+                    border-radius:50%;
+                    margin:auto;
+                    object-fit:cover;
+                "
+                src="${user.avatar}"
+            >
+
+            <input
+                id="avatarFile"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+            >
+
+            <p style="font-size:12px;color:#7899a7;">
+                PNG, JPG или WebP.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3 style="margin-top:0;">🌅 Обложка профиля</h3>
+
+            <img
+                id="coverPreview"
+                class="file-preview"
+                src="${user.cover || ""}"
+                style="${user.cover ? "display:block;" : ""}"
+            >
+
+            <input
+                id="coverFile"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+            >
+
+        </div>
+
+
+        <button
+            class="primary"
+            style="width:auto;"
+            onclick="saveProfileChanges()"
+        >
+            💾 Сохранить изменения
+        </button>
+
+    `;
+
+
+    document.getElementById("avatarFile").addEventListener("change", function() {
+
+        const file = this.files[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            toast("Выбери изображение.");
+            this.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = e => {
+            document.getElementById("avatarPreview").src = e.target.result;
+            document.getElementById("avatarPreview").style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+
+    document.getElementById("coverFile").addEventListener("change", function() {
+
+        const file = this.files[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            toast("Выбери изображение.");
+            this.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = e => {
+            document.getElementById("coverPreview").src = e.target.result;
+            document.getElementById("coverPreview").style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
+    });
+}
+
+
+function saveProfileChanges() {
+
+    const user = getCurrentUser();
+
+    const username = document
+        .getElementById("editUsername")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const displayName = document
+        .getElementById("editDisplayName")
+        .value
+        .trim();
+
+    const bio = document
+        .getElementById("editBio")
+        .value
+        .trim();
+
+    const gender = document
+        .getElementById("editGender")
+        .value;
+
+    if (!/^[a-zA-Z0-9_.-]{3,25}$/.test(username)) {
+        toast("Некорректный username.");
+        return;
+    }
+
+    const duplicate = db.users.find(
+        u => u.username === username && u.id !== user.id
+    );
+
+    if (duplicate) {
+        toast("Такой username уже занят.");
+        return;
+    }
+
+    user.username = username;
+    user.displayName = displayName || username;
+    user.bio = bio;
+    user.gender = gender;
+
+    const avatarFile = document.getElementById("avatarFile").files[0];
+    const coverFile = document.getElementById("coverFile").files[0];
+
+    const read = file => new Promise((resolve, reject) => {
+
+        if (!file) {
+            resolve(null);
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = reject;
+
+        reader.readAsDataURL(file);
+    });
+
+
+    Promise.all([
+        read(avatarFile),
+        read(coverFile)
+    ])
+    .then(([avatar, cover]) => {
+
+        if (avatar) user.avatar = avatar;
+        if (cover) user.cover = cover;
+
+        saveDB();
+        updateTopbar();
+
+        renderProfile(user.id);
+
+        toast("Профиль сохранён 🫧");
+    });
+}
+
+
+/* ============================================================
+   MESSAGES
+   ============================================================ */
+
+function openChat(userId) {
+
+    selectedChatUser = userId;
+
+    openPage("messages");
+}
+
+
+function renderMessages() {
+
+    const me = getCurrentUser();
+
+    const otherUsers = db.users
+        .filter(u => u.id !== currentUserId)
+        .filter(u =>
+            db.messages.some(m =>
+                (m.from === currentUserId && m.to === u.id) ||
+                (m.from === u.id && m.to === currentUserId)
+            )
         );
 
-    if(!m)return;
+    if (!selectedChatUser && otherUsers.length) {
+        selectedChatUser = otherUsers[0].id;
+    }
 
-    const u=
-        getUser(m.authorId);
+    document.getElementById("page").innerHTML = `
 
-    db.posts.unshift({
+        <h1 class="section-title">💌 Сообщения</h1>
 
-        id:uid("post"),
+        <div class="messages-layout card" style="padding:0;">
 
-        authorId:currentUser,
+            <div class="conversations">
 
-        text:
-            `🎵 Поделился(ась) треком «${m.title}» от @${u.username}`,
+                ${
+                    otherUsers.length
+                    ? otherUsers.map(renderConversation).join("")
+                    : emptyState("💌", "Пока нет сообщений", "Открой профиль пользователя и нажми «Написать».")
+                }
 
-        image:
-            m.cover||"",
+            </div>
 
-        likes:[],
+            <div class="chat">
 
-        comments:[],
+                ${
+                    selectedChatUser
+                    ? renderChat(selectedChatUser)
+                    : `
+                        <div class="empty" style="margin:auto;">
+                            <div class="empty-icon">🫧</div>
+                            Выбери собеседника
+                        </div>
+                    `
+                }
 
-        createdAt:Date.now()
+            </div>
 
+        </div>
+
+    `;
+
+    const chatMessages = document.getElementById("chatMessages");
+
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+
+function renderConversation(user) {
+
+    return `
+        <div
+            class="conversation ${selectedChatUser === user.id ? "active" : ""}"
+            onclick="openChat('${user.id}')"
+        >
+
+            <img src="${user.avatar || defaultAvatar(user.displayName)}">
+
+            <div style="min-width:0;">
+
+                <b style="overflow-wrap:anywhere;">
+                    ${escapeHtml(user.displayName)}
+                </b>
+
+                <div
+                    style="
+                        font-size:12px;
+                        color:#759aaa;
+                        overflow:hidden;
+                        text-overflow:ellipsis;
+                    "
+                >
+                    @${escapeHtml(user.username)}
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+function renderChat(userId) {
+
+    const user = getUser(userId);
+
+    if (!user) return "";
+
+    const messages = db.messages
+        .filter(m =>
+            (m.from === currentUserId && m.to === userId) ||
+            (m.from === userId && m.to === currentUserId)
+        )
+        .sort((a,b) => a.createdAt - b.createdAt);
+
+    return `
+
+        <div class="chat-header">
+            💬 ${escapeHtml(user.displayName)}
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+
+            ${
+                messages.length
+                ? messages.map(m => `
+                    <div class="message ${m.from === currentUserId ? "mine" : ""}">
+                        ${escapeHtml(m.text)}
+                    </div>
+                `).join("")
+                : `
+                    <div class="empty">
+                        <div class="empty-icon">🫧</div>
+                        Напиши первое сообщение
+                    </div>
+                `
+            }
+
+        </div>
+
+        <form class="chat-form" onsubmit="sendMessage(event, '${userId}')">
+
+            <input
+                id="messageInput"
+                maxlength="1000"
+                placeholder="Написать сообщение..."
+                autocomplete="off"
+                required
+            >
+
+            <button class="primary" style="width:auto;">
+                ➤
+            </button>
+
+        </form>
+
+    `;
+}
+
+
+function sendMessage(event, userId) {
+
+    event.preventDefault();
+
+    const input = document.getElementById("messageInput");
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    db.messages.push({
+        id: uid("message"),
+        from: currentUserId,
+        to: userId,
+        text,
+        createdAt: Date.now()
     });
 
     saveDB();
 
-    toast(
-        "Музыка опубликована в твоей ленте"
-    );
+    selectedChatUser = userId;
+
+    renderMessages();
 }
 
-function deleteMusic(id){
 
-    if(
-        !confirm(
-            "Удалить этот трек?"
-        )
-    )
+/* ============================================================
+   SEARCH
+   ============================================================ */
+
+function searchEverything(query) {
+
+    query = query.trim().toLowerCase();
+
+    if (!query) {
+        if (currentPage === "feed") renderFeed();
         return;
+    }
 
-    db.music=
-        db.music.filter(
-            m=>m.id!==id
-        );
-
-    saveDB();
-
-    renderMusic();
-
-    toast(
-        "Трек удалён"
+    const users = db.users.filter(u =>
+        u.username.includes(query) ||
+        u.displayName.toLowerCase().includes(query)
     );
+
+    const posts = db.posts.filter(p =>
+        p.text.toLowerCase().includes(query)
+    );
+
+    document.getElementById("page").innerHTML = `
+
+        <h1 class="section-title">
+            🔎 Результаты поиска
+        </h1>
+
+        <div class="card">
+
+            <h3>Люди</h3>
+
+            ${
+                users.length
+                ? `<div class="user-list">${users.map(u => renderUserCard(u)).join("")}</div>`
+                : `<p style="color:#7899a7;">Никого не найдено.</p>`
+            }
+
+        </div>
+
+        <h2 class="section-title">Посты</h2>
+
+        ${
+            posts.length
+            ? posts.map(renderPost).join("")
+            : emptyState("🔎", "Постов не найдено", "")
+        }
+
+    `;
 }
 
-/* ==========================================
-   NOTIFICATIONS
-========================================== */
 
-function renderNotifications(){
+/* ============================================================
+   WIDGET
+   ============================================================ */
 
-    const list=
-        db.notifications.filter(
-            n=>n.userId===currentUser
-        );
+function updateOnlineWidget() {
 
-    const box=
-        document.getElementById(
-            "notificationsList"
-        );
+    const count = Math.max(1, Math.min(
+        db.users.length,
+        3 + Math.floor(Math.random() * 7)
+    ));
 
-    if(!list.length){
+    document.getElementById("onlineWidget").innerHTML = `
 
-        box.innerHTML=`
+        <div style="
+            background:rgba(255,255,255,.5);
+            border-radius:17px;
+            padding:12px;
+        ">
 
-            <div class="empty">
-
-                <div class="bubble-icon">
-                    🔔
-                </div>
-
-                <h3>
-                    Пока ничего нет
-                </h3>
-
-                <p>
-                    Здесь будут появляться
-                    новые события.
-                </p>
-
+            <div style="font-weight:800;">
+                🟢 Сейчас в bubbles
             </div>
 
-        `;
+            <div style="font-size:28px;font-weight:900;margin-top:4px;">
+                ${count}
+            </div>
 
-        return;
+            <div style="font-size:12px;color:#7899a7;">
+                пользователей гуляют по интернету
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+
+function emptyState(icon, title, text) {
+
+    return `
+        <div class="empty">
+
+            <div class="empty-icon">${icon}</div>
+
+            <b style="font-size:18px;">
+                ${escapeHtml(title)}
+            </b>
+
+            ${
+                text
+                ? `<div style="margin-top:6px;">${escapeHtml(text)}</div>`
+                : ""
+            }
+
+        </div>
+    `;
+}
+
+
+function formatDate(timestamp) {
+
+    const date = new Date(timestamp);
+
+    const diff = Date.now() - timestamp;
+
+    if (diff < 60000) return "только что";
+
+    if (diff < 3600000) {
+        return Math.floor(diff / 60000) + " мин назад";
     }
 
-    box.innerHTML=
-        list
-            .map(
-                n=>
-                    `
-                    <div
-                        class="person"
-                        style="margin-bottom:8px"
-                    >
-
-                        <div class="person-info">
-
-                            <strong>
-                                ${esc(n.text)}
-                            </strong>
-
-                            <small>
-                                ${timeAgo(n.createdAt)}
-                            </small>
-
-                        </div>
-
-                        ${
-                            n.friendRequest
-                            ?
-                            `
-                            <button
-                                class="primary"
-                                onclick="
-                                    acceptFriend('${n.fromId}')
-                                "
-                            >
-                                Принять
-                            </button>
-                            `
-                            :
-                            ""
-                        }
-
-                    </div>
-                    `
-            )
-            .join("");
-
-    list.forEach(
-        n=>n.read=true
-    );
-
-    saveDB();
-}
-
-/* ==========================================
-   SETTINGS
-========================================== */
-
-function saveSettings(){
-
-    const user=
-        getUser(currentUser);
-
-    const username=
-        document
-            .getElementById(
-                "settingsUsername"
-            )
-            .value
-            .trim();
-
-    const bio=
-        document
-            .getElementById(
-                "settingsBio"
-            )
-            .value
-            .trim();
-
-    if(username.length<3)
-        return toast(
-            "Слишком короткий юзернейм"
-        );
-
-    const exists=
-        db.users.find(
-            u=>
-                u.username.toLowerCase()===
-                username.toLowerCase() &&
-                u.id!==currentUser
-        );
-
-    if(exists)
-        return toast(
-            "Юзернейм уже занят"
-        );
-
-    user.username=username;
-
-    user.bio=bio;
-
-    saveDB();
-
-    refreshUserUI();
-
-    toast(
-        "Настройки сохранены"
-    );
-}
-
-/* ==========================================
-   SEARCH
-========================================== */
-
-function searchEverything(query){
-
-    query=
-        query
-            .trim()
-            .toLowerCase();
-
-    if(!query){
-
-        return;
-
+    if (diff < 86400000) {
+        return Math.floor(diff / 3600000) + " ч назад";
     }
 
-    const people=
-        db.users.filter(
-            u=>
-                u.id!==currentUser &&
-                u.username
-                    .toLowerCase()
-                    .includes(query)
-        );
-
-    if(people.length){
-
-        go("friends");
-
-        document
-            .getElementById(
-                "peopleList"
-            )
-            .innerHTML=
-                people
-                    .map(personHTML)
-                    .join("");
-
-    }
-
+    return date.toLocaleDateString("ru-RU", {
+        day: "numeric",
+        month: "short",
+        year: date.getFullYear() !== new Date().getFullYear()
+            ? "numeric"
+            : undefined
+    });
 }
 
-/* ==========================================
-   MODALS
-========================================== */
 
-function openModal(
-    title,
-    html
-){
+function toast(text) {
 
-    document
-        .getElementById(
-            "modalTitle"
-        )
-        .textContent=title;
+    const el = document.getElementById("toast");
 
-    document
-        .getElementById(
-            "modalContent"
-        )
-        .innerHTML=html;
+    el.textContent = text;
+    el.classList.add("show");
 
-    document
-        .getElementById(
-            "modal"
-        )
-        .classList.remove(
-            "hidden"
-        );
+    clearTimeout(window.toastTimer);
+
+    window.toastTimer = setTimeout(() => {
+        el.classList.remove("show");
+    }, 2600);
 }
 
-function closeModal(){
 
-    document
-        .getElementById(
-            "modal"
-        )
-        .classList.add(
-            "hidden"
-        );
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
-document
-    .getElementById("modal")
-    .addEventListener(
-        "click",
-        e=>{
 
-            if(
-                e.target.id==="modal"
-            )
-                closeModal();
+function escapeAttr(value) {
+    return escapeHtml(value);
+}
 
-        }
-    );
 
-/* ==========================================
+function escapeSvg(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+}
+
+
+/* ============================================================
    START
-========================================== */
+   ============================================================ */
 
-window.addEventListener(
-    "load",
-    ()=>{
+showAuth("login");
 
-        startApp();
-
-    }
-);
+if (currentUserId && getCurrentUser()) {
+    startApp();
+}
 
 </script>
 
