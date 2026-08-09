@@ -1,0 +1,2091 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bubbles 🫧</title>
+
+
+<style>
+
+*{
+box-sizing:border-box;
+font-family:Tahoma, Arial, sans-serif;
+}
+
+
+body{
+
+margin:0;
+
+min-height:100vh;
+
+background:
+linear-gradient(
+180deg,
+#7de4ff,
+#dfffff 50%,
+#ffffff
+);
+
+color:#164b68;
+
+}
+
+
+
+/* HEADER */
+
+header{
+
+height:75px;
+
+position:sticky;
+top:0;
+
+z-index:10;
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:10px 25px;
+
+
+background:
+
+linear-gradient(
+180deg,
+rgba(255,255,255,.95),
+rgba(180,245,255,.85)
+);
+
+
+border-bottom:2px solid white;
+
+
+box-shadow:
+0 5px 20px rgba(0,150,255,.25);
+
+}
+
+
+
+.logo{
+
+font-size:35px;
+
+font-weight:bold;
+
+color:#009ee8;
+
+
+text-shadow:
+
+0 2px white,
+0 0 15px #00d9ff;
+
+}
+
+
+
+.search input{
+
+width:260px;
+
+padding:12px 18px;
+
+border:none;
+
+border-radius:30px;
+
+
+box-shadow:
+
+inset 0 2px 6px #aaa;
+
+}
+
+
+
+/* MAIN */
+
+.container{
+
+display:flex;
+
+max-width:1300px;
+
+margin:auto;
+
+}
+
+
+
+.sidebar{
+
+width:240px;
+
+padding:20px;
+
+}
+
+
+
+.sidebar button{
+
+width:100%;
+
+padding:14px;
+
+margin-bottom:12px;
+
+
+border:none;
+
+border-radius:25px;
+
+
+background:
+
+linear-gradient(
+white,
+#9eeeff
+);
+
+
+cursor:pointer;
+
+
+box-shadow:
+
+0 5px 15px rgba(0,150,255,.25);
+
+
+font-size:16px;
+
+}
+
+
+.sidebar button:hover{
+
+transform:scale(1.05);
+
+}
+
+
+
+.content{
+
+flex:1;
+
+padding:20px;
+
+}
+
+
+
+
+.page{
+
+display:none;
+
+}
+
+
+.page.active{
+
+display:block;
+
+}
+
+
+
+
+.card{
+
+background:
+
+rgba(255,255,255,.85);
+
+
+border-radius:25px;
+
+
+padding:25px;
+
+
+margin-bottom:20px;
+
+
+box-shadow:
+
+
+0 10px 30px rgba(0,150,255,.25),
+
+
+inset 0 0 20px white;
+
+
+}
+
+
+
+
+
+button{
+
+cursor:pointer;
+
+}
+
+
+
+
+input,
+textarea,
+select{
+
+
+width:100%;
+
+padding:12px;
+
+margin:8px 0;
+
+
+border:none;
+
+border-radius:15px;
+
+
+box-shadow:
+
+inset 0 2px 5px #aaa;
+
+}
+
+
+textarea{
+
+resize:none;
+
+height:100px;
+
+}
+
+
+
+
+
+.main-button{
+
+
+background:
+
+linear-gradient(
+white,
+#59dfff
+);
+
+
+border:none;
+
+padding:12px 20px;
+
+
+border-radius:25px;
+
+
+font-weight:bold;
+
+
+color:#075577;
+
+
+box-shadow:
+
+0 4px 12px rgba(0,150,255,.3);
+
+}
+
+
+
+/* PROFILE */
+
+
+.cover{
+
+
+height:230px;
+
+
+border-radius:30px;
+
+
+background:
+
+linear-gradient(
+135deg,
+#00cfff,
+#9affff,
+white
+);
+
+
+padding:20px;
+
+
+display:flex;
+
+align-items:flex-end;
+
+
+}
+
+
+
+.avatar{
+
+
+width:120px;
+
+height:120px;
+
+
+border-radius:50%;
+
+
+border:5px solid white;
+
+
+object-fit:cover;
+
+
+box-shadow:
+
+0 0 20px #00cfff;
+
+
+}
+
+
+
+
+.profile-info{
+
+
+text-align:center;
+
+}
+
+
+
+
+
+/* POSTS */
+
+
+.post-header{
+
+
+display:flex;
+
+align-items:center;
+
+gap:15px;
+
+}
+
+
+
+.small-avatar{
+
+
+width:55px;
+
+height:55px;
+
+border-radius:50%;
+
+object-fit:cover;
+
+}
+
+
+
+
+.post-actions button{
+
+
+background:#dfffff;
+
+border:none;
+
+border-radius:20px;
+
+padding:10px;
+
+
+margin-right:8px;
+
+
+}
+
+
+
+
+
+/* MUSIC */
+
+
+.music-card{
+
+
+display:flex;
+
+gap:20px;
+
+align-items:center;
+
+
+}
+
+
+
+.music-cover{
+
+
+width:110px;
+
+height:110px;
+
+
+border-radius:20px;
+
+
+object-fit:cover;
+
+}
+
+
+
+
+/* FRIENDS */
+
+
+.friend{
+
+
+display:flex;
+
+gap:15px;
+
+align-items:center;
+
+
+background:#ecfbff;
+
+
+padding:15px;
+
+
+border-radius:20px;
+
+margin-bottom:10px;
+
+}
+
+
+
+.friend img{
+
+
+width:60px;
+
+height:60px;
+
+border-radius:50%;
+
+
+}
+
+
+
+
+/* CHAT */
+
+
+.chat{
+
+
+height:300px;
+
+
+overflow:auto;
+
+
+background:#eaffff;
+
+
+border-radius:20px;
+
+
+padding:15px;
+
+
+}
+
+
+
+.message{
+
+
+background:#9eeeff;
+
+
+padding:12px;
+
+
+border-radius:20px;
+
+
+margin:10px;
+
+max-width:70%;
+
+
+}
+
+
+
+
+
+
+
+@media(max-width:700px){
+
+
+.container{
+
+display:block;
+
+}
+
+
+
+.sidebar{
+
+
+width:100%;
+
+display:flex;
+
+overflow:auto;
+
+
+}
+
+
+.sidebar button{
+
+
+min-width:130px;
+
+margin-right:10px;
+
+}
+
+
+
+.search input{
+
+width:150px;
+
+}
+
+
+
+}
+
+
+
+</style>
+
+</head>
+<body>
+
+
+<header>
+
+
+<div class="logo">
+🫧 Bubbles
+</div>
+
+
+<div class="search">
+
+<input placeholder="Поиск в Bubbles...">
+
+</div>
+
+
+<div>
+
+🟢
+
+</div>
+
+
+</header>
+
+
+
+
+<div class="container">
+
+
+
+<aside class="sidebar">
+
+
+<button onclick="openPage('feed')">
+🏠 Лента
+</button>
+
+
+<button onclick="openPage('profile')">
+👤 Профиль
+</button>
+
+
+<button onclick="openPage('friends')">
+👥 Друзья
+</button>
+
+
+<button onclick="openPage('messages')">
+💬 Сообщения
+</button>
+
+
+<button onclick="openPage('music')">
+🎵 Музыка
+</button>
+
+
+<button onclick="openPage('settings')">
+⚙ Настройки
+</button>
+
+
+<button onclick="openPage('register')">
+✨ Регистрация
+</button>
+
+
+<a href="https://zeshpr.github.io/frutigeraeropage/bubbling.html"
+style="text-decoration:none">
+
+<button>
+🌊 Главный сайт
+</button>
+
+</a>
+
+
+
+</aside>
+
+
+
+
+
+
+<main class="content">
+
+
+
+
+
+
+
+<!-- РЕГИСТРАЦИЯ -->
+
+
+<section id="register" class="page active">
+
+
+<div class="card">
+
+
+<h1>
+🫧 Создание аккаунта Bubbles
+</h1>
+
+
+
+<p>
+Добро пожаловать в новую интернет-вселенную.
+</p>
+
+
+
+<input id="regName"
+placeholder="Имя пользователя">
+
+
+
+<input id="regEmail"
+placeholder="Почта">
+
+
+
+<input id="regPassword"
+type="password"
+placeholder="Пароль">
+
+
+
+<button class="main-button"
+onclick="registerUser()">
+
+Создать аккаунт
+
+</button>
+
+
+
+<p id="registerInfo"></p>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ЛЕНТА -->
+
+
+<section id="feed" class="page">
+
+
+<div class="card">
+
+
+<h2>
+🌊 Лента
+</h2>
+
+
+
+<textarea id="postText"
+placeholder="Что нового?"></textarea>
+
+
+
+<input id="postImage"
+type="file"
+accept="image/*">
+
+
+
+<button class="main-button"
+onclick="createPost()">
+
+Опубликовать
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+<div id="posts">
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ПРОФИЛЬ -->
+
+
+<section id="profile" class="page">
+
+
+
+<div class="card">
+
+
+<div class="cover">
+
+
+<img id="profileAvatar"
+class="avatar"
+src="https://via.placeholder.com/120">
+
+
+</div>
+
+
+
+<div class="profile-info">
+
+
+<h1 id="profileName">
+@username
+</h1>
+
+
+<p id="profileDescription">
+
+Описание пользователя
+
+</p>
+
+
+
+<button class="main-button"
+onclick="editProfile()">
+
+Изменить профиль
+
+</button>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+🎵 Музыка пользователя
+</h2>
+
+
+<div id="profileMusic">
+
+Пока ничего нет
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+📝 Посты
+</h2>
+
+
+<div id="profilePosts">
+
+</div>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- ДРУЗЬЯ -->
+
+
+<section id="friends" class="page">
+
+
+<div class="card">
+
+
+<h2>
+👥 Друзья
+</h2>
+
+
+
+<input placeholder="Найти пользователя">
+
+
+
+<div class="friend">
+
+
+<img src="https://via.placeholder.com/60">
+
+
+
+<div>
+
+
+<b>
+AeroUser
+</b>
+
+
+<br>
+
+
+<button class="main-button">
+
+Добавить
+
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+
+<div class="friend">
+
+
+<img src="https://via.placeholder.com/60">
+
+
+
+<div>
+
+
+<b>
+Cloudy
+</b>
+
+
+<br>
+
+
+<button class="main-button">
+
+Добавить
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- СООБЩЕНИЯ -->
+
+
+<section id="messages" class="page">
+
+
+
+<div class="card">
+
+
+<h2>
+💬 Сообщения
+</h2>
+
+
+
+
+<div class="chat"
+id="chat">
+
+
+<div class="message">
+
+Привет! Добро пожаловать в Bubbles 🫧
+
+</div>
+
+
+
+</div>
+
+
+
+
+<input id="messageText"
+placeholder="Написать сообщение">
+
+
+
+<button class="main-button"
+onclick="sendMessage()">
+
+Отправить
+
+</button>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- МУЗЫКА -->
+
+
+<section id="music" class="page">
+
+
+<div class="card">
+
+
+<h2>
+🎵 Загрузить музыку
+</h2>
+
+
+
+<input id="musicTitle"
+placeholder="Название трека">
+
+
+
+<input id="musicArtist"
+placeholder="Артист">
+
+
+
+<label>
+Обложка:
+</label>
+
+
+<input id="musicCover"
+type="file"
+accept="image/*">
+
+
+
+<label>
+MP3 файл:
+</label>
+
+
+<input id="musicFile"
+type="file"
+accept=".mp3,audio/mpeg">
+
+
+
+<button class="main-button"
+onclick="uploadMusic()">
+
+Опубликовать трек
+
+</button>
+
+
+<p id="musicInfo"></p>
+
+
+</div>
+
+
+
+
+
+
+<div class="card">
+
+
+<h2>
+🌎 Вся музыка Bubbles
+</h2>
+
+
+<div id="musicList">
+
+Музыки пока нет
+
+</div>
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+
+
+
+
+<!-- НАСТРОЙКИ -->
+
+
+<section id="settings" class="page">
+
+
+
+<div class="card">
+
+
+<h2>
+🔒 Приватность
+</h2>
+
+
+
+
+<p>
+Кто видит мой профиль?
+</p>
+
+
+<select>
+
+<option>
+Все
+</option>
+
+
+<option>
+Друзья
+</option>
+
+
+<option>
+Только я
+</option>
+
+
+</select>
+
+
+
+
+
+
+<p>
+Показывать аватар?
+</p>
+
+
+<select>
+
+
+<option>
+Да
+</option>
+
+
+<option>
+Нет
+</option>
+
+
+</select>
+
+
+
+
+
+
+<p>
+Показывать музыку?
+</p>
+
+
+<select>
+
+
+<option>
+Все
+</option>
+
+
+<option>
+Друзья
+</option>
+
+
+<option>
+Никто
+</option>
+
+
+</select>
+
+
+
+
+
+
+<p>
+Кто может писать сообщения?
+</p>
+
+
+
+<select>
+
+
+<option>
+Все
+</option>
+
+
+<option>
+Только друзья
+</option>
+
+
+<option>
+Никто
+</option>
+
+
+</select>
+
+
+
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+</main>
+
+
+</div>
+<script>
+
+
+// ======================
+// BUBBLES LOCAL DATABASE
+// ======================
+
+
+let user = JSON.parse(localStorage.getItem("bubblesUser")) || null;
+
+
+let posts =
+JSON.parse(localStorage.getItem("bubblesPosts")) || [];
+
+
+let music =
+JSON.parse(localStorage.getItem("bubblesMusic")) || [];
+
+
+let messages =
+JSON.parse(localStorage.getItem("bubblesMessages")) || [];
+
+
+
+
+// ======================
+// PAGE SWITCH
+// ======================
+
+
+function openPage(page){
+
+
+document.querySelectorAll(".page")
+.forEach(item=>{
+
+item.classList.remove("active");
+
+});
+
+
+document.getElementById(page)
+.classList.add("active");
+
+
+
+}
+
+
+
+
+
+// ======================
+// REGISTER
+// ======================
+
+
+function registerUser(){
+
+
+let name =
+document.getElementById("regName").value;
+
+
+let email =
+document.getElementById("regEmail").value;
+
+
+let password =
+document.getElementById("regPassword").value;
+
+
+
+if(!name || !email || !password){
+
+
+document.getElementById("registerInfo").innerHTML =
+"Заполни все поля";
+
+
+return;
+
+}
+
+
+
+
+user={
+
+name:name,
+
+email:email,
+
+avatar:"https://via.placeholder.com/120",
+
+description:
+"Новый пользователь Bubbles"
+
+
+};
+
+
+
+localStorage.setItem(
+"bubblesUser",
+JSON.stringify(user)
+);
+
+
+
+document.getElementById("registerInfo").innerHTML =
+"✨ Аккаунт создан!";
+
+
+
+loadProfile();
+
+
+setTimeout(()=>{
+
+openPage("feed");
+
+},1000);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ======================
+// PROFILE
+// ======================
+
+
+
+function loadProfile(){
+
+
+if(!user)return;
+
+
+
+document.getElementById("profileName")
+.innerHTML=
+"@"+user.name;
+
+
+
+document.getElementById("profileDescription")
+.innerHTML=
+user.description;
+
+
+
+document.getElementById("profileAvatar")
+.src=
+user.avatar;
+
+
+
+}
+
+
+
+
+
+function editProfile(){
+
+
+let text =
+prompt(
+"Новое описание:",
+user.description
+);
+
+
+
+if(text){
+
+
+user.description=text;
+
+
+localStorage.setItem(
+"bubblesUser",
+JSON.stringify(user)
+);
+
+
+loadProfile();
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ======================
+// POSTS
+// ======================
+
+
+
+function createPost(){
+
+
+
+let text =
+document.getElementById("postText").value;
+
+
+let image =
+document.getElementById("postImage");
+
+
+
+if(!text && !image.files[0]){
+
+return;
+
+}
+
+
+
+let img="";
+
+
+
+if(image.files[0]){
+
+
+img=
+URL.createObjectURL(
+image.files[0]
+);
+
+
+}
+
+
+
+
+let post={
+
+
+id:Date.now(),
+
+
+author:user?
+user.name:
+"Гость",
+
+
+text:text,
+
+
+image:img,
+
+
+likes:0
+
+
+
+};
+
+
+
+posts.unshift(post);
+
+
+
+localStorage.setItem(
+
+"bubblesPosts",
+
+JSON.stringify(posts)
+
+);
+
+
+
+document.getElementById("postText").value="";
+
+
+renderPosts();
+
+
+}
+
+
+
+
+
+function renderPosts(){
+
+
+
+let box=
+document.getElementById("posts");
+
+
+box.innerHTML="";
+
+
+
+posts.forEach(post=>{
+
+
+let div=document.createElement("div");
+
+
+div.className="card post";
+
+
+
+div.innerHTML=`
+
+<div class="post-header">
+
+<img class="small-avatar"
+
+src="https://via.placeholder.com/55">
+
+
+<b>
+@${post.author}
+</b>
+
+
+</div>
+
+
+<p>
+${post.text}
+</p>
+
+
+
+${post.image?
+
+`
+<img src="${post.image}">
+`
+
+:""}
+
+
+
+<div class="post-actions">
+
+
+<button onclick="likePost(${post.id})">
+
+❤️ ${post.likes}
+
+</button>
+
+
+
+<button>
+
+💬
+
+</button>
+
+
+<button>
+
+↗
+
+</button>
+
+
+</div>
+
+
+`;
+
+
+
+box.appendChild(div);
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+function likePost(id){
+
+
+
+let p =
+posts.find(
+x=>x.id===id
+);
+
+
+
+if(p){
+
+p.likes++;
+
+}
+
+
+localStorage.setItem(
+
+"bubblesPosts",
+
+JSON.stringify(posts)
+
+);
+
+
+
+renderPosts();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ======================
+// MUSIC
+// ======================
+
+
+
+function uploadMusic(){
+
+
+
+let title =
+document.getElementById("musicTitle").value;
+
+
+
+let artist =
+document.getElementById("musicArtist").value;
+
+
+
+let file =
+document.getElementById("musicFile")
+.files[0];
+
+
+
+if(!file){
+
+alert(
+"Выбери MP3 файл"
+);
+
+return;
+
+}
+
+
+
+
+if(file.size > 15*1024*1024){
+
+
+alert(
+"Максимальный размер 15 MB"
+);
+
+
+return;
+
+
+}
+
+
+
+
+let track={
+
+
+id:Date.now(),
+
+
+title:title,
+
+
+artist:artist,
+
+
+file:
+URL.createObjectURL(file)
+
+
+
+};
+
+
+
+music.push(track);
+
+
+
+localStorage.setItem(
+
+"bubblesMusic",
+
+JSON.stringify(music)
+
+);
+
+
+
+document.getElementById("musicInfo")
+.innerHTML=
+"🎵 Трек опубликован";
+
+
+
+renderMusic();
+
+
+
+}
+
+
+
+
+
+
+function renderMusic(){
+
+
+let box=
+document.getElementById("musicList");
+
+
+box.innerHTML="";
+
+
+
+music.forEach(track=>{
+
+
+let div=document.createElement("div");
+
+
+div.className="card music-card";
+
+
+
+div.innerHTML=`
+
+<div>
+
+
+<h3>
+${track.title}
+</h3>
+
+
+<p>
+${track.artist}
+</p>
+
+
+<audio controls>
+
+<source src="${track.file}">
+
+</audio>
+
+
+</div>
+
+
+`;
+
+
+
+box.appendChild(div);
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// ======================
+// CHAT
+// ======================
+
+
+
+function sendMessage(){
+
+
+
+let input=
+document.getElementById("messageText");
+
+
+
+if(!input.value)return;
+
+
+
+
+messages.push({
+
+text:input.value,
+
+time:new Date()
+
+});
+
+
+
+localStorage.setItem(
+
+"bubblesMessages",
+
+JSON.stringify(messages)
+
+);
+
+
+
+input.value="";
+
+
+
+renderMessages();
+
+
+
+}
+
+
+
+
+
+function renderMessages(){
+
+
+let box=
+document.getElementById("chat");
+
+
+box.innerHTML="";
+
+
+
+messages.forEach(msg=>{
+
+
+let div=
+document.createElement("div");
+
+
+
+div.className="message";
+
+
+div.innerHTML=
+msg.text;
+
+
+
+box.appendChild(div);
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+// ======================
+// START
+// ======================
+
+
+
+loadProfile();
+
+renderPosts();
+
+renderMusic();
+
+renderMessages();
+
+
+
+</script>
+
+
+</body>
+
+</html>
