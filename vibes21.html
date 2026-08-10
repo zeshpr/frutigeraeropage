@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>bubbles — winter 2021</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+}
+
+body{
+
+    margin:0;
+    min-height:100vh;
+
+    color:white;
+
+    background:
+    radial-gradient(
+        circle at 20% 10%,
+        #7655b8,
+        transparent 35%
+    ),
+    radial-gradient(
+        circle at 90% 20%,
+        #536dff,
+        transparent 35%
+    ),
+    linear-gradient(
+        160deg,
+        #080817,
+        #15142c,
+        #090912
+    );
+
+    overflow-x:hidden;
+
+}
+
+
+/* VHS шум */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    inset:0;
+
+    pointer-events:none;
+
+    opacity:.08;
+
+    background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+
+}
+
+
+/* снег */
+
+.snow{
+
+    position:fixed;
+
+    inset:-100px 0 0;
+
+    pointer-events:none;
+
+    z-index:0;
+
+    opacity:.35;
+
+    font-size:30px;
+
+    animation:snowfall 20s linear infinite;
+
+}
+
+
+@keyframes snowfall{
+
+    from{
+        transform:translateY(-20%);
+    }
+
+    to{
+        transform:translateY(100%);
+    }
+
+}
+
+
+
+/* приложение */
+
+#app{
+
+    position:relative;
+
+    z-index:1;
+
+    max-width:600px;
+
+    margin:auto;
+
+    padding-bottom:90px;
+
+}
+
+
+
+/* верхняя панель */
+
+.header{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:5;
+
+
+    padding:18px;
+
+
+    background:
+    rgba(10,10,25,.65);
+
+
+    backdrop-filter:blur(20px);
+
+
+    border-bottom:
+    1px solid rgba(255,255,255,.12);
+
+}
+
+
+
+.logo{
+
+    font-size:32px;
+
+    font-weight:800;
+
+}
+
+
+.logo span{
+
+    color:#cba8ff;
+
+}
+
+
+
+.subtitle{
+
+    opacity:.6;
+
+    font-size:13px;
+
+}
+
+
+
+
+/* стекло */
+
+
+.glass{
+
+    background:
+    rgba(255,255,255,.09);
+
+
+    border:
+    1px solid rgba(255,255,255,.14);
+
+
+    backdrop-filter:blur(18px);
+
+
+    border-radius:25px;
+
+
+    box-shadow:
+    0 20px 60px rgba(0,0,0,.35);
+
+
+}
+
+
+
+/* страницы */
+
+
+.page{
+
+    padding:15px;
+
+}
+
+
+
+.card{
+
+    padding:20px;
+
+    margin-bottom:15px;
+
+}
+
+
+
+
+/* кнопки */
+
+
+button{
+
+    border:0;
+
+    color:white;
+
+    background:
+    rgba(255,255,255,.12);
+
+
+    padding:10px 16px;
+
+    border-radius:20px;
+
+}
+
+
+button:active{
+
+    transform:scale(.95);
+
+}
+
+
+
+/* нижнее меню */
+
+
+.bottom-nav{
+
+    position:fixed;
+
+    bottom:15px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+
+    width:92%;
+
+    max-width:560px;
+
+
+    display:flex;
+
+    justify-content:space-around;
+
+
+    padding:14px;
+
+
+    background:
+    rgba(20,18,35,.75);
+
+
+    backdrop-filter:blur(25px);
+
+
+    border:
+
+    1px solid rgba(255,255,255,.15);
+
+
+    border-radius:30px;
+
+
+    z-index:10;
+
+}
+
+
+
+.nav-item{
+
+    font-size:22px;
+
+    cursor:pointer;
+
+    opacity:.7;
+
+}
+
+
+.nav-item.active{
+
+    opacity:1;
+
+}
+
+
+
+/* профиль */
+
+.avatar{
+
+    width:80px;
+
+    height:80px;
+
+    border-radius:50%;
+
+
+    background:
+    linear-gradient(
+        135deg,
+        #ff91d5,
+        #798bff
+    );
+
+
+    box-shadow:
+    0 0 30px #8d7aff;
+
+}
+
+
+
+.center{
+
+    text-align:center;
+
+}
+
+
+
+.hidden{
+
+    display:none;
+
+}
+
+
+
+/* музыка */
+
+
+.music-player{
+
+
+    padding:15px;
+
+
+    margin:15px;
+
+
+    background:
+    rgba(255,255,255,.1);
+
+
+    border-radius:20px;
+
+
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="snow">
+
+❄️ ❄️ ❄️ ❄️ ❄️
+
+</div>
+
+
+
+<div id="app">
+
+
+<div class="header">
+
+<div class="logo">
+
+🫧 <span>bubbles</span>
+
+</div>
+
+
+<div class="subtitle">
+
+Winter memories • 2021
+
+</div>
+
+</div>
+
+
+<div id="page" class="page">
+
+</div>
+
+
+</div>
+
+
+
+<div class="music-player glass">
+
+🎧 Winter Radio
+
+<br>
+
+<small>
+
+December 2021 memories
+
+</small>
+
+</div>
+
+
+
+
+<div class="bottom-nav glass">
+
+
+<div class="nav-item active" onclick="openPage('home')">
+🏠
+</div>
+
+
+<div class="nav-item" onclick="openPage('search')">
+🔎
+</div>
+
+
+<div class="nav-item" onclick="openPage('create')">
+➕
+</div>
+
+
+<div class="nav-item" onclick="openPage('messages')">
+💬
+</div>
+
+
+<div class="nav-item" onclick="openPage('profile')">
+👤
+</div>
+
+
+
+</div>
+
+
+
+<script>
+
+
+const page =
+document.getElementById("page");
+
+
+
+function openPage(name){
+
+
+document
+.querySelectorAll(".nav-item")
+.forEach(x=>x.classList.remove("active"));
+
+
+
+event.target.classList.add("active");
+
+
+
+if(name==="home")
+home();
+
+
+if(name==="profile")
+profile();
+
+
+if(name==="search")
+search();
+
+
+if(name==="messages")
+messages();
+
+
+if(name==="create")
+create();
+
+
+}
+
+
+
+
+
+function home(){
+
+page.innerHTML=`
+
+<div class="glass card">
+
+<h2>
+❄ Winter Memories 2021
+</h2>
+
+
+<p>
+Старый интернет. Старые звуки.
+</p>
+
+
+</div>
+
+
+`;
+
+}
+
+
+
+function profile(){
+
+page.innerHTML=`
+
+<div class="glass card center">
+
+
+<div class="avatar"></div>
+
+
+<h2>
+qshaa
+</h2>
+
+
+<p>
+@uniwqsh
+</p>
+
+
+<p>
+lost somewhere in december 2021
+</p>
+
+
+<button>
+❄ OG user
+</button>
+
+
+</div>
+
+
+`;
+
+}
+
+
+
+function search(){
+
+page.innerHTML=`
+
+<div class="glass card">
+
+<h2>
+🔎 Search
+</h2>
+
+
+<input placeholder="найти пользователя..."
+style="
+width:100%;
+padding:15px;
+border-radius:20px;
+border:0;
+background:#ffffff20;
+color:white;
+">
+
+
+</div>
+
+`;
+
+}
+
+
+
+function messages(){
+
+page.innerHTML=`
+
+<div class="glass card">
+
+<h2>
+💬 Messages
+</h2>
+
+
+<p>
+qshaa: помнишь 2021?
+</p>
+
+
+<p>
+friend: лучший год...
+</p>
+
+
+</div>
+
+`;
+
+}
+
+
+
+function create(){
+
+page.innerHTML=`
+
+<div class="glass card">
+
+<h2>
+➕ New memory
+</h2>
+
+
+<p>
+Создать пост
+</p>
+
+
+</div>
+
+`;
+
+}
+
+
+
+home();
+
+
+</script>
+
+
+</body>
+</html>
+<script>
+
+
+const page =
+document.getElementById("page");
+
+
+
+let posts = JSON.parse(
+localStorage.getItem("bubblesPosts")
+)
+||
+[
+
+{
+id:1,
+
+user:"qshaa",
+
+tag:"@uniwqsh",
+
+date:"24 декабря 2021 · 23:41",
+
+text:
+"помните этот вайб? весь интернет был другим... ❄️",
+
+likes:142,
+
+comments:
+[
+"лучшее время",
+"ностальгия..."
+],
+
+color:
+"linear-gradient(135deg,#ff9ad5,#786cff)"
+
+},
+
+
+
+{
+
+id:2,
+
+user:"alayse",
+
+tag:"@alayseerasen",
+
+date:"31 декабря 2021 · 23:59",
+
+text:
+"последний день 2021. спасибо этому году 🫧",
+
+likes:89,
+
+comments:
+[],
+
+color:
+"linear-gradient(135deg,#8deaff,#5968ff)"
+
+}
+
+
+
+];
+
+
+
+
+function savePosts(){
+
+localStorage.setItem(
+"bubblesPosts",
+JSON.stringify(posts)
+);
+
+}
+
+
+
+
+function home(){
+
+
+page.innerHTML=
+
+`
+
+<div class="glass card">
+
+
+<h2>
+❄ Winter Memories
+</h2>
+
+
+<p style="opacity:.7">
+
+December 2021 archive
+
+</p>
+
+
+</div>
+
+
+
+${
+posts
+.map(postCard)
+.join("")
+}
+
+
+
+`;
+
+}
+
+
+
+
+
+function postCard(post){
+
+
+return `
+
+
+<div class="glass card">
+
+
+<div style="
+display:flex;
+align-items:center;
+gap:12px;
+">
+
+
+<div class="avatar"
+style="
+width:55px;
+height:55px;
+background:${post.color};
+">
+
+</div>
+
+
+
+<div>
+
+
+<b>
+${post.user}
+</b>
+
+
+<br>
+
+
+<small style="opacity:.6">
+
+${post.tag}
+<br>
+${post.date}
+
+</small>
+
+
+</div>
+
+
+</div>
+
+
+
+
+<p style="
+font-size:18px;
+margin-top:20px;
+">
+
+${post.text}
+
+</p>
+
+
+
+<div style="
+
+height:180px;
+
+border-radius:20px;
+
+background:${post.color};
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:45px;
+
+">
+
+❄️
+
+</div>
+
+
+
+
+<div style="
+display:flex;
+gap:15px;
+margin-top:15px;
+">
+
+
+<button onclick="likePost(${post.id})">
+
+❤️ ${post.likes}
+
+</button>
+
+
+<button onclick="commentPost(${post.id})">
+
+💬 ${post.comments.length}
+
+</button>
+
+
+<button>
+
+↗
+
+</button>
+
+
+</div>
+
+
+
+<div id="comments-${post.id}">
+
+</div>
+
+
+
+</div>
+
+
+`;
+
+}
+
+
+
+
+function likePost(id){
+
+
+let post =
+posts.find(
+p=>p.id===id
+);
+
+
+post.likes++;
+
+
+savePosts();
+
+home();
+
+
+}
+
+
+
+
+function commentPost(id){
+
+
+let text =
+prompt(
+"Комментарий:"
+);
+
+
+
+if(!text)
+return;
+
+
+
+let post =
+posts.find(
+p=>p.id===id
+);
+
+
+
+post.comments.push(text);
+
+
+savePosts();
+
+
+home();
+
+
+}
+
+
+
+
+
+function create(){
+
+
+page.innerHTML=
+
+`
+
+<div class="glass card">
+
+
+<h2>
+➕ New Memory
+</h2>
+
+
+
+<textarea id="newPost"
+
+placeholder="Что произошло в 2021?"
+
+style="
+width:100%;
+height:120px;
+border-radius:20px;
+padding:15px;
+background:#ffffff15;
+color:white;
+border:1px solid #ffffff30;
+"
+
+></textarea>
+
+
+
+
+<br><br>
+
+
+
+<button onclick="addPost()">
+
+Опубликовать
+
+</button>
+
+
+
+</div>
+
+
+`;
+
+}
+
+
+
+
+function addPost(){
+
+
+let input =
+document.getElementById(
+"newPost"
+);
+
+
+
+if(!input.value.trim())
+return;
+
+
+
+posts.unshift({
+
+id:
+Date.now(),
+
+user:
+"you",
+
+tag:
+"@winter_user",
+
+date:
+"сейчас",
+
+text:
+input.value,
+
+likes:0,
+
+comments:[],
+
+color:
+"linear-gradient(135deg,#d4b3ff,#77dfff)"
+
+});
+
+
+
+savePosts();
+
+
+home();
+
+
+}
+
+
+
+
+
+function search(){
+
+
+page.innerHTML=
+
+`
+
+<div class="glass card">
+
+
+<h2>
+🔎 Search
+</h2>
+
+
+<input
+
+id="searchInput"
+
+oninput="searchUsers()"
+
+placeholder="найти пользователя..."
+
+style="
+width:100%;
+padding:15px;
+border-radius:20px;
+border:0;
+background:#ffffff20;
+color:white;
+"
+
+
+>
+
+
+<div id="searchResults">
+
+</div>
+
+
+</div>
+
+
+`;
+
+}
+
+
+
+
+
+let users=[
+
+{
+name:"qshaa",
+tag:"@uniwqsh"
+},
+
+{
+name:"alayse",
+tag:"@alayseerasen"
+},
+
+{
+name:"dreamer",
+tag:"@winter2021"
+}
+
+];
+
+
+
+function searchUsers(){
+
+
+let value =
+document
+.getElementById("searchInput")
+.value
+.toLowerCase();
+
+
+
+document.getElementById(
+"searchResults"
+)
+.innerHTML =
+
+
+users
+
+.filter(
+u=>
+u.name
+.toLowerCase()
+.includes(value)
+)
+
+.map(
+
+u=>
+
+`
+
+<div class="glass card">
+
+<b>${u.name}</b>
+
+<br>
+
+${u.tag}
+
+</div>
+
+`
+
+)
+
+.join("");
+
+
+
+}
+
+
+
+
+home();
+
+
+</script>
+  function profile(){
+
+
+let myPosts =
+posts.filter(
+p=>p.user==="you"
+);
+
+
+
+page.innerHTML = `
+
+
+<div class="glass card center">
+
+
+<div class="avatar"
+style="
+margin:auto;
+width:100px;
+height:100px;
+background:
+linear-gradient(
+135deg,
+#ff9ad5,
+#7d8cff
+);
+">
+</div>
+
+
+
+<h2>
+you ❄️
+</h2>
+
+
+<p>
+@winter_user
+</p>
+
+
+<p style="opacity:.7">
+lost somewhere in december 2021
+</p>
+
+
+
+<div class="glass card">
+
+❄ OG Winter User
+
+<br><br>
+
+📝 ${posts.length} memories
+
+<br>
+
+❤️ ${
+posts.reduce(
+(a,b)=>a+b.likes,
+0
+)
+} likes
+
+
+</div>
+
+
+
+<h3>
+My memories
+</h3>
+
+
+${
+myPosts.length
+
+?
+
+myPosts.map(postCard).join("")
+
+:
+
+"<p>пока нет воспоминаний</p>"
+
+}
+
+
+
+</div>
+
+
+`;
+
+}
+let chats=[
+
+{
+user:"qshaa",
+text:"помнишь декабрь 2021?"
+},
+
+{
+user:"friend",
+text:"да, это был лучший вайб..."
+},
+
+{
+user:"alayse",
+text:"старый интернет был другим 🫧"
+}
+
+];
+
+
+
+function messages(){
+
+
+page.innerHTML=`
+
+<div class="glass card">
+
+
+<h2>
+💬 Messages
+</h2>
+
+
+
+${
+
+chats.map(
+
+c=>`
+
+<div class="glass card">
+
+
+<b>
+${c.user}
+</b>
+
+
+<p>
+
+${c.text}
+
+</p>
+
+
+</div>
+
+
+`
+
+).join("")
+
+
+}
+
+
+
+</div>
+
+
+`;
+
+}
+  .memory-date{
+
+font-size:12px;
+
+opacity:.5;
+
+letter-spacing:2px;
+
+}
+
+
+
+.vhs{
+
+filter:
+contrast(110%)
+brightness(90%);
+
+}
+
+
+
+.glow{
+
+box-shadow:
+0 0 30px #9b7cff;
+
+}
+
+
+
+.music-cover{
+
+width:70px;
+
+height:70px;
+
+border-radius:20px;
+
+
+background:
+
+linear-gradient(
+135deg,
+#ff9ad5,
+#697cff
+);
+
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:30px;
+
+}
+  function intro(){
+
+
+page.innerHTML=`
+
+<div class="glass card center"
+style="
+margin-top:80px;
+">
+
+
+<div style="
+font-size:70px;
+">
+
+🫧
+
+</div>
+
+
+
+<h1>
+
+bubbles
+
+</h1>
+
+
+
+<p>
+
+restoring memories...
+
+</p>
+
+
+
+<p class="memory-date">
+
+DECEMBER 2021
+
+</p>
+
+
+
+<button onclick="home()">
+
+enter
+
+</button>
+
+
+</div>
+
+`;
+
+}
+
+
+intro();
